@@ -1,4 +1,4 @@
-    |           NAMA                   |       NIM      |
+|               NAMA                   |       NIM      |
 |--------------------------------------|----------------|
 |Bertrand Lianto                       | (103072400019) |
 |Yan Chrisdaniel Partogi rayano Ludjen | (103072400010) |
