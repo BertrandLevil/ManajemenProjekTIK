@@ -451,20 +451,12 @@ function initSideDrawer() {
 const SEED_REVIEWS = {
   default: [
     {
-      author: "Alex R.",
+      author: "Fajri Anak Mama.",
       avatar: "🦊",
       stars: 5,
       time: "2 days ago",
-      body: "Absolutely stunning artwork. The pacing of this episode was perfect — I couldn't stop reading!",
+      body: "oke sih keren banget bg aku suka",
       helpful: 12,
-    },
-    {
-      author: "Jamie L.",
-      avatar: "🐺",
-      stars: 4,
-      time: "5 days ago",
-      body: "Great chapter, loved the plot twist at the end. Can't wait for the next one.",
-      helpful: 7,
     },
   ],
 };
