@@ -3,18 +3,24 @@
 }
 
 :root {
-  --purple: #654486;
-  --purple-dark: #523470;
-  --purple-light: #7c58a4;
-  --purple-soft: #f4eefb;
-  --line: #eeeaf4;
-  --line-focus: #654486;
-  --muted: #a59fae;
-  --text-main: #332644;
-  --text-secondary: #5f4b70;
-  --bg-gradient: radial-gradient(circle at 50% 10%, #f7f1fc 0%, #ede5f5 55%, #e4daf0 100%);
-  --card-shadow: 0 24px 48px -12px rgba(95, 61, 133, 0.22), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
-  --inner-shadow: 0 12px 28px rgba(102, 78, 164, 0.2);
+  --purple: #8b5cf6;
+  --purple-dark: #6d28d9;
+  --purple-light: #a78bfa;
+  --purple-neon: #c084fc;
+  --purple-glow: rgba(139, 92, 246, 0.45);
+  --pink-neon: #ec4899;
+  --space-dark: #080612;
+  --space-card: rgba(18, 14, 34, 0.82);
+  --space-inner: rgba(26, 20, 48, 0.8);
+  --space-border: rgba(168, 114, 255, 0.22);
+  --space-border-focus: rgba(192, 132, 252, 0.65);
+  --line: rgba(168, 114, 255, 0.22);
+  --line-focus: #a855f7;
+  --muted: #9389a8;
+  --text-main: #f5f3ff;
+  --text-secondary: #c4b5fd;
+  --card-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 45px rgba(139, 92, 246, 0.25);
+  --inner-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 body {
@@ -24,38 +30,77 @@ body {
   align-items: center;
   justify-content: center;
   padding: 40px 16px;
-  background: var(--bg-gradient);
+  background: radial-gradient(ellipse at 30% 20%, #1a0f30 0%, #0c081e 50%, #05030c 100%);
+  background-attachment: fixed;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
 }
 
-/* Scalable desktop card container */
+/* Background Space Canvas for Shooting Stars */
+.space-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Scalable desktop card container with cosmic glassmorphism */
 .auth-container,
 .phone-frame {
   position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 440px;
-  background: #ffffff;
-  border: none; /* Removed phone mockup border */
+  background: var(--space-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--space-border);
   border-radius: 36px;
   overflow: hidden;
   box-shadow: var(--card-shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Hero artwork header */
+.auth-container:hover {
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 55px rgba(168, 85, 247, 0.35);
+}
+
+/* Hero artwork header with space cosmic overlay */
 .hero-image {
   position: relative;
   width: 100%;
   height: 230px;
-  background-color: #e98679;
-  /* Put your header artwork at: assets/header-bg.png */
-  background-image: url("../assets/header-bg.png");
+  background-color: #1a103c;
+  background-image: 
+    linear-gradient(180deg, rgba(12, 8, 28, 0.2) 0%, rgba(18, 14, 34, 0.95) 100%),
+    url("../assets/header-bg.png");
   background-size: cover;
   background-position: center 30%;
   border-bottom-left-radius: 46% 36%;
   border-bottom-right-radius: 24% 48%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 18px 22px;
+}
+
+.hero-overlay-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #f5f3ff;
+  background: rgba(139, 92, 246, 0.35);
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  padding: 5px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
 }
 
 /* Layered auth card that gracefully overlaps the header */
@@ -64,7 +109,10 @@ body {
   margin: -80px 22px 30px;
   padding: 34px 28px 28px;
   border-radius: 30px;
-  background: #ffffff;
+  background: var(--space-inner);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--space-border);
   box-shadow: var(--inner-shadow);
 }
 
@@ -74,9 +122,9 @@ body {
   margin-bottom: 34px;
   padding: 4px;
   border-radius: 24px;
-  background: #faf8fc;
-  border: 1px solid #f0eaf7;
-  box-shadow: 0 2px 8px rgba(95, 70, 140, 0.08);
+  background: rgba(12, 8, 24, 0.7);
+  border: 1px solid var(--space-border);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .tab {
@@ -84,23 +132,24 @@ body {
   border: 0;
   border-radius: 20px;
   padding: 10px 14px;
-  color: var(--purple);
+  color: #a79fc2;
   background: transparent;
   font: inherit;
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .tab:hover:not(.active) {
-  background: rgba(101, 68, 134, 0.06);
+  color: #f5f3ff;
+  background: rgba(139, 92, 246, 0.12);
 }
 
 .tab.active {
   color: #ffffff;
-  background: var(--purple);
-  box-shadow: 0 4px 10px rgba(101, 68, 134, 0.3);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+  box-shadow: 0 4px 16px var(--purple-glow);
 }
 
 #authForm {
@@ -111,7 +160,7 @@ body {
 
 #authForm input {
   width: 100%;
-  padding: 10px 2px;
+  padding: 12px 4px;
   border: 0;
   border-bottom: 1.5px solid var(--line);
   outline: none;
@@ -119,17 +168,18 @@ body {
   background: transparent;
   font: inherit;
   font-size: 14px;
-  transition: border-color 0.2s ease, padding 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 #authForm input::placeholder {
   color: var(--muted);
   font-size: 13.5px;
-  opacity: 1;
+  opacity: 0.8;
 }
 
 #authForm input:focus {
-  border-bottom-color: var(--purple);
+  border-bottom-color: var(--line-focus);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.25);
 }
 
 .submit-button {
@@ -139,34 +189,35 @@ body {
   border: 0;
   border-radius: 24px;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #c026d3 100%);
   font: inherit;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(101, 68, 134, 0.35);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .submit-button:hover {
-  background: linear-gradient(135deg, var(--purple-light) 0%, var(--purple) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(101, 68, 134, 0.42);
+  box-shadow: 0 8px 28px rgba(168, 85, 247, 0.6);
+  filter: brightness(1.08);
 }
 
 .submit-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(101, 68, 134, 0.3);
+  box-shadow: 0 3px 12px rgba(147, 51, 234, 0.4);
 }
 
 .or-divider {
   display: flex;
   align-items: center;
   margin: 24px 0 22px;
-  color: #a49dae;
+  color: #8e84a3;
   font-size: 11.5px;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   text-align: center;
 }
 
@@ -175,7 +226,7 @@ body {
   content: "";
   flex: 1;
   height: 1px;
-  background: #ede8f5;
+  background: var(--space-border);
 }
 
 .or-divider::before {
@@ -198,18 +249,19 @@ body {
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid #ede8f5;
+  border: 1px solid var(--space-border);
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 3px 8px rgba(95, 70, 140, 0.1);
+  background: rgba(30, 24, 56, 0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .social:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(95, 70, 140, 0.18);
-  border-color: #dfd6eb;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.35);
+  border-color: var(--purple-neon);
 }
 
 .social:active {
@@ -249,10 +301,26 @@ body {
 .message {
   min-height: 18px;
   margin: 14px 0 0;
-  color: var(--purple);
+  color: var(--purple-neon);
   text-align: center;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+}
+
+.guest-link {
+  font-size: 12.5px;
+  color: var(--purple-neon);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.guest-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(192, 132, 252, 0.8);
+  transform: translateX(3px);
 }
 
 .visually-hidden {

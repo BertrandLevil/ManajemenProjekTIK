@@ -10,9 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="space-theme">
+  <!-- Dynamic Space Canvas: Rapid Shooting Stars & Twinkling Cosmos -->
+  <canvas id="spaceCanvas" class="space-canvas"></canvas>
+
   <main class="auth-container phone-frame">
-    <div class="hero-image" role="img" aria-label="Decorative header image"></div>
+    <div class="hero-image" role="img" aria-label="Decorative header image">
+      <div class="hero-overlay-tag">🌌 COMIC-ID</div>
+    </div>
 
     <section class="auth-card" aria-label="Account access">
       <div class="tabs" role="tablist" aria-label="Choose login or sign up">
@@ -44,8 +49,8 @@
         </button>
       </div>
       <p class="message" id="message" aria-live="polite"></p>
-      <div style="text-align: center; margin-top: 14px;">
-        <a href="pages/home.html" style="font-size: 12.5px; color: var(--purple); text-decoration: none; font-weight: 600; opacity: 0.9;">
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="pages/home.html" class="guest-link">
           Explore Comics as Guest →
         </a>
       </div>
