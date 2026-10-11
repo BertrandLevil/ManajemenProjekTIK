@@ -370,11 +370,12 @@ function loadPanelSmartImage(img, comicId, panelNum) {
 
 /* --------------------------------------------------------------------------
    Auto-sliding Carousel (Trending & Latest Updates)
-   Slides every 3-10 seconds (configurable per section)
+
    -------------------------------------------------------------------------- */
 function initAutoCarousel() {
-  setupCarousel("trendingTrack", "trendingDots", 4000);  // 4 detik
-  setupCarousel("latestTrack",   "latestDots",   6000);  // 6 detik
+  let random = Math.random()*10000 + 1000
+  setupCarousel("trendingTrack", "trendingDots", random);
+  setupCarousel("latestTrack",   "latestDots",   random); 
 }
 
 function setupCarousel(trackId, dotsContainerId, intervalMs) {
@@ -385,33 +386,37 @@ function setupCarousel(trackId, dotsContainerId, intervalMs) {
   const cards = Array.from(track.querySelectorAll(".comic-card"));
   if (cards.length === 0) return;
 
-  const CARDS_PER_VIEW = getCardsPerView();
-  const totalSlides = Math.ceil(cards.length / CARDS_PER_VIEW);
+  let CARDS_PER_VIEW = getCardsPerView();
+  let totalSlides = Math.ceil(cards.length / CARDS_PER_VIEW);
   let currentSlide = 0;
   let autoTimer = null;
   let isPaused = false;
 
-  // Rebuild dots dynamically based on number of slides
-  dotsContainer.innerHTML = "";
-  for (let i = 0; i < totalSlides; i++) {
-    const dot = document.createElement("span");
-    dot.className = "dot" + (i === 0 ? " active" : "");
-    dot.setAttribute("aria-label", `Slide ${i + 1}`);
-    dot.addEventListener("click", () => {
-      goToSlide(i);
-      restartTimer();
-    });
-    dotsContainer.appendChild(dot);
+  function rebuildDots() {
+    dotsContainer.innerHTML = "";
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement("span");
+      dot.className = "dot" + (i === currentSlide ? " active" : "");
+      dot.setAttribute("aria-label", `Slide ${i + 1}`);
+      dot.addEventListener("click", () => {
+        goToSlide(i);
+        restartTimer();
+      });
+      dotsContainer.appendChild(dot);
+    }
   }
 
   function getCardsPerView() {
     if (window.innerWidth >= 1200) return 4;
-    if (window.innerWidth >= 900) return 3;
-    if (window.innerWidth >= 600) return 2;
-    return 1;
+    if (window.innerWidth >= 600) return 3;
+    return 2;
   }
 
   function goToSlide(index) {
+    if (totalSlides <= 1) {
+      track.style.transform = "translateX(0px)";
+      return;
+    }
     currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
     const cardWidth = cards[0].offsetWidth;
     const gap = 20; // matches CSS gap
@@ -460,8 +465,14 @@ function setupCarousel(trackId, dotsContainerId, intervalMs) {
 
   // Recalculate on resize
   window.addEventListener("resize", () => {
-    goToSlide(0);
+    CARDS_PER_VIEW = getCardsPerView();
+    totalSlides = Math.ceil(cards.length / CARDS_PER_VIEW);
+    if (currentSlide >= totalSlides) currentSlide = 0;
+    rebuildDots();
+    goToSlide(currentSlide);
   });
+
+  rebuildDots();
 
   startTimer();
 }

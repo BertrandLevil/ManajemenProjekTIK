@@ -51,7 +51,7 @@ body {
   height: 230px;
   background-color: #e98679;
   /* Put your header artwork at: assets/header-bg.png */
-  background-image: url("assets/header-bg.png");
+  background-image: url("../assets/header-bg.png");
   background-size: cover;
   background-position: center 30%;
   border-bottom-left-radius: 46% 36%;
