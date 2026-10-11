@@ -6,6 +6,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initSmartImages();
+  initHomeBackground();
   initRegistrationBanner();
   initSearch();
   initGenres();
@@ -15,6 +16,32 @@ document.addEventListener("DOMContentLoaded", () => {
   initSideDrawer();
   initCommentSection();
 });
+
+/* --------------------------------------------------------------------------
+   Smart Home Background Resolver
+   Supports: home-background.(png|jpg|jpeg|webp|gif) in assets/
+   -------------------------------------------------------------------------- */
+function initHomeBackground() {
+  const homeBody = document.querySelector("body.home-page") || document.body;
+  if (!homeBody.classList.contains("home-page") && !document.getElementById("trending")) return;
+
+  const extensions = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
+  let extIdx = 0;
+
+  function tryNextExt() {
+    if (extIdx < extensions.length) {
+      const ext = extensions[extIdx++];
+      const testImg = new Image();
+      testImg.onload = () => {
+        homeBody.style.setProperty("--home-bg-image", `url("../assets/home-background${ext}")`);
+      };
+      testImg.onerror = tryNextExt;
+      testImg.src = `../assets/home-background${ext}`;
+    }
+  }
+
+  tryNextExt();
+}
 
 /* --------------------------------------------------------------------------
    Smart Image Resolver: Supports .webp, .jpg, .png, .jpeg seamlessly
@@ -249,6 +276,9 @@ function initSaveToLibrary(comicId, saveBtn) {
     isSaved = !isSaved;
     localStorage.setItem(storageKey, String(isSaved));
     updateUI();
+    if (typeof renderDrawerLibrary === "function") {
+      renderDrawerLibrary();
+    }
   };
 }
 
@@ -373,12 +403,13 @@ function loadPanelSmartImage(img, comicId, panelNum) {
 
    -------------------------------------------------------------------------- */
 function initAutoCarousel() {
-  let random = Math.random()*10000 + 1000
-  setupCarousel("trendingTrack", "trendingDots", random);
-  setupCarousel("latestTrack",   "latestDots",   random); 
+  // Setiap kali carousel bergeser (run), durasi delay di-random ulang
+  const getRandomDelay = () => Math.random() * 10000 + 1000;
+  setupCarousel("trendingTrack", "trendingDots", getRandomDelay);
+  setupCarousel("latestTrack",   "latestDots",   getRandomDelay); 
 }
 
-function setupCarousel(trackId, dotsContainerId, intervalMs) {
+function setupCarousel(trackId, dotsContainerId, getInterval = () => Math.random() * 10000 + 1000) {
   const track = document.getElementById(trackId);
   const dotsContainer = document.getElementById(dotsContainerId);
   if (!track || !dotsContainer) return;
@@ -391,6 +422,10 @@ function setupCarousel(trackId, dotsContainerId, intervalMs) {
   let currentSlide = 0;
   let autoTimer = null;
   let isPaused = false;
+
+  function getDelay() {
+    return typeof getInterval === "function" ? getInterval() : getInterval;
+  }
 
   function rebuildDots() {
     dotsContainer.innerHTML = "";
@@ -436,31 +471,43 @@ function setupCarousel(trackId, dotsContainerId, intervalMs) {
   }
 
   function startTimer() {
-    autoTimer = setInterval(nextSlide, intervalMs);
+    clearTimeout(autoTimer);
+    const delay = getDelay();
+    autoTimer = setTimeout(() => {
+      nextSlide();
+      startTimer(); // Di-random ulang untuk setiap kali run berikutnya
+    }, delay);
   }
 
   function restartTimer() {
-    clearInterval(autoTimer);
+    clearTimeout(autoTimer);
     startTimer();
   }
 
   // Pause on hover
-  track.addEventListener("mouseenter", () => { isPaused = true; });
-  track.addEventListener("mouseleave", () => { isPaused = false; });
+  track.addEventListener("mouseenter", () => {
+    isPaused = true;
+    clearTimeout(autoTimer);
+  });
+  track.addEventListener("mouseleave", () => {
+    isPaused = false;
+    startTimer();
+  });
 
   // Touch/swipe support
   let touchStartX = 0;
   track.addEventListener("touchstart", (e) => {
     touchStartX = e.touches[0].clientX;
     isPaused = true;
+    clearTimeout(autoTimer);
   }, { passive: true });
   track.addEventListener("touchend", (e) => {
     const diff = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
       goToSlide(diff > 0 ? currentSlide + 1 : currentSlide - 1);
-      restartTimer();
     }
     isPaused = false;
+    restartTimer();
   }, { passive: true });
 
   // Recalculate on resize
@@ -492,6 +539,7 @@ function initSideDrawer() {
     menuBtn.classList.add("open");
     menuBtn.setAttribute("aria-expanded", "true");
     document.body.style.overflow = "hidden";
+    renderDrawerLibrary();
   }
 
   function closeDrawer() {
@@ -511,6 +559,22 @@ function initSideDrawer() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeDrawer();
   });
+
+  // Library in Side Drawer Toggle
+  const libraryBtn = document.getElementById("drawerLibraryBtn");
+  const savedComicsPanel = document.getElementById("drawerSavedComics");
+  if (libraryBtn && savedComicsPanel) {
+    libraryBtn.addEventListener("click", () => {
+      const isExpanded = libraryBtn.getAttribute("aria-expanded") === "true";
+      libraryBtn.setAttribute("aria-expanded", String(!isExpanded));
+      libraryBtn.classList.toggle("expanded", !isExpanded);
+      savedComicsPanel.style.display = isExpanded ? "none" : "flex";
+      renderDrawerLibrary();
+    });
+  }
+
+  // Initial render of library badge and saved items
+  renderDrawerLibrary();
 
   // Sync drawer theme toggle with page theme
   const drawerToggle = document.getElementById("drawerThemeToggle");
@@ -533,6 +597,90 @@ function initSideDrawer() {
     const headerThemeBtn = document.getElementById("themeToggleBtn");
     if (headerThemeBtn) {
       headerThemeBtn.addEventListener("click", syncDrawerToggle);
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Drawer Library (Saved Comics View)
+   -------------------------------------------------------------------------- */
+function renderDrawerLibrary() {
+  const badge = document.getElementById("drawerLibraryBadge");
+  const container = document.getElementById("drawerSavedComics");
+  if (!window.COMICS_DATA) return;
+
+  const savedComics = Object.values(window.COMICS_DATA).filter((comic) => {
+    return localStorage.getItem(`saved_comic_${comic.id}`) === "true";
+  });
+
+  if (badge) {
+    badge.textContent = savedComics.length;
+    badge.style.display = savedComics.length > 0 ? "inline-flex" : "none";
+  }
+
+  if (!container) return;
+
+  if (savedComics.length === 0) {
+    container.innerHTML = `
+      <div class="drawer-saved-empty">
+        <span class="drawer-saved-empty-icon">📖</span>
+        <div><strong>No saved comics yet</strong></div>
+        <div style="font-size: 11px; margin-top: 4px; color: var(--text-muted);">
+          Open any comic details and click <em>"Save to library"</em> to add it here.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = savedComics.map((comic) => `
+    <div class="drawer-saved-item" data-comic-id="${comic.id}">
+      <a href="comic-details.html?id=${comic.id}" class="drawer-saved-link">
+        <img 
+          data-smart-img="${comic.coverBase}" 
+          alt="${comic.title}" 
+          class="drawer-saved-thumb"
+          loading="lazy"
+          data-fallback="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=200&auto=format&fit=crop&q=80"
+        />
+        <div class="drawer-saved-info">
+          <span class="drawer-saved-title">${comic.title}</span>
+          <span class="drawer-saved-meta">
+            <span class="star">★</span> ${comic.rating} · ${comic.chapterPrefix} ${comic.latestChapter}
+          </span>
+        </div>
+      </a>
+      <button 
+        type="button" 
+        class="drawer-saved-remove" 
+        title="Remove from library"
+        aria-label="Remove ${comic.title} from library"
+        onclick="event.stopPropagation(); removeSavedComic('${comic.id}')"
+      >
+        ✕
+      </button>
+    </div>
+  `).join("");
+
+  // Re-run smart image loader on newly created thumbnails
+  container.querySelectorAll("img[data-smart-img]").forEach((img) => {
+    const base = img.getAttribute("data-smart-img");
+    const fb = img.getAttribute("data-fallback") || "";
+    smartLoadImage(img, base, fb);
+  });
+}
+
+function removeSavedComic(comicId) {
+  localStorage.setItem(`saved_comic_${comicId}`, "false");
+  renderDrawerLibrary();
+
+  // If currently on details page for this comic, update the save button
+  const saveBtn = document.getElementById("saveLibraryBtn");
+  if (saveBtn) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("id") === comicId) {
+      saveBtn.innerHTML = "Save to library";
+      saveBtn.classList.remove("saved");
     }
   }
 }
