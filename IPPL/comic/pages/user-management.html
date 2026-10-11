@@ -25,8 +25,10 @@
 
       <nav class="header-nav">
         <a href="home.html" class="nav-link">Home</a>
-        <a href="analytics.html" class="nav-link">Analytics</a>
+        <a href="analytics.html" class="nav-link" id="navAnalyticsLink" style="display: none;">Analytics</a>
         <a href="user-management.html" class="nav-link active">Users</a>
+        <a href="comic-management.html" class="nav-link">Comics</a>
+        <a href="category-management.html" class="nav-link">Categories</a>
       </nav>
 
       <div class="header-actions">
@@ -77,10 +79,42 @@
 
       <!-- Card Header -->
       <div class="um-card-header">
-        <h2 class="um-header-title">User Management</h2>
+        <h2 class="um-header-title">👥 User Management</h2>
         <button type="button" class="um-header-user-btn" aria-label="Account details" title="Administrator Profile">
           👤
         </button>
+      </div>
+
+      <!-- Metrics Overview Strip -->
+      <div class="um-metrics-strip">
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👥</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricTotalUsers">9</span>
+            <span class="um-metric-lbl">Total Users</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👑</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricAdmins">3</span>
+            <span class="um-metric-lbl">Admins</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">🎨</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricCreators">4</span>
+            <span class="um-metric-lbl">Creators</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👁️</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricViewers">2</span>
+            <span class="um-metric-lbl">Viewers</span>
+          </div>
+        </div>
       </div>
 
       <!-- Controls & Filter Toolbar -->
@@ -298,6 +332,11 @@
       const headerSelect = document.getElementById("headerRoleSelect");
       if (headerSelect) headerSelect.value = currentRole;
 
+      const navAnalyticsLink = document.getElementById("navAnalyticsLink");
+      if (navAnalyticsLink) {
+        navAnalyticsLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+      }
+
       const deniedView = document.getElementById("accessDeniedView");
       const contentView = document.getElementById("userManagementContent");
       const deniedRoleName = document.getElementById("deniedRoleName");
@@ -333,13 +372,26 @@
       });
     }
 
-    // ── TABLE RENDERING ───────────────────────────────────────────────────
+    // ── TABLE RENDERING & METRICS ──────────────────────────────────────────
     const tableBody = document.getElementById("usersTableBody");
     const masterCheckbox = document.getElementById("masterCheckbox");
     const searchInput = document.getElementById("userSearchInput");
     const permissionFilter = document.getElementById("permissionFilter");
 
+    function updateUserMetrics() {
+      const totalEl = document.getElementById("metricTotalUsers");
+      const adminsEl = document.getElementById("metricAdmins");
+      const creatorsEl = document.getElementById("metricCreators");
+      const viewersEl = document.getElementById("metricViewers");
+
+      if (totalEl) totalEl.textContent = users.length;
+      if (adminsEl) adminsEl.textContent = users.filter(u => u.permission === "Admin").length;
+      if (creatorsEl) creatorsEl.textContent = users.filter(u => u.permission === "Creator").length;
+      if (viewersEl) viewersEl.textContent = users.filter(u => u.permission === "Viewer").length;
+    }
+
     function renderTable() {
+      updateUserMetrics();
       const query = (searchInput ? searchInput.value : "").toLowerCase().trim();
       const selectedPerm = permissionFilter ? permissionFilter.value : "All";
 
@@ -363,7 +415,12 @@
         return;
       }
 
-      tableBody.innerHTML = filtered.map((u) => `
+      tableBody.innerHTML = filtered.map((u) => {
+        let badgeIcon = "👁️";
+        if (u.permission === "Admin") badgeIcon = "👑";
+        else if (u.permission === "Creator") badgeIcon = "🎨";
+
+        return `
         <tr data-user-id="${u.id}">
           <td style="text-align: center;">
             <input type="checkbox" class="um-checkbox row-checkbox" data-id="${u.id}" />
@@ -389,7 +446,7 @@
           <td class="um-joined">${u.joined}</td>
           <td>
             <span class="um-badge ${u.permission.toLowerCase()}">
-              ${u.permission}
+              ${badgeIcon} ${u.permission}
             </span>
           </td>
           <td style="text-align: center;">
@@ -398,7 +455,8 @@
             </button>
           </td>
         </tr>
-      `).join("");
+      `;
+      }).join("");
 
       bindCheckboxEvents();
     }

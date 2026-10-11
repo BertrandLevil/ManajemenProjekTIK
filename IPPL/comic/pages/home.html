@@ -57,9 +57,11 @@
             <!-- Rendered dynamically by JS -->
           </div>
         </div>
-        <a href="analytics.html" class="drawer-nav-item">
+        <!-- Admin-Only: Analytics -->
+        <a href="analytics.html" class="drawer-nav-item drawer-admin-item" id="drawerAnalytics" style="display: none;">
           <span class="drawer-nav-icon">📊</span>
           <span>Analytics</span>
+          <span class="admin-pill-badge">Admin</span>
         </a>
         <!-- Admin-Only: User Management -->
         <a href="user-management.html" class="drawer-nav-item drawer-admin-item" id="drawerUserManagement" style="display: none;">
@@ -67,9 +69,17 @@
           <span>User Management</span>
           <span class="admin-pill-badge">Admin</span>
         </a>
-        <a href="#" class="drawer-nav-item">
+        <!-- Admin-Only: Category Management -->
+        <a href="category-management.html" class="drawer-nav-item drawer-admin-item" id="drawerCategoryManagement" style="display: none;">
+          <span class="drawer-nav-icon">🏷️</span>
+          <span>Manage Categories</span>
+          <span class="admin-pill-badge">Admin</span>
+        </a>
+        <!-- Author & Admin: Comic Management -->
+        <a href="comic-management.html" class="drawer-nav-item" id="drawerComicManagement" style="display: none;">
           <span class="drawer-nav-icon">📚</span>
           <span>Manage Comic</span>
+          <span class="admin-pill-badge" style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">Creator</span>
         </a>
         <a href="upgrade.html" class="drawer-nav-item">
           <span class="drawer-nav-icon">⭐</span>

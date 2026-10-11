@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Comic Data Management - Add, edit, and organize comics, series metadata, authors, and sources." />
+  <title>Comic Data Management – Comic Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/comics.css" />
+  <link rel="stylesheet" href="../css/user-management.css" />
+  <link rel="stylesheet" href="../css/comic-management.css" />
+</head>
+<body>
+
+  <!-- Sticky Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="home.html" class="action-btn" aria-label="Go to Home" title="Back to Home">
+          ←
+        </a>
+        <h1 class="page-title-heading" style="font-size: 20px;">Comic Data Management</h1>
+      </div>
+
+      <nav class="header-nav">
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="analytics.html" class="nav-link" id="navAnalyticsLink" style="display: none;">Analytics</a>
+        <a href="user-management.html" class="nav-link" id="navUsersLink" style="display: none;">Users</a>
+        <a href="comic-management.html" class="nav-link active">Comics</a>
+        <a href="category-management.html" class="nav-link" id="navCategoriesLink" style="display: none;">Categories</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Role Switcher for Testing & Demonstration -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label for="headerRoleSelect" style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">Current Role:</label>
+          <select id="headerRoleSelect" class="drawer-role-select" style="width: auto;" aria-label="Change current user role">
+            <option value="user">User</option>
+            <option value="author">Author</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <!-- Theme Switcher -->
+        <button class="action-btn" id="themeToggleBtn" aria-label="Toggle dark/light theme" title="Toggle Theme">
+          ☀️
+        </button>
+        <!-- Home Link -->
+        <a href="home.html" class="action-btn" aria-label="Home page" title="Home">
+          🏠
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="cm-wrapper">
+
+    <!-- ACCESS DENIED VIEW (Shown only when role is User) -->
+    <div class="cm-access-denied" id="accessDeniedView" style="display: none;">
+      <div class="cm-denied-icon">🔒</div>
+      <h2 class="cm-denied-title">Access Restricted</h2>
+      <p class="cm-denied-desc">
+        The <strong>Comic Data Management</strong> page is only accessible by accounts with the <strong>Author</strong> or <strong>Admin</strong> role.<br />
+        Your current role is: <strong id="deniedRoleName" style="color: var(--purple-light);">USER</strong>.
+      </p>
+      <div class="cm-denied-actions">
+        <button type="button" class="cm-btn-switch" id="btnSwitchAuthor">
+          ✍️ Switch to Author Role
+        </button>
+        <button type="button" class="cm-btn-switch" id="btnSwitchAdmin">
+          👑 Switch to Admin Role
+        </button>
+        <a href="home.html" class="cm-btn-back">
+          ← Return to Home
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN COMIC DATA MANAGEMENT CONTENT (Shown to Author & Admin) -->
+    <div class="cm-card" id="comicManagementContent">
+
+      <!-- Card Header -->
+      <div class="cm-card-header">
+        <h2 class="cm-header-title">📚 Comic Data Management</h2>
+        <button type="button" class="cm-header-user-btn" aria-label="Account details" title="Profile">
+          👤
+        </button>
+      </div>
+
+      <!-- Metrics Overview Strip -->
+      <div class="cm-metrics-strip">
+        <div class="cm-metric-item">
+          <div class="cm-metric-icon">📖</div>
+          <div class="cm-metric-info">
+            <span class="cm-metric-val" id="metricTotalComics">9</span>
+            <span class="cm-metric-lbl">Total Comics</span>
+          </div>
+        </div>
+        <div class="cm-metric-item">
+          <div class="cm-metric-icon">✍️</div>
+          <div class="cm-metric-info">
+            <span class="cm-metric-val" id="metricTotalAuthors">8</span>
+            <span class="cm-metric-lbl">Active Creators</span>
+          </div>
+        </div>
+        <div class="cm-metric-item">
+          <div class="cm-metric-icon">🏷️</div>
+          <div class="cm-metric-info">
+            <span class="cm-metric-val" id="metricCategories">Manhwa &amp; Manga</span>
+            <span class="cm-metric-lbl">Categories</span>
+          </div>
+        </div>
+        <div class="cm-metric-item">
+          <div class="cm-metric-icon">👁️</div>
+          <div class="cm-metric-info">
+            <span class="cm-metric-val">82.4K</span>
+            <span class="cm-metric-lbl">Total Reads</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Filter Toolbar -->
+      <div class="cm-toolbar">
+        <div class="cm-toolbar-left">
+          <!-- Search Box -->
+          <div class="cm-search-box">
+            <span class="cm-search-icon">🔍</span>
+            <input 
+              type="text" 
+              class="cm-search-input" 
+              id="comicSearchInput" 
+              placeholder="Search ..." 
+              aria-label="Search comics"
+            />
+          </div>
+
+          <!-- + add Comic Button -->
+          <button type="button" class="cm-add-btn" id="openAddComicBtn">
+            <span>+</span> add Comic
+          </button>
+        </div>
+
+        <!-- Creator Role Badge (Right side of toolbar) -->
+        <div class="cm-role-badge" id="toolbarRoleBadge">
+          Creator
+        </div>
+      </div>
+
+      <!-- Inner Bordered List Box matching wireframe Image 2 -->
+      <div class="cm-list-box">
+        <div id="comicListContainer">
+          <!-- Dynamically populated from JS -->
+        </div>
+
+        <!-- Pagination matching wireframe Image 2 -->
+        <div class="cm-pagination">
+          <button type="button" class="cm-page-arrow" id="prevPageBtn" aria-label="Previous page">‹</button>
+          <div class="cm-page-circle active" id="pageBtn1">1</div>
+          <div class="cm-page-circle" id="pageBtn2">2</div>
+          <div class="cm-page-circle" id="pageBtn3">3</div>
+          <div class="cm-page-circle" id="pageBtn4">4</div>
+          <span class="cm-page-dots">...</span>
+          <div class="cm-page-circle">10</div>
+          <button type="button" class="cm-page-arrow" id="nextPageBtn" aria-label="Next page">›</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT COMIC MODAL (Matches Wireframe Images 1 & 3) -->
+  <div class="cm-modal-overlay" id="comicModal">
+    <div class="cm-modal-card">
+      <div class="cm-modal-header">
+        <h3 class="cm-modal-title" id="comicModalTitle">Add Comic</h3>
+        <div class="cm-modal-header-right">
+          <span class="cm-modal-badge-creator">Creator</span>
+          <button type="button" class="cm-modal-close" id="closeComicModalBtn" aria-label="Close modal">✕</button>
+        </div>
+      </div>
+
+      <form id="comicForm">
+        <div class="cm-modal-body">
+          
+          <!-- Left Column: Photo / Cover Card -->
+          <div class="cm-photo-col">
+            <div class="cm-photo-box" id="photoDropArea" title="Click to upload or select cover">
+              <!-- Placeholder when no photo is selected -->
+              <div class="cm-photo-placeholder" id="photoPlaceholder">
+                <span class="cm-photo-placeholder-icon">📷</span>
+                <span class="cm-photo-placeholder-text">Add Photo</span>
+                <span class="cm-photo-placeholder-sub">Click to browse or drop image</span>
+              </div>
+
+              <!-- Preview Image when photo exists -->
+              <img src="" alt="Comic Cover Preview" class="cm-photo-preview-img" id="photoPreviewImg" />
+              
+              <div class="cm-photo-change-overlay" id="photoChangeOverlay">
+                <span>🔄 Change Photo</span>
+              </div>
+            </div>
+
+            <!-- Hidden File Input for Custom Upload -->
+            <input type="file" id="coverFileInput" accept="image/*" style="display: none;" />
+
+            <!-- Preset Asset Cover Picker -->
+            <label for="coverPresetSelect" style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 10px;">
+              Or choose existing asset cover:
+            </label>
+            <select id="coverPresetSelect" class="cm-photo-preset-select" aria-label="Choose preset asset cover">
+              <option value="">-- Choose Preset Asset Cover --</option>
+              <option value="../assets/world-after-fall.gif">The World After The Fall</option>
+              <option value="../assets/magic-emperor.gif">Magic Emperor</option>
+              <option value="../assets/martial-reigns.gif">Martial Reigns</option>
+              <option value="../assets/ranker-second.gif">Ranker Second</option>
+              <option value="../assets/versatile-mage.gif">Versatile Mage</option>
+              <option value="../assets/evil-god.gif">Evil God</option>
+              <option value="../assets/go-toubun.gif">Go-Toubun</option>
+              <option value="../assets/shenwu-tianzun.jpg">Shenwu Tianzun</option>
+              <option value="../assets/reverse-world.gif">Reverse World</option>
+            </select>
+          </div>
+
+          <!-- Right Column: Fields matching wireframe -->
+          <div class="cm-fields-col">
+            
+            <!-- Comic Title -->
+            <div class="cm-form-group">
+              <label class="cm-label" for="cmTitleInput">Comic Title :</label>
+              <input 
+                type="text" 
+                class="cm-input-pill" 
+                id="cmTitleInput" 
+                placeholder="e.g. The World After The Fall" 
+                required 
+              />
+            </div>
+
+            <!-- 2-Subcolumn Layout -->
+            <div class="cm-subgrid">
+              
+              <!-- Left Sub-column: Author, Studio, Category -->
+              <div class="cm-subcol">
+                <div class="cm-form-group">
+                  <label class="cm-label" for="cmAuthorInput">Author :</label>
+                  <input 
+                    type="text" 
+                    class="cm-input-pill" 
+                    id="cmAuthorInput" 
+                    placeholder="e.g. Sing-Shong" 
+                    required 
+                  />
+                </div>
+
+                <div class="cm-form-group">
+                  <label class="cm-label" for="cmStudioInput">Studio :</label>
+                  <input 
+                    type="text" 
+                    class="cm-input-pill" 
+                    id="cmStudioInput" 
+                    placeholder="e.g. Redice Studio" 
+                  />
+                </div>
+
+                <div class="cm-form-group">
+                  <label class="cm-label" for="cmCategoryInput">Category :</label>
+                  <input 
+                    type="text" 
+                    class="cm-input-pill" 
+                    id="cmCategoryInput" 
+                    placeholder="e.g. Manhwa" 
+                  />
+                </div>
+              </div>
+
+              <!-- Right Sub-column: Genre, Description, Upload/File -->
+              <div class="cm-subcol">
+                <div class="cm-form-group">
+                  <label class="cm-label" for="cmGenreInput">Genre :</label>
+                  <input 
+                    type="text" 
+                    class="cm-input-pill" 
+                    id="cmGenreInput" 
+                    placeholder="e.g. Action, Adventure, Fantasy" 
+                  />
+                </div>
+
+                <div class="cm-form-group">
+                  <label class="cm-label" for="cmDescInput">Description :</label>
+                  <textarea 
+                    class="cm-textarea-pill" 
+                    id="cmDescInput" 
+                    placeholder="Humans were suddenly summoned to become Walkers..."
+                  ></textarea>
+                </div>
+
+                <!-- Upload/File row matching pink button in wireframe -->
+                <div class="cm-upload-file-row">
+                  <label class="cm-btn-upload-file" for="cmChapterFileInput">
+                    <span>☁</span> Upload/File
+                  </label>
+                  <input type="file" id="cmChapterFileInput" style="display: none;" />
+                  <span class="cm-file-badge" id="cmFileBadge" style="display: none;">File Attached</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Source (Full width below sub-columns) -->
+            <div class="cm-form-group">
+              <label class="cm-label" for="cmSourceInput">Source :</label>
+              <input 
+                type="text" 
+                class="cm-input-pill" 
+                id="cmSourceInput" 
+                placeholder="e.g. http://127.0.0.1:8080/" 
+              />
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="cm-modal-footer">
+              <button type="button" class="um-btn-cancel" id="cancelComicModalBtn">Cancel</button>
+              <button type="submit" class="cm-btn-save" id="saveComicBtn">Save Changes</button>
+            </div>
+
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION POPUP MODAL (Custom English Modal) -->
+  <div class="um-modal-overlay" id="deleteConfirmModal">
+    <div class="um-modal-card" style="max-width: 440px;">
+      <div class="um-modal-header">
+        <h3 class="um-modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+          <span>🗑️</span> Confirm Delete
+        </h3>
+        <button type="button" class="um-modal-close" id="closeDeleteModalBtn">✕</button>
+      </div>
+      <div style="padding: 8px 0 20px;">
+        <p id="deleteModalMessage" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+          Are you sure you want to delete this comic? This action cannot be undone.
+        </p>
+      </div>
+      <div class="um-modal-footer">
+        <button type="button" class="um-btn-cancel" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="um-btn-danger" id="confirmDeleteBtn">Delete Comic</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTICE / ALERT POPUP MODAL -->
+  <div class="um-modal-overlay" id="noticeModal">
+    <div class="um-modal-card" style="max-width: 420px;">
+      <div class="um-modal-header">
+        <h3 class="um-modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>⚠️</span> Notice
+        </h3>
+        <button type="button" class="um-modal-close" id="closeNoticeModalBtn">✕</button>
+      </div>
+      <div style="padding: 8px 0 20px;">
+        <p id="noticeModalMessage" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+          Notification message.
+        </p>
+      </div>
+      <div class="um-modal-footer">
+        <button type="button" class="um-btn-primary" id="okNoticeBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/comics-data.js"></script>
+  <script src="../js/comics.js"></script>
+  <script>
+    // ── INITIAL DATA (Exact matching wireframe Image 2 & 3) ──────────────────
+    const DEFAULT_COMICS = [
+      {
+        id: 1,
+        title: "One Piece",
+        author: "Eiichiro Oda",
+        studio: "Toei Animation",
+        category: "Manga",
+        genre: "Action, Adventure, Fantasy",
+        description: "Monkey D. Luffy embarks on a journey with his straw hat crew across the Grand Line to find the legendary treasure One Piece and become the Pirate King.",
+        source: "https://onepiece.mangaplus.shueisha.co.jp/",
+        cover: "../assets/versatile-mage.gif"
+      },
+      {
+        id: 2,
+        title: "Eleceed",
+        author: "Son Jae-ho & ZHENA",
+        studio: "Studio JHS",
+        category: "Manhwa",
+        genre: "Action, Supernatural, Comedy",
+        description: "Jiwoo is a kind-hearted young man who possesses lightning quick reflexes. Kayden, a secret agent on the run, is stuck in the body of a fat, fluffy cat.",
+        source: "https://www.webtoons.com/eleceed",
+        cover: "../assets/ranker-second.gif"
+      },
+      {
+        id: 3,
+        title: "Omniscient Reader's",
+        author: "sing N song",
+        studio: "Redice Studio",
+        category: "Manhwa",
+        genre: "Action, Fantasy, Apocalyptic",
+        description: "Dokja was an average office worker whose sole interest was reading his favorite web novel. When the novel becomes reality, he is the only one who knows the end of the world.",
+        source: "https://www.webtoons.com/omniscient-reader",
+        cover: "../assets/martial-reigns.gif"
+      },
+      {
+        id: 4,
+        title: "Nano Machine",
+        author: "Jeolmu Hyeon",
+        studio: "Redice Studio",
+        category: "Manhwa",
+        genre: "Action, Martial Arts, Sci-Fi",
+        description: "After being held in disdain and having his life put in danger, an orphan from the Demonic Cult gets an unexpected visit from his descendant from the future who inserts a nanomachine into his body.",
+        source: "https://www.webtoons.com/nano-machine",
+        cover: "../assets/magic-emperor.gif"
+      },
+      {
+        id: 5,
+        title: "Magic Emperor",
+        author: "Wuer Manhua",
+        studio: "Comic Loft",
+        category: "Manhua",
+        genre: "Action, Fantasy, Reincarnation",
+        description: "Zhuo Yifan was the Demonic Emperor. Betrayed by his trusted disciple, he reincarnates into the body of an ordinary servant boy in the Luo Clan to reclaim his throne.",
+        source: "http://127.0.0.1:8080/comics/magic-emperor",
+        cover: "../assets/magic-emperor.gif"
+      },
+      {
+        id: 6,
+        title: "Job Change Log",
+        author: "Mok-in",
+        studio: "D&C Media",
+        category: "Manhwa",
+        genre: "Action, System, Fantasy",
+        description: "A mysterious system grants hidden class changes and endless progression to an awakened hunter fighting through high-rank dungeons.",
+        source: "http://127.0.0.1:8080/job-change-log",
+        cover: "../assets/evil-god.gif"
+      },
+      {
+        id: 7,
+        title: "The Villainess Is a Marionette",
+        author: "Han Yi-rim",
+        studio: "KakaoPage",
+        category: "Manhwa",
+        genre: "Fantasy, Romance, Drama",
+        description: "Kayena Hill awakened as the villainess of a novel. Used as a pawn by her tyrannical brother, she refuses to remain a marionette and pulls the strings herself.",
+        source: "https://page.kakao.com/",
+        cover: "../assets/go-toubun.gif"
+      },
+      {
+        id: 8,
+        title: "How to win my Husband Over",
+        author: "Spice&Kitty",
+        studio: "KakaoPage",
+        category: "Manhwa",
+        genre: "Romance, Fantasy, Drama",
+        description: "Trapped in the role of Rudbeckia de Borgia, she must marry the cold Northern Duke Izek van Omerta and win his trust to survive her ruthless family.",
+        source: "https://page.kakao.com/",
+        cover: "../assets/shenwu-tianzun.jpg"
+      },
+      {
+        id: 9,
+        title: "The World After The Fall",
+        author: "Sing-Shong",
+        studio: "Redice Studio",
+        category: "Manhwa",
+        genre: "Action, Adventure, Fantasy",
+        description: "Humans were suddenly summoned to become Walkers ... The regression stone allows Walkers to go back to the past.",
+        source: "http://127.0.0.1:8080/",
+        cover: "../assets/world-after-fall.gif"
+      }
+    ];
+
+    let comics = JSON.parse(localStorage.getItem("comic_management_data")) || DEFAULT_COMICS;
+
+    function saveComics() {
+      localStorage.setItem("comic_management_data", JSON.stringify(comics));
+    }
+
+    // ── ROLE ACCESS CONTROL CHECK (AUTHOR & ADMIN ONLY) ─────────────────────
+    function checkAccess() {
+      const currentRole = localStorage.getItem("current_user_role") || "user";
+      const headerSelect = document.getElementById("headerRoleSelect");
+      if (headerSelect) headerSelect.value = currentRole;
+
+      const deniedView = document.getElementById("accessDeniedView");
+      const contentView = document.getElementById("comicManagementContent");
+      const deniedRoleName = document.getElementById("deniedRoleName");
+      const navUsersLink = document.getElementById("navUsersLink");
+      const toolbarRoleBadge = document.getElementById("toolbarRoleBadge");
+
+      // Admin only nav links
+      if (navUsersLink) {
+        navUsersLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+      }
+      const navAnalyticsLink = document.getElementById("navAnalyticsLink");
+      if (navAnalyticsLink) {
+        navAnalyticsLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+      }
+      const navCategoriesLink = document.getElementById("navCategoriesLink");
+      if (navCategoriesLink) {
+        navCategoriesLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+      }
+
+      if (toolbarRoleBadge) {
+        toolbarRoleBadge.textContent = currentRole === "admin" ? "Admin" : "Creator";
+      }
+
+      // Access granted to author AND admin
+      if (currentRole === "admin" || currentRole === "author") {
+        deniedView.style.display = "none";
+        contentView.style.display = "block";
+      } else {
+        deniedView.style.display = "block";
+        contentView.style.display = "none";
+        if (deniedRoleName) {
+          deniedRoleName.textContent = currentRole.toUpperCase();
+        }
+      }
+    }
+
+    // Role select listener
+    const headerRoleSelect = document.getElementById("headerRoleSelect");
+    if (headerRoleSelect) {
+      headerRoleSelect.addEventListener("change", (e) => {
+        const nextRole = e.target.value;
+        localStorage.setItem("current_user_role", nextRole);
+        checkAccess();
+      });
+    }
+
+    // Quick switch buttons on access denied screen
+    const btnSwitchAuthor = document.getElementById("btnSwitchAuthor");
+    if (btnSwitchAuthor) {
+      btnSwitchAuthor.addEventListener("click", () => {
+        localStorage.setItem("current_user_role", "author");
+        checkAccess();
+      });
+    }
+
+    const btnSwitchAdmin = document.getElementById("btnSwitchAdmin");
+    if (btnSwitchAdmin) {
+      btnSwitchAdmin.addEventListener("click", () => {
+        localStorage.setItem("current_user_role", "admin");
+        checkAccess();
+      });
+    }
+
+    // ── COMIC LIST RENDERING ────────────────────────────────────────────────
+    const comicListContainer = document.getElementById("comicListContainer");
+    const comicSearchInput = document.getElementById("comicSearchInput");
+
+    function updateMetrics() {
+      const metricTotalComics = document.getElementById("metricTotalComics");
+      const metricTotalAuthors = document.getElementById("metricTotalAuthors");
+      if (metricTotalComics) metricTotalComics.textContent = comics.length;
+      if (metricTotalAuthors) {
+        const authors = new Set(comics.map((c) => c.author).filter(Boolean));
+        metricTotalAuthors.textContent = authors.size;
+      }
+    }
+
+    function renderComicList() {
+      updateMetrics();
+      const query = (comicSearchInput ? comicSearchInput.value : "").toLowerCase().trim();
+
+      const filtered = comics.filter((c) => {
+        return (
+          c.title.toLowerCase().includes(query) ||
+          (c.author && c.author.toLowerCase().includes(query)) ||
+          (c.category && c.category.toLowerCase().includes(query)) ||
+          (c.genre && c.genre.toLowerCase().includes(query))
+        );
+      });
+
+      if (filtered.length === 0) {
+        comicListContainer.innerHTML = `
+          <div class="cm-empty-state">
+            No comics match your search query. Click <strong>+ add Comic</strong> to create one.
+          </div>
+        `;
+        return;
+      }
+
+      comicListContainer.innerHTML = filtered.map((c, index) => {
+        const displayIndex = index + 1;
+        const coverSrc = c.cover || "../assets/world-after-fall.gif";
+        return `
+          <div class="cm-row" data-id="${c.id}">
+            <!-- Number Box -->
+            <div class="cm-num-box">${displayIndex}</div>
+
+            <!-- Comic Title Pill -->
+            <div class="cm-title-pill" onclick="openEditComicModal(${c.id})" title="Click to edit: ${escapeHtml(c.title)}">
+              <div class="cm-title-left">
+                <img src="${coverSrc}" alt="${escapeHtml(c.title)}" class="cm-thumb-img" onerror="this.src='../assets/world-after-fall.gif'" />
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span class="cm-title-text">${escapeHtml(c.title)}</span>
+                  <div style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">
+                    ${c.author ? `<span>by ${escapeHtml(c.author)}</span>` : ""}
+                    ${c.studio ? `<span style="opacity: 0.7;"> • ${escapeHtml(c.studio)}</span>` : ""}
+                  </div>
+                </div>
+              </div>
+
+              <div class="cm-title-meta">
+                ${c.category ? `<span class="cm-title-category-badge">${escapeHtml(c.category)}</span>` : ""}
+                ${c.genre ? `<span style="opacity: 0.75; font-size: 12px;">${escapeHtml(c.genre.split(',')[0])}</span>` : ""}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="cm-actions">
+              <button 
+                type="button" 
+                class="cm-btn-action cm-btn-edit" 
+                onclick="openEditComicModal(${c.id})" 
+                title="Edit Comic"
+                aria-label="Edit comic ${escapeHtml(c.title)}"
+              >
+                ✏️
+              </button>
+              <button 
+                type="button" 
+                class="cm-btn-action cm-btn-delete" 
+                onclick="triggerDeleteComic(${c.id})" 
+                title="Delete Comic"
+                aria-label="Delete comic ${escapeHtml(c.title)}"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    if (comicSearchInput) {
+      comicSearchInput.addEventListener("input", renderComicList);
+    }
+
+    // ── ADD / EDIT COMIC MODAL HANDLING ─────────────────────────────────────
+    let editingComicId = null;
+    let currentCoverDataUrl = "";
+
+    const comicModal = document.getElementById("comicModal");
+    const comicModalTitle = document.getElementById("comicModalTitle");
+    const closeComicModalBtn = document.getElementById("closeComicModalBtn");
+    const cancelComicModalBtn = document.getElementById("cancelComicModalBtn");
+    const openAddComicBtn = document.getElementById("openAddComicBtn");
+    const comicForm = document.getElementById("comicForm");
+
+    // Inputs
+    const cmTitleInput = document.getElementById("cmTitleInput");
+    const cmAuthorInput = document.getElementById("cmAuthorInput");
+    const cmStudioInput = document.getElementById("cmStudioInput");
+    const cmCategoryInput = document.getElementById("cmCategoryInput");
+    const cmGenreInput = document.getElementById("cmGenreInput");
+    const cmDescInput = document.getElementById("cmDescInput");
+    const cmSourceInput = document.getElementById("cmSourceInput");
+
+    // Cover elements
+    const photoDropArea = document.getElementById("photoDropArea");
+    const photoPlaceholder = document.getElementById("photoPlaceholder");
+    const photoPreviewImg = document.getElementById("photoPreviewImg");
+    const coverFileInput = document.getElementById("coverFileInput");
+    const coverPresetSelect = document.getElementById("coverPresetSelect");
+
+    // Chapter file element
+    const cmChapterFileInput = document.getElementById("cmChapterFileInput");
+    const cmFileBadge = document.getElementById("cmFileBadge");
+
+    function setCoverPreview(src) {
+      currentCoverDataUrl = src || "";
+      if (src) {
+        photoPreviewImg.src = src;
+        photoPreviewImg.style.display = "block";
+        photoPlaceholder.style.display = "none";
+      } else {
+        photoPreviewImg.src = "";
+        photoPreviewImg.style.display = "none";
+        photoPlaceholder.style.display = "flex";
+      }
+    }
+
+    // File input trigger
+    if (photoDropArea) {
+      photoDropArea.addEventListener("click", () => {
+        if (coverFileInput) coverFileInput.click();
+      });
+    }
+
+    if (coverFileInput) {
+      coverFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            setCoverPreview(event.target.result);
+            if (coverPresetSelect) coverPresetSelect.value = "";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    if (coverPresetSelect) {
+      coverPresetSelect.addEventListener("change", (e) => {
+        if (e.target.value) {
+          setCoverPreview(e.target.value);
+        }
+      });
+    }
+
+    // Chapter file input change
+    if (cmChapterFileInput) {
+      cmChapterFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file && cmFileBadge) {
+          cmFileBadge.textContent = `File: ${file.name.substring(0, 14)}...`;
+          cmFileBadge.style.display = "inline-flex";
+        }
+      });
+    }
+
+    function openAddComicModal() {
+      editingComicId = null;
+      comicModalTitle.textContent = "Add Comic";
+      comicForm.reset();
+      setCoverPreview("");
+      if (cmFileBadge) cmFileBadge.style.display = "none";
+      if (comicModal) comicModal.classList.add("open");
+    }
+
+    window.openEditComicModal = function(id) {
+      const found = comics.find((c) => c.id === id);
+      if (!found) return;
+
+      editingComicId = id;
+      comicModalTitle.textContent = "Edit Comic";
+
+      cmTitleInput.value = found.title || "";
+      cmAuthorInput.value = found.author || "";
+      cmStudioInput.value = found.studio || "";
+      cmCategoryInput.value = found.category || "";
+      cmGenreInput.value = found.genre || "";
+      cmDescInput.value = found.description || "";
+      cmSourceInput.value = found.source || "";
+
+      setCoverPreview(found.cover || "");
+
+      if (cmFileBadge) {
+        cmFileBadge.textContent = "File Attached";
+        cmFileBadge.style.display = "inline-flex";
+      }
+
+      if (comicModal) comicModal.classList.add("open");
+    };
+
+    function closeComicModal() {
+      if (comicModal) comicModal.classList.remove("open");
+      editingComicId = null;
+    }
+
+    if (openAddComicBtn) openAddComicBtn.addEventListener("click", openAddComicModal);
+    if (closeComicModalBtn) closeComicModalBtn.addEventListener("click", closeComicModal);
+    if (cancelComicModalBtn) cancelComicModalBtn.addEventListener("click", closeComicModal);
+
+    if (comicModal) {
+      comicModal.addEventListener("click", (e) => {
+        if (e.target === comicModal) closeComicModal();
+      });
+    }
+
+    // Form submit
+    if (comicForm) {
+      comicForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = cmTitleInput.value.trim();
+        const author = cmAuthorInput.value.trim();
+        const studio = cmStudioInput.value.trim();
+        const category = cmCategoryInput.value.trim();
+        const genre = cmGenreInput.value.trim();
+        const description = cmDescInput.value.trim();
+        const source = cmSourceInput.value.trim();
+        const cover = currentCoverDataUrl || "../assets/world-after-fall.gif";
+
+        if (!title) return;
+
+        if (editingComicId !== null) {
+          // Update existing
+          const idx = comics.findIndex((c) => c.id === editingComicId);
+          if (idx !== -1) {
+            comics[idx] = {
+              ...comics[idx],
+              title,
+              author,
+              studio,
+              category,
+              genre,
+              description,
+              source,
+              cover: currentCoverDataUrl || comics[idx].cover
+            };
+          }
+        } else {
+          // Add new
+          const newComic = {
+            id: Date.now(),
+            title,
+            author,
+            studio,
+            category,
+            genre,
+            description,
+            source,
+            cover
+          };
+          comics.unshift(newComic);
+        }
+
+        saveComics();
+        renderComicList();
+        closeComicModal();
+      });
+    }
+
+    // ── CUSTOM DELETE POPUP CONFIRMATION MODAL ──────────────────────────────
+    let pendingDeleteCallback = null;
+    const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+    const deleteModalMessage = document.getElementById("deleteModalMessage");
+    const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+    function openDeleteConfirm(messageHtml, confirmBtnText, onConfirm) {
+      if (deleteModalMessage) deleteModalMessage.innerHTML = messageHtml;
+      if (confirmDeleteBtn) confirmDeleteBtn.textContent = confirmBtnText || "Delete Comic";
+      pendingDeleteCallback = onConfirm;
+      if (deleteConfirmModal) deleteConfirmModal.classList.add("open");
+    }
+
+    function closeDeleteConfirm() {
+      if (deleteConfirmModal) deleteConfirmModal.classList.remove("open");
+      pendingDeleteCallback = null;
+    }
+
+    if (closeDeleteModalBtn) closeDeleteModalBtn.addEventListener("click", closeDeleteConfirm);
+    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener("click", closeDeleteConfirm);
+
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener("click", () => {
+        if (typeof pendingDeleteCallback === "function") {
+          pendingDeleteCallback();
+        }
+        closeDeleteConfirm();
+      });
+    }
+
+    window.triggerDeleteComic = function(id) {
+      const found = comics.find((c) => c.id === id);
+      const title = found ? found.title : "this comic";
+      const message = `Are you sure you want to delete <strong>${escapeHtml(title)}</strong>? This action cannot be undone.`;
+
+      openDeleteConfirm(message, "Delete Comic", () => {
+        comics = comics.filter((c) => c.id !== id);
+        saveComics();
+        renderComicList();
+      });
+    };
+
+    // Notice Modal
+    const noticeModal = document.getElementById("noticeModal");
+    const noticeModalMessage = document.getElementById("noticeModalMessage");
+    const closeNoticeModalBtn = document.getElementById("closeNoticeModalBtn");
+    const okNoticeBtn = document.getElementById("okNoticeBtn");
+
+    function openNotice(message) {
+      if (noticeModalMessage) noticeModalMessage.textContent = message;
+      if (noticeModal) noticeModal.classList.add("open");
+    }
+
+    function closeNotice() {
+      if (noticeModal) noticeModal.classList.remove("open");
+    }
+
+    if (closeNoticeModalBtn) closeNoticeModalBtn.addEventListener("click", closeNotice);
+    if (okNoticeBtn) okNoticeBtn.addEventListener("click", closeNotice);
+
+    [deleteConfirmModal, noticeModal].forEach((overlay) => {
+      if (overlay) {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.classList.remove("open");
+        });
+      }
+    });
+
+    // Pagination buttons interaction
+    document.querySelectorAll(".cm-page-circle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".cm-page-circle").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+
+    // Initialize
+    checkAccess();
+    renderComicList();
+  </script>
+</body>
+</html>

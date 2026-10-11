@@ -47,9 +47,26 @@ function initRoleManagement() {
       }
     }
 
-    // User Management menu: Accessible ONLY by admin
+    // Analytics & User Management: Accessible ONLY by admin
+    const analyticsItem = document.getElementById("drawerAnalytics");
+    if (analyticsItem) {
+      analyticsItem.style.display = role === "admin" ? "flex" : "none";
+    }
+
     if (userMgmtItem) {
       userMgmtItem.style.display = role === "admin" ? "flex" : "none";
+    }
+
+    // Category Management menu: Accessible ONLY by admin
+    const categoryMgmtItem = document.getElementById("drawerCategoryManagement");
+    if (categoryMgmtItem) {
+      categoryMgmtItem.style.display = role === "admin" ? "flex" : "none";
+    }
+
+    // Comic Management menu: Accessible by author AND admin
+    const comicMgmtItem = document.getElementById("drawerComicManagement");
+    if (comicMgmtItem) {
+      comicMgmtItem.style.display = (role === "admin" || role === "author") ? "flex" : "none";
     }
 
     window.dispatchEvent(new CustomEvent("roleChanged", { detail: { role } }));

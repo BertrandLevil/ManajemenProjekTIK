@@ -358,8 +358,62 @@ function initPlayground() {
   });
 }
 
+/* ── Role Access Control (Admin Only) ────────────────────────────────── */
+function checkAnalyticsAccess() {
+  const currentRole = localStorage.getItem("current_user_role") || "user";
+  const headerSelect = document.getElementById("headerRoleSelect");
+  if (headerSelect) headerSelect.value = currentRole;
+
+  const deniedView = document.getElementById("accessDeniedView");
+  const mainContent = document.getElementById("analyticsMainContent");
+  const deniedRoleName = document.getElementById("deniedRoleName");
+  const navUsersLink = document.getElementById("navUsersLink");
+  const navComicsLink = document.getElementById("navComicsLink");
+
+  if (navUsersLink) {
+    navUsersLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+  }
+  if (navComicsLink) {
+    navComicsLink.style.display = (currentRole === "admin" || currentRole === "author") ? "inline-block" : "none";
+  }
+  const navCategoriesLink = document.getElementById("navCategoriesLink");
+  if (navCategoriesLink) {
+    navCategoriesLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+  }
+
+  if (currentRole === "admin") {
+    if (deniedView) deniedView.style.display = "none";
+    if (mainContent) mainContent.style.display = "block";
+    const canvas = document.getElementById("readersChart");
+    if (canvas) drawChart(canvas, PERIOD_LABELS[currentPeriod], chartData);
+  } else {
+    if (deniedView) deniedView.style.display = "block";
+    if (mainContent) mainContent.style.display = "none";
+    if (deniedRoleName) deniedRoleName.textContent = currentRole.toUpperCase();
+  }
+}
+
+// Header role switcher
+const headerRoleSelect = document.getElementById("headerRoleSelect");
+if (headerRoleSelect) {
+  headerRoleSelect.addEventListener("change", (e) => {
+    localStorage.setItem("current_user_role", e.target.value);
+    checkAnalyticsAccess();
+  });
+}
+
+// Quick switch to admin button
+const btnSwitchAdmin = document.getElementById("btnSwitchAdmin");
+if (btnSwitchAdmin) {
+  btnSwitchAdmin.addEventListener("click", () => {
+    localStorage.setItem("current_user_role", "admin");
+    checkAnalyticsAccess();
+  });
+}
+
 /* ── Init ─────────────────────────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
+  checkAnalyticsAccess();
   const canvas = document.getElementById("readersChart");
   drawChart(canvas, PERIOD_LABELS[currentPeriod], chartData);
   updateStatCards();
