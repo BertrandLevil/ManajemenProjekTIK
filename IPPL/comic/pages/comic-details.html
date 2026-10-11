@@ -10,7 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/comics.css" />
 </head>
-<body>
+<body class="details-page">
+  <!-- Dynamic Ambient Comic Backdrop (Uses this comic's own cover) -->
+  <div class="comic-ambient-backdrop" id="comicAmbientBackdrop" aria-hidden="true">
+    <img id="detailBackdropImg" class="ambient-backdrop-img" src="" alt="" />
+    <div class="ambient-backdrop-overlay"></div>
+  </div>
+
   <!-- Desktop Sticky Header -->
   <header class="site-header">
     <div class="header-container">

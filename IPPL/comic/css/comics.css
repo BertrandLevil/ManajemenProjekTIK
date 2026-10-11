@@ -1075,6 +1075,50 @@ body.home-page {
   text-overflow: ellipsis;
 }
 
+/* Drawer Role Selector */
+.drawer-role-wrapper {
+  margin-top: 4px;
+}
+
+.drawer-role-select {
+  background: var(--input-bg);
+  color: var(--purple-light);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px 8px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.drawer-role-select:hover,
+.drawer-role-select:focus {
+  border-color: var(--purple-light);
+  box-shadow: 0 0 10px var(--purple-glow);
+}
+
+.drawer-role-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.admin-pill-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.16);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  letter-spacing: 0.5px;
+}
+
 /* Drawer Search */
 .drawer-search-box {
   display: flex;
@@ -1784,5 +1828,84 @@ button.drawer-nav-item {
 .carousel-dots .dot:hover:not(.active) {
   opacity: 0.65;
   background-color: var(--purple);
+}
+
+/* ==========================================================================
+   DYNAMIC COMIC AMBIENT BACKDROP (comic-details.html & reader.html)
+   ========================================================================== */
+.comic-ambient-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient-backdrop-img {
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+  object-fit: cover;
+  object-position: center 25%;
+  filter: blur(10px) brightness(0.35) saturate(1.4);
+  transform: scale(1.15);
+  opacity: 0.9;
+  transition: opacity 0.4s ease;
+}
+
+.ambient-backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(30, 33, 39, 0.45) 0%,
+    rgba(30, 33, 39, 0.88) 60%,
+    var(--bg-primary) 100%
+  );
+}
+
+[data-theme="light"] .ambient-backdrop-img {
+  filter: blur(60px) brightness(0.92) saturate(1.2);
+  opacity: 0.35;
+}
+
+[data-theme="light"] .ambient-backdrop-overlay {
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(246, 245, 251, 0.55) 0%,
+    rgba(246, 245, 251, 0.92) 65%,
+    var(--bg-primary) 100%
+  );
+}
+
+body.details-page,
+body.reader-page {
+  position: relative;
+  min-height: 100vh;
+}
+
+body.details-page .main-wrapper,
+body.details-page .site-header,
+body.reader-page .reader-wrapper,
+body.reader-page .site-header {
+  position: relative;
+  z-index: 10;
+}
+
+body.details-page .site-header,
+body.reader-page .site-header {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(30, 33, 39, 0.78);
+}
+
+[data-theme="light"] body.details-page .site-header,
+[data-theme="light"] body.reader-page .site-header {
+  background-color: rgba(246, 245, 251, 0.84);
 }
 

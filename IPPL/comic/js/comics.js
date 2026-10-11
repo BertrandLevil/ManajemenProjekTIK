@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initSmartImages();
   initHomeBackground();
+  initRoleManagement();
   initRegistrationBanner();
   initSearch();
   initGenres();
@@ -16,6 +17,52 @@ document.addEventListener("DOMContentLoaded", () => {
   initSideDrawer();
   initCommentSection();
 });
+
+/* --------------------------------------------------------------------------
+   Role-Based Access Control (RBAC)
+   Roles: admin, author, user (default: user)
+   -------------------------------------------------------------------------- */
+function initRoleManagement() {
+  const roleSelect = document.getElementById("userRoleSelect");
+  const usernameSpan = document.getElementById("drawerUsername");
+  const userMgmtItem = document.getElementById("drawerUserManagement");
+
+  let currentRole = localStorage.getItem("current_user_role") || "user";
+
+  function applyRole(role) {
+    currentRole = role;
+    localStorage.setItem("current_user_role", role);
+
+    if (roleSelect) {
+      roleSelect.value = role;
+    }
+
+    if (usernameSpan) {
+      if (role === "admin") {
+        usernameSpan.textContent = "Admin User";
+      } else if (role === "author") {
+        usernameSpan.textContent = "Author User";
+      } else {
+        usernameSpan.textContent = "Guest User";
+      }
+    }
+
+    // User Management menu: Accessible ONLY by admin
+    if (userMgmtItem) {
+      userMgmtItem.style.display = role === "admin" ? "flex" : "none";
+    }
+
+    window.dispatchEvent(new CustomEvent("roleChanged", { detail: { role } }));
+  }
+
+  applyRole(currentRole);
+
+  if (roleSelect) {
+    roleSelect.addEventListener("change", (e) => {
+      applyRole(e.target.value);
+    });
+  }
+}
 
 /* --------------------------------------------------------------------------
    Smart Home Background Resolver
@@ -207,6 +254,17 @@ function initDynamicDetailsPage() {
     );
   }
 
+  // Update Dynamic Ambient Backdrop with this Comic's Own Cover
+  const backdropImg = document.getElementById("detailBackdropImg");
+  if (backdropImg) {
+    backdropImg.alt = "";
+    smartLoadImage(
+      backdropImg,
+      comic.coverBase,
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80"
+    );
+  }
+
   // Update Text Elements
   const eyebrow = document.getElementById("detailEyebrow");
   if (eyebrow) eyebrow.textContent = comic.genreEyebrow;
@@ -304,6 +362,17 @@ function initDynamicReaderPage() {
   const subtitle = document.getElementById("readerComicSubtitle");
   if (subtitle) {
     subtitle.textContent = comic.title;
+  }
+
+  // Update Dynamic Ambient Backdrop in Reader View
+  const readerBackdropImg = document.getElementById("readerBackdropImg");
+  if (readerBackdropImg) {
+    readerBackdropImg.alt = "";
+    smartLoadImage(
+      readerBackdropImg,
+      comic.coverBase,
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80"
+    );
   }
 
   document.title = `${comic.chapterPrefix} ${currentEp} - ${comic.title}`;

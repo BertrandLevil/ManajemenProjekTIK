@@ -22,8 +22,14 @@
       <div class="drawer-profile">
         <div class="drawer-avatar">👤</div>
         <div class="drawer-user-info">
-          <span class="drawer-username">Guest User</span>
-          <span class="drawer-email">Sign in to sync progress</span>
+          <span class="drawer-username" id="drawerUsername">Guest User</span>
+          <div class="drawer-role-wrapper">
+            <select id="userRoleSelect" class="drawer-role-select" aria-label="Select User Role">
+              <option value="user" selected>Role: User</option>
+              <option value="author">Role: Author</option>
+              <option value="admin">Role: Admin</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -54,6 +60,12 @@
         <a href="analytics.html" class="drawer-nav-item">
           <span class="drawer-nav-icon">📊</span>
           <span>Analytics</span>
+        </a>
+        <!-- Admin-Only: User Management -->
+        <a href="user-management.html" class="drawer-nav-item drawer-admin-item" id="drawerUserManagement" style="display: none;">
+          <span class="drawer-nav-icon">👥</span>
+          <span>User Management</span>
+          <span class="admin-pill-badge">Admin</span>
         </a>
         <a href="#" class="drawer-nav-item">
           <span class="drawer-nav-icon">📚</span>
