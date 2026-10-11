@@ -22,9 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function smartLoadImage(img, baseName, fallbackUrl) {
   if (!img || !baseName) return;
 
-  const extensions = [".webp", ".jpg", ".png", ".jpeg"];
+  const extensions = [".gif", ".webp", ".jpg", ".png", ".jpeg"];
   // Strip any existing extension from baseName to be agnostic
-  const cleanBase = baseName.replace(/\.(webp|jpg|jpeg|png)$/i, "");
+  const cleanBase = baseName.replace(/\.(webp|jpg|jpeg|png|gif)$/i, "");
   let extIndex = 0;
 
   function tryNextExtension() {
@@ -329,7 +329,7 @@ function initDynamicReaderPage() {
 }
 
 function loadPanelSmartImage(img, comicId, panelNum) {
-  const extensions = [".webp", ".jpg", ".png", ".jpeg"];
+  const extensions = [".gif", ".webp", ".jpg", ".png", ".jpeg"];
   
   // Candidates in priority order:
   // 1. ../assets/{comicId}-panel-{panelNum}.*
