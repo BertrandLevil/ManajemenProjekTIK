@@ -1538,3 +1538,85 @@ body {
   letter-spacing: 2px;
 }
 
+/* ==========================================================================
+   AUTO-SLIDING CAROUSEL (Trending & Latest Updates)
+   ========================================================================== */
+
+/* Outer container: clips overflow for sliding effect */
+.carousel-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Track: flex row, no wrap — cards laid side by side */
+.carousel-track {
+  display: flex !important;
+  grid-template-columns: unset !important;
+  flex-wrap: nowrap;
+  gap: 20px;
+  will-change: transform;
+  cursor: grab;
+}
+
+.carousel-track:active {
+  cursor: grabbing;
+}
+
+/* Each card in carousel track: fixed width per viewport breakpoint */
+.carousel-track .comic-card {
+  flex: 0 0 calc(50% - 10px);  /* 2 per row mobile */
+  min-width: 0;
+}
+
+@media (min-width: 600px) {
+  .carousel-track .comic-card {
+    flex: 0 0 calc(33.333% - 14px);  /* 3 per row */
+  }
+}
+
+@media (min-width: 900px) {
+  .carousel-track .comic-card {
+    flex: 0 0 calc(33.333% - 14px);  /* 3 per row */
+  }
+}
+
+@media (min-width: 1200px) {
+  .carousel-track .comic-card {
+    flex: 0 0 calc(25% - 15px);  /* 4 per row */
+  }
+}
+
+/* Dots: enhanced interactive style */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.carousel-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  opacity: 0.35;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.carousel-dots .dot.active {
+  background-color: var(--purple-light);
+  opacity: 1;
+  width: 28px;
+  border-radius: 10px;
+}
+
+.carousel-dots .dot:hover:not(.active) {
+  opacity: 0.65;
+  background-color: var(--purple);
+}
+

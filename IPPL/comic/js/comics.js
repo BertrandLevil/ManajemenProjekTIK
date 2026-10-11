@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initGenres();
   initDynamicDetailsPage();
   initDynamicReaderPage();
-  initCarouselDots();
+  initAutoCarousel();
   initSideDrawer();
   initCommentSection();
 });
@@ -30,7 +30,7 @@ function smartLoadImage(img, baseName, fallbackUrl) {
   function tryNextExtension() {
     if (extIndex < extensions.length) {
       const ext = extensions[extIndex++];
-      img.src = `assets/${cleanBase}${ext}`;
+      img.src = `../assets/${cleanBase}${ext}`;
     } else {
       img.onerror = null;
       if (fallbackUrl) {
@@ -332,8 +332,8 @@ function loadPanelSmartImage(img, comicId, panelNum) {
   const extensions = [".webp", ".jpg", ".png", ".jpeg"];
   
   // Candidates in priority order:
-  // 1. assets/{comicId}-panel-{panelNum}.*
-  // 2. assets/comic-panel-{panelNum}.*
+  // 1. ../assets/{comicId}-panel-{panelNum}.*
+  // 2. ../assets/comic-panel-{panelNum}.*
   const candidateBases = [
     `${comicId}-panel-${panelNum}`,
     `comic-panel-${panelNum}`
@@ -352,7 +352,7 @@ function loadPanelSmartImage(img, comicId, panelNum) {
         candidateIdx++;
       }
       
-      img.src = `assets/${base}${ext}`;
+      img.src = `../assets/${base}${ext}`;
     } else {
       // If none found, show stylish placeholder
       img.onerror = null;
@@ -369,18 +369,101 @@ function loadPanelSmartImage(img, comicId, panelNum) {
 }
 
 /* --------------------------------------------------------------------------
-   Carousel Dots Indicator
+   Auto-sliding Carousel (Trending & Latest Updates)
+   Slides every 3-10 seconds (configurable per section)
    -------------------------------------------------------------------------- */
-function initCarouselDots() {
-  document.querySelectorAll(".carousel-dots").forEach((container) => {
-    const dots = container.querySelectorAll(".dot");
-    dots.forEach((dot) => {
-      dot.addEventListener("click", () => {
-        dots.forEach((d) => d.classList.remove("active"));
-        dot.classList.add("active");
-      });
+function initAutoCarousel() {
+  setupCarousel("trendingTrack", "trendingDots", 4000);  // 4 detik
+  setupCarousel("latestTrack",   "latestDots",   6000);  // 6 detik
+}
+
+function setupCarousel(trackId, dotsContainerId, intervalMs) {
+  const track = document.getElementById(trackId);
+  const dotsContainer = document.getElementById(dotsContainerId);
+  if (!track || !dotsContainer) return;
+
+  const cards = Array.from(track.querySelectorAll(".comic-card"));
+  if (cards.length === 0) return;
+
+  const CARDS_PER_VIEW = getCardsPerView();
+  const totalSlides = Math.ceil(cards.length / CARDS_PER_VIEW);
+  let currentSlide = 0;
+  let autoTimer = null;
+  let isPaused = false;
+
+  // Rebuild dots dynamically based on number of slides
+  dotsContainer.innerHTML = "";
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement("span");
+    dot.className = "dot" + (i === 0 ? " active" : "");
+    dot.setAttribute("aria-label", `Slide ${i + 1}`);
+    dot.addEventListener("click", () => {
+      goToSlide(i);
+      restartTimer();
     });
+    dotsContainer.appendChild(dot);
+  }
+
+  function getCardsPerView() {
+    if (window.innerWidth >= 1200) return 4;
+    if (window.innerWidth >= 900) return 3;
+    if (window.innerWidth >= 600) return 2;
+    return 1;
+  }
+
+  function goToSlide(index) {
+    currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
+    const cardWidth = cards[0].offsetWidth;
+    const gap = 20; // matches CSS gap
+    const offset = currentSlide * CARDS_PER_VIEW * (cardWidth + gap);
+    track.style.transform = `translateX(-${offset}px)`;
+    track.style.transition = "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)";
+
+    // Update dots
+    const dots = dotsContainer.querySelectorAll(".dot");
+    dots.forEach((d, i) => d.classList.toggle("active", i === currentSlide));
+  }
+
+  function nextSlide() {
+    if (!isPaused) {
+      goToSlide(currentSlide + 1);
+    }
+  }
+
+  function startTimer() {
+    autoTimer = setInterval(nextSlide, intervalMs);
+  }
+
+  function restartTimer() {
+    clearInterval(autoTimer);
+    startTimer();
+  }
+
+  // Pause on hover
+  track.addEventListener("mouseenter", () => { isPaused = true; });
+  track.addEventListener("mouseleave", () => { isPaused = false; });
+
+  // Touch/swipe support
+  let touchStartX = 0;
+  track.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    isPaused = true;
+  }, { passive: true });
+  track.addEventListener("touchend", (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      goToSlide(diff > 0 ? currentSlide + 1 : currentSlide - 1);
+      restartTimer();
+    }
+    isPaused = false;
+  }, { passive: true });
+
+  // Recalculate on resize
+  window.addEventListener("resize", () => {
+    goToSlide(0);
   });
+
+  startTimer();
 }
 
 /* --------------------------------------------------------------------------

@@ -41,7 +41,7 @@ authForm.addEventListener("submit", (event) => {
     : "Logged in! Redirecting to home...";
 
   setTimeout(() => {
-    window.location.href = mode === "signup" ? "home.html?registered=true" : "home.html";
+    window.location.href = mode === "signup" ? "pages/home.html?registered=true" : "pages/home.html";
   }, 600);
 });
 
