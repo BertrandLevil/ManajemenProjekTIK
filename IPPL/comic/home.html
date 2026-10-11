@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discover popular and trending web comics, manhwa, and manga." />
+  <title>Comics - Trending & Updates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="comics.css" />
+</head>
+<body>
+
+  <!-- Side Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Side Drawer -->
+  <aside class="side-drawer" id="sideDrawer" aria-label="Main menu" role="dialog" aria-modal="true">
+    <div class="drawer-inner">
+      <!-- User Profile -->
+      <div class="drawer-profile">
+        <div class="drawer-avatar">👤</div>
+        <div class="drawer-user-info">
+          <span class="drawer-username">Guest User</span>
+          <span class="drawer-email">Sign in to sync progress</span>
+        </div>
+      </div>
+
+      <!-- Drawer Search -->
+      <div class="drawer-search-box">
+        <span class="drawer-search-icon">🔍</span>
+        <input type="text" class="drawer-search-input" placeholder="Search..." aria-label="Drawer search" />
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="drawer-nav">
+        <a href="home.html" class="drawer-nav-item active">
+          <span class="drawer-nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="#" class="drawer-nav-item">
+          <span class="drawer-nav-icon">🔔</span>
+          <span>Notifications</span>
+        </a>
+        <a href="analytics.html" class="drawer-nav-item">
+          <span class="drawer-nav-icon">📊</span>
+          <span>Analytics</span>
+        </a>
+        <a href="#" class="drawer-nav-item">
+          <span class="drawer-nav-icon">📚</span>
+          <span>Manage Comic</span>
+        </a>
+        <a href="upgrade.html" class="drawer-nav-item">
+          <span class="drawer-nav-icon">⭐</span>
+          <span>Upgrade Premium</span>
+        </a>
+        <a href="index.html" class="drawer-nav-item">
+          <span class="drawer-nav-icon">🚪</span>
+          <span>Log Out</span>
+        </a>
+      </nav>
+
+      <!-- Theme Toggle Row -->
+      <div class="drawer-theme-row">
+        <span class="drawer-theme-label">☀️ Light mode</span>
+        <button class="drawer-theme-toggle" id="drawerThemeToggle" aria-label="Toggle light/dark mode">
+          <span class="drawer-toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+  </aside>
+  <!-- Desktop Sticky Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sideDrawer">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <a href="home.html" class="site-logo">
+          <span class="logo-icon">✦</span>
+          <span>WebComics</span>
+        </a>
+      </div>
+
+      <nav class="header-nav">
+        <a href="home.html" class="nav-link active">Home</a>
+        <a href="#trending" class="nav-link">Trending</a>
+        <a href="#latest" class="nav-link">Latest Updates</a>
+        <a href="comic-details.html?id=world-after-fall" class="nav-link">Featured</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Dark / Light Theme Toggle -->
+        <button class="action-btn" id="themeToggleBtn" aria-label="Toggle dark/light theme" title="Toggle Theme">
+          ☀️
+        </button>
+        <a href="index.html" class="auth-btn-link">Account</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Registration Success Notification (Shown when redirected after Sign Up) -->
+  <div class="toast-notification" id="regToast" style="display: none;">
+    <div class="toast-icon">✓</div>
+    <div class="toast-content">
+      <h4>Account has been successfully registered!</h4>
+      <p>Welcome! Explore trending series and start reading.</p>
+    </div>
+    <button class="toast-close" id="closeToast" aria-label="Close notification">✕</button>
+  </div>
+
+  <main class="main-wrapper">
+    <!-- Desktop Centered Search -->
+    <div class="search-wrapper">
+      <div class="search-input-box">
+        <input 
+          type="text" 
+          id="comicSearch" 
+          class="search-input" 
+          placeholder="Search comics, manga, or authors..." 
+          aria-label="Search comics"
+        />
+        <button class="search-submit-btn" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Category / Genre Filters (From Reference Mockup) -->
+    <section class="genre-pills-container" aria-label="Categories">
+      <button class="genre-pill" data-genre="action">
+        <span class="genre-icon">⚔️</span>
+        <span class="genre-label">Action</span>
+      </button>
+      <button class="genre-pill" data-genre="love">
+        <span class="genre-icon">❤️</span>
+        <span class="genre-label">Love</span>
+      </button>
+      <button class="genre-pill" data-genre="adventure">
+        <span class="genre-icon">🧭</span>
+        <span class="genre-label">Adventure</span>
+      </button>
+      <button class="genre-pill" data-genre="horror">
+        <span class="genre-icon">🥷</span>
+        <span class="genre-label">Horror</span>
+      </button>
+      <button class="genre-pill" data-genre="mystery">
+        <span class="genre-icon">🔍</span>
+        <span class="genre-label">Mystery</span>
+      </button>
+      <button class="genre-pill" data-genre="comedy">
+        <span class="genre-icon">😂</span>
+        <span class="genre-label">Comedy</span>
+      </button>
+      <button class="genre-pill" data-genre="school">
+        <span class="genre-icon">🏫</span>
+        <span class="genre-label">School life</span>
+      </button>
+      <button class="genre-pill" data-genre="drama">
+        <span class="genre-icon">🎭</span>
+        <span class="genre-label">Drama</span>
+      </button>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="content-section" id="trending">
+      <div class="section-header">
+        <h2 class="section-title">Trending</h2>
+        <a href="#trending" class="view-all-link">View all ›</a>
+      </div>
+
+      <div class="comic-grid">
+        <!-- Card 1: Magic Emperor -->
+        <a href="comic-details.html?id=magic-emperor" class="comic-card" data-title="Magic Emperor" data-genre="action adventure">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="magic-emperor"
+              alt="Magic Emperor" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">🔥 Hot</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Magic Emperor</span>
+            <span class="chapter-badge">Chapter 220</span>
+          </div>
+        </a>
+
+        <!-- Card 2: Ranker Second -->
+        <a href="comic-details.html?id=ranker-second" class="comic-card" data-title="Ranker Second" data-genre="action fantasy">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="ranker-second"
+              alt="Ranker Second" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">Top 2</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Ranker Second</span>
+            <span class="chapter-badge">Chapter 97</span>
+          </div>
+        </a>
+
+        <!-- Card 3: Martial Reigns -->
+        <a href="comic-details.html?id=martial-reigns" class="comic-card" data-title="Martial Reigns" data-genre="action drama">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="martial-reigns"
+              alt="Martial Reigns" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1563089145-599997674d42?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">Top 3</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Martial Reigns</span>
+            <span class="chapter-badge">Chapter 317</span>
+          </div>
+        </a>
+
+        <!-- Card 4: Versatile Mage -->
+        <a href="comic-details.html?id=versatile-mage" class="comic-card" data-title="Versatile Mage" data-genre="adventure mystery">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="versatile-mage"
+              alt="Versatile Mage" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">Top 4</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Versatile Mage</span>
+            <span class="chapter-badge">Chapter 757</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Carousel Pagination Indicator -->
+      <div class="carousel-dots" aria-hidden="true">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </section>
+
+    <!-- Latest Updates Section -->
+    <section class="content-section" id="latest">
+      <div class="section-header">
+        <h2 class="section-title">Latest Updates</h2>
+        <a href="#latest" class="view-all-link">View all ›</a>
+      </div>
+
+      <div class="comic-grid">
+        <!-- Card 1: Reverse World -->
+        <a href="comic-details.html?id=reverse-world" class="comic-card" data-title="Reverse World" data-genre="adventure fantasy">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="reverse-world"
+              alt="Reverse World" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">New</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Reverse World</span>
+            <span class="chapter-badge">Chapter 241</span>
+          </div>
+        </a>
+
+        <!-- Card 2: Go-Toubun -->
+        <a href="comic-details.html?id=go-toubun" class="comic-card" data-title="Go-Toubun" data-genre="love comedy school">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="go-toubun"
+              alt="Go-Toubun" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">New</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Go-Toubun</span>
+            <span class="chapter-badge">Chapter 112</span>
+          </div>
+        </a>
+
+        <!-- Card 3: Shenwu Tianzun -->
+        <a href="comic-details.html?id=shenwu-tianzun" class="comic-card" data-title="Shenwu Tianzun" data-genre="action adventure">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="shenwu-tianzun"
+              alt="Shenwu Tianzun" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">New</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Shenwu Tianzun</span>
+            <span class="chapter-badge">Chapter 357</span>
+          </div>
+        </a>
+
+        <!-- Card 4: Evil God -->
+        <a href="comic-details.html?id=evil-god" class="comic-card" data-title="Evil God" data-genre="horror mystery">
+          <div class="comic-cover-box">
+            <img 
+              data-smart-img="evil-god"
+              alt="Evil God" 
+              class="comic-cover" 
+              loading="lazy"
+              data-fallback="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=80"
+            />
+            <span class="comic-badge-overlay">New</span>
+          </div>
+          <div class="comic-info">
+            <span class="comic-title">Evil God</span>
+            <span class="chapter-badge">Chapter 187</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Carousel Pagination Indicator -->
+      <div class="carousel-dots" aria-hidden="true">
+        <span class="dot"></span>
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="comics-data.js"></script>
+  <script src="comics.js"></script>
+</body>
+</html>

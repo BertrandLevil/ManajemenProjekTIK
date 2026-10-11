@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Analytics Dashboard – Comic reader activity, ratings, and growth data." />
+  <title>Analytics Dashboard – WebComics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="comics.css" />
+  <link rel="stylesheet" href="analytics.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ────────────────────────────────────────────────────── -->
+  <header class="an-header">
+    <div class="an-header-inner">
+      <div class="an-header-left">
+        <a href="home.html" class="upg-back-btn" aria-label="Back to home">←</a>
+        <h1 class="an-page-title">Analysis Dashboard</h1>
+      </div>
+      <div class="an-header-right">
+        <button class="an-export-btn" id="exportDataBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Data
+        </button>
+        <button class="an-admin-badge" id="themeToggleBtn" aria-label="Toggle theme" title="Toggle Theme">☀️</button>
+        <div class="an-admin-pill">Admin</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="an-main">
+
+    <!-- ── STAT CARDS ROW ──────────────────────────────────────────── -->
+    <div class="an-stats-row">
+      <div class="an-stat-card">
+        <div class="an-stat-icon">📖</div>
+        <div class="an-stat-body">
+          <span class="an-stat-label">Active readers</span>
+          <span class="an-stat-value" id="statReaders">1,243</span>
+        </div>
+      </div>
+      <div class="an-stat-card">
+        <div class="an-stat-icon">⭐</div>
+        <div class="an-stat-body">
+          <span class="an-stat-label">Average comic rating</span>
+          <div class="an-stat-value-row">
+            <span class="an-stat-value" id="statRating">4.72</span>
+            <span class="an-stat-unit">/ 5.00</span>
+            <span class="an-stat-delta positive" id="statRatingDelta">+4k</span>
+          </div>
+        </div>
+      </div>
+      <div class="an-stat-card">
+        <div class="an-stat-icon">👥</div>
+        <div class="an-stat-body">
+          <span class="an-stat-label">Comic reads</span>
+          <div class="an-stat-value-row">
+            <span class="an-stat-value" id="statReads">82,453</span>
+            <span class="an-stat-delta positive" id="statReadsDelta">+100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHARTS ROW ─────────────────────────────────────────────── -->
+    <div class="an-charts-row">
+
+      <!-- Line Chart: Readers Activity -->
+      <div class="an-chart-card an-chart-main">
+        <div class="an-chart-header">
+          <h2 class="an-chart-title">Readers Activity</h2>
+          <div class="an-chart-controls">
+            <button class="an-period-btn active" data-period="week">7D</button>
+            <button class="an-period-btn" data-period="month">30D</button>
+            <button class="an-period-btn" data-period="quarter">90D</button>
+          </div>
+        </div>
+        <div class="an-line-chart-wrap">
+          <canvas id="readersChart" aria-label="Readers activity chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Side: Readers Rating -->
+      <div class="an-chart-card an-chart-side">
+        <h2 class="an-chart-title">Readers Rating</h2>
+        <p class="an-chart-sub">Rating distribution across all comics</p>
+
+        <div class="an-big-rating" id="sidePanelRating">4.72</div>
+        <div class="an-big-rating-unit">/ 5.0</div>
+        <div class="an-big-stars" id="sidePanelStars">★★★★★</div>
+        <p class="an-rating-count" id="sidePanelRatingCount">3,265 ratings in selected period</p>
+
+        <div class="an-rating-bars" id="ratingBarsContainer">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── DATA PLAYGROUND MODAL ─────────────────────────────────────── -->
+  <div class="an-modal-overlay" id="dataPlaygroundModal" style="display:none;" role="dialog" aria-modal="true" aria-label="Data Playground">
+    <div class="an-modal">
+      <div class="an-modal-header">
+        <div>
+          <h2 class="an-modal-title">📊 Data Playground</h2>
+          <p class="an-modal-sub">Simulate different analytics scenarios</p>
+        </div>
+        <button class="upg-modal-close" id="closePlaygroundBtn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="an-playground-grid">
+        <!-- Readers slider -->
+        <div class="an-control-group">
+          <label class="an-ctrl-label" for="sliderReaders">Active Readers <span class="an-ctrl-val" id="valReaders">1,243</span></label>
+          <input type="range" id="sliderReaders" class="an-slider" min="100" max="10000" value="1243" step="50" />
+        </div>
+        <!-- Rating slider -->
+        <div class="an-control-group">
+          <label class="an-ctrl-label" for="sliderRating">Avg Rating <span class="an-ctrl-val" id="valRating">4.72</span></label>
+          <input type="range" id="sliderRating" class="an-slider" min="1" max="5" value="4.72" step="0.01" />
+        </div>
+        <!-- Reads slider -->
+        <div class="an-control-group">
+          <label class="an-ctrl-label" for="sliderReads">Total Reads <span class="an-ctrl-val" id="valReads">82,453</span></label>
+          <input type="range" id="sliderReads" class="an-slider" min="1000" max="500000" value="82453" step="1000" />
+        </div>
+        <!-- Trend selector -->
+        <div class="an-control-group">
+          <label class="an-ctrl-label">Growth Trend</label>
+          <div class="an-trend-btns">
+            <button class="an-trend-btn active" data-trend="rising">📈 Rising</button>
+            <button class="an-trend-btn" data-trend="stable">➡️ Stable</button>
+            <button class="an-trend-btn" data-trend="declining">📉 Declining</button>
+            <button class="an-trend-btn" data-trend="volatile">⚡ Volatile</button>
+          </div>
+        </div>
+        <!-- 5-star distribution -->
+        <div class="an-control-group an-control-group--full">
+          <label class="an-ctrl-label">Rating Distribution (drag to adjust)</label>
+          <div class="an-dist-sliders" id="distSliders">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="an-playground-actions">
+        <button class="an-apply-btn" id="applyPlaygroundBtn">Apply & Update Charts</button>
+        <button class="an-reset-btn" id="resetPlaygroundBtn">Reset to Default</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Playground trigger button -->
+  <button class="an-playground-fab" id="openPlaygroundBtn" aria-label="Open Data Playground" title="Open Data Playground">
+    🎮
+    <span class="an-fab-label">Playground</span>
+  </button>
+
+  <script src="comics-data.js"></script>
+  <script src="comics.js"></script>
+  <script src="analytics.js"></script>
+</body>
+</html>

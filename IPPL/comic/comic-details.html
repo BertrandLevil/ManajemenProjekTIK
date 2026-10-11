@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Comic Details - Read online with episode list and details" />
+  <title>Comic Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="comics.css" />
+</head>
+<body>
+  <!-- Desktop Sticky Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="home.html" class="action-btn" aria-label="Go to Home" title="Back to Home">
+          ←
+        </a>
+        <h1 class="page-title-heading" style="font-size: 20px;">Comic Details</h1>
+      </div>
+
+      <nav class="header-nav">
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="#episodes" class="nav-link active">Episodes</a>
+        <a href="home.html#trending" class="nav-link">Trending</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Theme Switcher -->
+        <button class="action-btn" id="themeToggleBtn" aria-label="Toggle dark/light theme" title="Toggle Theme">
+          ☀️
+        </button>
+        <!-- Home Link -->
+        <a href="home.html" class="action-btn" aria-label="Home page" title="Home">
+          🏠
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-wrapper" id="comicDetailsMain">
+    <!-- Desktop Split Showcase Layout -->
+    <div class="details-desktop-layout">
+      <!-- Left: High-Res Cover Artwork (smart loaded for .webp, .jpg, .png) -->
+      <div class="details-cover-container">
+        <img 
+          id="detailCoverImg"
+          src=""
+          alt="Comic Cover" 
+          class="details-cover-img"
+        />
+      </div>
+
+      <!-- Right: Metadata & Synopsis -->
+      <div class="details-meta-column">
+        <span class="genre-tag-eyebrow" id="detailEyebrow">FANTASY – ADVENTURE</span>
+        <h2 class="details-comic-title" id="detailTitle">The World After the Fall</h2>
+        <p class="author-name" id="detailAuthor">by Pika</p>
+
+        <div class="status-row">
+          <span class="status-badge">
+            <span class="status-dot"></span>
+            ongoing
+          </span>
+          <span class="rating-and-episodes" id="detailRatingStats">
+            <span>★</span> 4.8 · 32 episodes
+          </span>
+        </div>
+
+        <p class="synopsis-text" id="detailSynopsis">
+          A lighthouse keeper finds a lantern that guides lost spirits through the fog. When the tower faces an unprecedented dimensional rupture, an ancient warrior defies the fall to forge a path through the unknown.
+        </p>
+
+        <div class="details-action-buttons">
+          <a href="reader.html" class="btn-read-latest" id="detailReadLatestBtn">
+            <span>📖</span> Read latest episode
+          </a>
+          <button class="btn-save-library" id="saveLibraryBtn">
+            Save to library
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Episodes Section -->
+    <section class="episodes-section" id="episodes">
+      <div class="episodes-header-row">
+        <h3 class="section-title" style="color: var(--text-primary); font-size: 20px;">Episodes</h3>
+        <span class="view-all-link" style="opacity: 0.8;">Latest Chapters</span>
+      </div>
+
+      <div class="episodes-list" id="detailEpisodesList">
+        <!-- Dynamically rendered by comics.js based on selected comic -->
+      </div>
+    </section>
+  </main>
+
+  <script src="comics-data.js"></script>
+  <script src="comics.js"></script>
+</body>
+</html>

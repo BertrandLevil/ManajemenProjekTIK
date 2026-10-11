@@ -1,0 +1,94 @@
+================================================================================
+COMIC APP - IMAGE & PANEL ASSETS GUIDE
+================================================================================
+SUPPORTED FORMATS: .webp, .jpg, .jpeg, .png (ALL are supported and automatically detected!)
+LOCATION: Put all image files directly into this `assets/` folder.
+
+--------------------------------------------------------------------------------
+1. AUTH / SIGNUP HEADER
+--------------------------------------------------------------------------------
+• header-bg.png (or header-bg.webp / header-bg.jpg)
+  -> Displayed on index.html (Login / Sign Up page)
+
+--------------------------------------------------------------------------------
+2. COMIC COVERS (For home.html and comic-details.html)
+--------------------------------------------------------------------------------
+[Trending Series]
+• magic-emperor.webp      (or .jpg / .png) -> Magic Emperor Cover
+• ranker-second.webp      (or .jpg / .png) -> Ranker Second Cover
+• martial-reigns.webp     (or .jpg / .png) -> Martial Reigns Cover
+• versatile-mage.jpg      (or .webp / .png)-> Versatile Mage Cover
+
+[Latest Updates Series]
+• reverse-world.webp      (or .jpg / .png) -> Reverse World Cover
+• go-toubun.webp          (or .jpg / .png) -> Go-Toubun Cover
+• shenwu-tianzun.webp     (or .jpg / .png) -> Shenwu Tianzun Cover
+• evil-god.jpg            (or .webp / .png)-> Evil God Cover
+
+[Featured Series]
+• world-after-fall.webp   (or .jpg / .png) -> The World After the Fall Cover
+
+--------------------------------------------------------------------------------
+3. COMIC READING PANELS (For reader.html)
+--------------------------------------------------------------------------------
+You can provide individual panels for each specific comic!
+The reader will automatically load `{comic-id}-panel-1`, `{comic-id}-panel-2`, etc.
+Any extension (.webp, .jpg, .png) will be detected automatically.
+
+▼ The World After the Fall:
+  • world-after-fall-panel-1.webp (or .jpg / .png)
+  • world-after-fall-panel-2.webp (or .jpg / .png)
+  • world-after-fall-panel-3.webp (or .jpg / .png)
+
+▼ Magic Emperor:
+  • magic-emperor-panel-1.webp    (or .jpg / .png)
+  • magic-emperor-panel-2.webp    (or .jpg / .png)
+  • magic-emperor-panel-3.webp    (or .jpg / .png)
+
+▼ Ranker Second:
+  • ranker-second-panel-1.webp    (or .jpg / .png)
+  • ranker-second-panel-2.webp    (or .jpg / .png)
+  • ranker-second-panel-3.webp    (or .jpg / .png)
+
+▼ Martial Reigns:
+  • martial-reigns-panel-1.webp   (or .jpg / .png)
+  • martial-reigns-panel-2.webp   (or .jpg / .png)
+  • martial-reigns-panel-3.webp   (or .jpg / .png)
+
+▼ Versatile Mage:
+  • versatile-mage-panel-1.webp   (or .jpg / .png)
+  • versatile-mage-panel-2.webp   (or .jpg / .png)
+  • versatile-mage-panel-3.webp   (or .jpg / .png)
+
+▼ Reverse World:
+  • reverse-world-panel-1.webp    (or .jpg / .png)
+  • reverse-world-panel-2.webp    (or .jpg / .png)
+  • reverse-world-panel-3.webp    (or .jpg / .png)
+
+▼ Go-Toubun:
+  • go-toubun-panel-1.webp        (or .jpg / .png)
+  • go-toubun-panel-2.webp        (or .jpg / .png)
+  • go-toubun-panel-3.webp        (or .jpg / .png)
+
+▼ Shenwu Tianzun:
+  • shenwu-tianzun-panel-1.webp   (or .jpg / .png)
+  • shenwu-tianzun-panel-2.webp   (or .jpg / .png)
+  • shenwu-tianzun-panel-3.webp   (or .jpg / .png)
+
+▼ Evil God:
+  • evil-god-panel-1.webp         (or .jpg / .png)
+  • evil-god-panel-2.webp         (or .jpg / .png)
+  • evil-god-panel-3.webp         (or .jpg / .png)
+
+--------------------------------------------------------------------------------
+4. GLOBAL DEFAULT PANELS (Fallback for all comics)
+--------------------------------------------------------------------------------
+If you don't want to create separate panels for every comic yet, you can also 
+simply add these 3 shared files, and they will display for any comic that does 
+not have comic-specific panels:
+  • comic-panel-1.webp (or .jpg / .png)
+  • comic-panel-2.webp (or .jpg / .png)
+  • comic-panel-3.webp (or .jpg / .png)
+
+*If no panel image exists at all, a sleek placeholder frame will automatically show.*
+================================================================================
