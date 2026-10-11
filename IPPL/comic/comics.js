@@ -451,12 +451,20 @@ function initSideDrawer() {
 const SEED_REVIEWS = {
   default: [
     {
-      author: "Fajri Anak Mama.",
+      author: "Fajri Anak Mama",
       avatar: "🦊",
       stars: 5,
       time: "2 days ago",
-      body: "oke sih keren banget bg aku suka",
+      body: "Oke sih keren banget bg aku suka",
       helpful: 12,
+    },
+     {
+      author: "Bima Kun",
+      avatar: "🦊",
+      stars: 2,
+      time: "1 days ago",
+      body: "Kurang sih ini ga kyk komik sebelah",
+      helpful: 1,
     },
   ],
 };
