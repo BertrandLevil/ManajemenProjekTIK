@@ -931,3 +931,266 @@
 .cm-btn-back:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* ==========================================================================
+   AUTHOR REQUEST VIEW & INLINE FORM
+   ========================================================================== */
+
+/* Author request view wrapper */
+.cm-author-request-view {
+  display: none;
+}
+
+/* Info banner shown inside the author card — vibrant purple */
+.cm-author-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(109, 40, 217, 0.08) 100%) !important;
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.32) !important;
+  border-left: 4px solid #a855f7 !important;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #f3e8ff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 18px rgba(147, 51, 234, 0.12);
+}
+
+[data-theme="light"] .cm-author-info-banner {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(109, 40, 217, 0.05) 100%) !important;
+  border-bottom-color: rgba(168, 85, 247, 0.25) !important;
+  color: #581c87 !important;
+}
+
+.cm-author-info-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* 📄 Request Button (Author toolbar) — striking purple accent */
+.cm-request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.24), rgba(124, 58, 237, 0.16)) !important;
+  color: #d8b4fe !important;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25);
+}
+
+.cm-request-btn:hover {
+  background: linear-gradient(135deg, #a855f7, #7c3aed) !important;
+  color: #ffffff !important;
+  border-color: #c084fc !important;
+  box-shadow: 0 8px 26px rgba(168, 85, 247, 0.6), 0 0 16px rgba(147, 51, 234, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* Submit Request button inside modal footer and inline form — vibrant purple */
+.cm-btn-request {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 36px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(216, 180, 254, 0.5) !important;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(168, 85, 247, 0.5), 0 0 16px rgba(147, 51, 234, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+.cm-btn-request:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 10px 32px rgba(168, 85, 247, 0.7), 0 0 24px rgba(168, 85, 247, 0.55) !important;
+  filter: brightness(1.08);
+}
+
+/* ==========================================================================
+   AUTHOR INLINE FORM SECTION (Directly visible in Author Workspace)
+   ========================================================================== */
+.cm-author-form-section {
+  margin: 20px 32px 28px;
+  padding: 26px 30px;
+  background: linear-gradient(180deg, rgba(147, 51, 234, 0.08) 0%, rgba(15, 12, 28, 0.7) 100%);
+  border: 1.5px solid rgba(168, 85, 247, 0.35);
+  border-radius: 22px;
+  box-shadow: 0 16px 44px rgba(147, 51, 234, 0.16), 0 0 24px rgba(124, 58, 237, 0.08);
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-theme="light"] .cm-author-form-section {
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.95) 0%, #ffffff 100%);
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 14px 36px rgba(147, 51, 234, 0.1);
+}
+
+.cm-author-form-section.is-editing {
+  border-color: #c084fc;
+  box-shadow: 0 16px 48px rgba(168, 85, 247, 0.35), 0 0 28px rgba(168, 85, 247, 0.3);
+  animation: cmFormPulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes cmFormPulse {
+  from { border-color: rgba(168, 85, 247, 0.45); }
+  to   { border-color: #c084fc; }
+}
+
+.cm-form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.25);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.cm-form-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.cm-form-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 3px 0 0;
+}
+
+.cm-form-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cm-btn-reset-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.cm-btn-reset-form:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.cm-inline-form-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .cm-inline-form-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cm-inline-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.cm-photo-box-purple:hover {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.35) !important;
+}
+
+/* ==========================================================================
+   ROLE BADGE VARIANTS (Admin = Gold, Author/Creator = Purple)
+   ========================================================================== */
+
+/* Admin toolbar badge — gold/amber */
+.cm-role-badge-admin {
+  background: rgba(251, 191, 36, 0.14) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  color: #fbbf24 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Admin badge inside modal header */
+.cm-modal-badge-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px;
+  border-radius: 8px;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Creator / Author toolbar badge — striking purple */
+.cm-role-badge-author {
+  background: rgba(168, 85, 247, 0.18) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  color: #d8b4fe !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.3) !important;
+  letter-spacing: 0.4px;
+}
+
+/* Creator / Author badge inside modal header — purple */
+.cm-modal-badge-creator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px;
+  border-radius: 8px;
+  background: rgba(168, 85, 247, 0.2) !important;
+  border: 1px solid rgba(168, 85, 247, 0.5) !important;
+  color: #d8b4fe !important;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35) !important;
+}
+
+

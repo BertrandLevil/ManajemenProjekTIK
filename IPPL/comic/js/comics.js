@@ -63,10 +63,30 @@ function initRoleManagement() {
       categoryMgmtItem.style.display = role === "admin" ? "flex" : "none";
     }
 
-    // Comic Management menu: Accessible by author AND admin
+    // Comic Management menu: Accessible by admin (Manage Comic - Admin) and author (Comic Submission - Author)
     const comicMgmtItem = document.getElementById("drawerComicManagement");
+    const drawerComicTitle = document.getElementById("drawerComicTitle");
+    const drawerComicBadge = document.getElementById("drawerComicBadge");
     if (comicMgmtItem) {
-      comicMgmtItem.style.display = (role === "admin" || role === "author") ? "flex" : "none";
+      if (role === "admin") {
+        comicMgmtItem.style.display = "flex";
+        if (drawerComicTitle) drawerComicTitle.textContent = "Manage Comic";
+        if (drawerComicBadge) {
+          drawerComicBadge.textContent = "Admin";
+          drawerComicBadge.className = "admin-pill-badge";
+          drawerComicBadge.style.cssText = "";
+        }
+      } else if (role === "author") {
+        comicMgmtItem.style.display = "flex";
+        if (drawerComicTitle) drawerComicTitle.textContent = "Comic Submission";
+        if (drawerComicBadge) {
+          drawerComicBadge.textContent = "Author";
+          drawerComicBadge.className = "author-pill-badge";
+          drawerComicBadge.style.cssText = "background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.5); font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 700; box-shadow: 0 0 10px rgba(168, 85, 247, 0.35);";
+        }
+      } else {
+        comicMgmtItem.style.display = "none";
+      }
     }
 
     window.dispatchEvent(new CustomEvent("roleChanged", { detail: { role } }));

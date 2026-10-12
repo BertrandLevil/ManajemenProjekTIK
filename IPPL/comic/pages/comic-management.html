@@ -62,7 +62,7 @@
       <div class="cm-denied-icon">🔒</div>
       <h2 class="cm-denied-title">Access Restricted</h2>
       <p class="cm-denied-desc">
-        The <strong>Comic Data Management</strong> page is only accessible by accounts with the <strong>Author</strong> or <strong>Admin</strong> role.<br />
+        The <strong>Comic Data Management</strong> page is only accessible by accounts with the <strong>Admin</strong> role.<br />
         Your current role is: <strong id="deniedRoleName" style="color: var(--purple-light);">USER</strong>.
       </p>
       <div class="cm-denied-actions">
@@ -78,7 +78,201 @@
       </div>
     </div>
 
-    <!-- MAIN COMIC DATA MANAGEMENT CONTENT (Shown to Author & Admin) -->
+    <!-- AUTHOR REQUEST VIEW (Shown only when role is Author) -->
+    <div class="cm-author-request-view" id="authorRequestView" style="display: none;">
+
+      <!-- Author Main Card -->
+      <div class="cm-card">
+        <div class="cm-card-header">
+          <h2 class="cm-header-title">✍️ Comic Submission &amp; Workspace</h2>
+          <span class="cm-role-badge cm-role-badge-author">✍️ Author</span>
+        </div>
+
+        <!-- Info banner in striking purple -->
+        <div class="cm-author-info-banner">
+          <span class="cm-author-info-icon">📋</span>
+          <div>
+            <strong>Author Workspace</strong> Fill Comic data from below to request publish a new comic or edit an existing one.  <em>📄</em> Click request to send the submission to Admin to be checked and published
+          </div>
+        </div>
+
+        <!-- Author Metrics -->
+        <div class="cm-metrics-strip">
+          <div class="cm-metric-item">
+            <div class="cm-metric-icon">📬</div>
+            <div class="cm-metric-info">
+              <span class="cm-metric-val" id="authorMetricPending">0</span>
+              <span class="cm-metric-lbl">Pending Requests</span>
+            </div>
+          </div>
+          <div class="cm-metric-item">
+            <div class="cm-metric-icon">✅</div>
+            <div class="cm-metric-info">
+              <span class="cm-metric-val" id="authorMetricApproved">0</span>
+              <span class="cm-metric-lbl">Approved</span>
+            </div>
+          </div>
+          <div class="cm-metric-item">
+            <div class="cm-metric-icon">📖</div>
+            <div class="cm-metric-info">
+              <span class="cm-metric-val" id="authorMetricTotal">0</span>
+              <span class="cm-metric-lbl">Total Submitted</span>
+            </div>
+          </div>
+          <div class="cm-metric-item">
+            <div class="cm-metric-icon">✍️</div>
+            <div class="cm-metric-info">
+              <span class="cm-metric-val" id="authorMetricName">Author</span>
+              <span class="cm-metric-lbl">Your Role</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMIC SUBMISSION & EDIT FORM (Directly Visible!) -->
+        <div class="cm-author-form-section" id="authorInlineFormSection">
+          <div class="cm-form-section-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 24px;">📄</span>
+              <div>
+                <h3 class="cm-form-title" id="authorInlineFormTitle">Comic Submission Form</h3>
+                <p class="cm-form-subtitle">Complete the form below to request a new comic or edit an existing one.</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="cm-form-mode-badge" id="authorFormModeBadge">✨ New Submission</span>
+              <button type="button" class="cm-btn-reset-form" id="authorFormResetBtn" style="display: none;">
+                ✕ Cancel Edit / New Form
+              </button>
+            </div>
+          </div>
+
+          <form id="authorInlineComicForm">
+            <div class="cm-inline-form-body">
+
+              <!-- Left Column: Cover Photo & File Upload -->
+              <div class="cm-photo-col">
+                <label style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: block;">
+                  Comic Cover:
+                </label>
+                <div class="cm-photo-box cm-photo-box-purple" id="inlineReqPhotoDropArea" title="Click to upload or select cover">
+                  <div class="cm-photo-placeholder" id="inlineReqPhotoPlaceholder">
+                    <span class="cm-photo-placeholder-icon">📷</span>
+                    <span class="cm-photo-placeholder-text">Add Photo</span>
+                    <span class="cm-photo-placeholder-sub">Click or drag image file</span>
+                  </div>
+                  <img src="" alt="Comic Cover Preview" class="cm-photo-preview-img" id="inlineReqPhotoPreviewImg" />
+                  <div class="cm-photo-change-overlay" id="inlineReqPhotoChangeOverlay">
+                    <span>🔄 Change Photo</span>
+                  </div>
+                </div>
+                <input type="file" id="inlineReqCoverFileInput" accept="image/*" style="display: none;" />
+
+                <label for="inlineReqCoverPresetSelect" style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 12px; display: block;">
+                  Or choose sample cover from assets:
+                </label>
+                <select id="inlineReqCoverPresetSelect" class="cm-photo-preset-select" aria-label="Choose preset asset cover">
+                  <option value="">-- Choose sample cover --</option>
+                  <option value="../assets/world-after-fall.gif">The World After The Fall</option>
+                  <option value="../assets/magic-emperor.gif">Magic Emperor</option>
+                  <option value="../assets/martial-reigns.gif">Martial Reigns</option>
+                  <option value="../assets/ranker-second.gif">Ranker Second</option>
+                  <option value="../assets/versatile-mage.gif">Versatile Mage</option>
+                  <option value="../assets/evil-god.gif">Evil God</option>
+                  <option value="../assets/go-toubun.gif">Go-Toubun</option>
+                  <option value="../assets/shenwu-tianzun.jpg">Shenwu Tianzun</option>
+                  <option value="../assets/reverse-world.gif">Reverse World</option>
+                </select>
+              </div>
+
+              <!-- Right Column: Fields -->
+              <div class="cm-fields-col">
+
+                <div class="cm-form-group">
+                  <label class="cm-label" for="inlineReqTitleInput">Comic Title :</label>
+                  <input type="text" class="cm-input-pill" id="inlineReqTitleInput" placeholder="e.g. The World After The Fall" required />
+                </div>
+
+                <div class="cm-subgrid">
+                  <div class="cm-subcol">
+                    <div class="cm-form-group">
+                      <label class="cm-label" for="inlineReqAuthorInput">Author :</label>
+                      <input type="text" class="cm-input-pill" id="inlineReqAuthorInput" placeholder="e.g. Sing-Shong" required />
+                    </div>
+                    <div class="cm-form-group">
+                      <label class="cm-label" for="inlineReqStudioInput">Studio :</label>
+                      <input type="text" class="cm-input-pill" id="inlineReqStudioInput" placeholder="e.g. Redice Studio" />
+                    </div>
+                    <div class="cm-form-group">
+                      <label class="cm-label" for="inlineReqCategoryInput">Category :</label>
+                      <input type="text" class="cm-input-pill" id="inlineReqCategoryInput" placeholder="e.g. Manhwa" />
+                    </div>
+                  </div>
+                  <div class="cm-subcol">
+                    <div class="cm-form-group">
+                      <label class="cm-label" for="inlineReqGenreInput">Genre :</label>
+                      <input type="text" class="cm-input-pill" id="inlineReqGenreInput" placeholder="e.g. Action, Adventure, Fantasy" />
+                    </div>
+                    <div class="cm-form-group">
+                      <label class="cm-label" for="inlineReqDescInput">Description :</label>
+                      <textarea class="cm-textarea-pill" id="inlineReqDescInput" placeholder="Brief description of the comic..."></textarea>
+                    </div>
+                    <div class="cm-upload-file-row">
+                      <label class="cm-btn-upload-file" for="inlineReqChapterFileInput">
+                        <span>☁</span> Upload/File
+                      </label>
+                      <input type="file" id="inlineReqChapterFileInput" style="display: none;" />
+                      <span class="cm-file-badge" id="inlineReqFileBadge" style="display: none;">File Attached</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cm-form-group">
+                  <label class="cm-label" for="inlineReqSourceInput">Source :</label>
+                  <input type="text" class="cm-input-pill" id="inlineReqSourceInput" placeholder="e.g. https://webtoons.com/..." />
+                </div>
+
+                <!-- Notes for admin -->
+                <div class="cm-form-group">
+                  <label class="cm-label" for="inlineReqNotesInput">Note for Admin :</label>
+                  <textarea class="cm-textarea-pill" id="inlineReqNotesInput" placeholder="Additional notes for admin review..." style="height: 64px;"></textarea>
+                </div>
+
+                <!-- Footer with prominent purple Request button -->
+                <div class="cm-inline-form-footer">
+                  <button type="submit" class="cm-btn-request" id="inlineSubmitRequestBtn">
+                    <span>📄</span> Request
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Section: Request List & Status History -->
+        <div class="cm-toolbar" style="margin-top: 10px;">
+          <div class="cm-toolbar-left">
+            <div class="cm-search-box">
+              <span class="cm-search-icon">🔍</span>
+              <input type="text" class="cm-search-input" id="authorRequestSearchInput" placeholder="Search requests..." aria-label="Search requests" />
+            </div>
+            <button type="button" class="cm-request-btn" id="openRequestFormBtn" title="Focus on the request form">
+              <span>📄</span> New Request
+            </button>
+          </div>
+          <div class="cm-role-badge cm-role-badge-author">✍️ Author</div>
+        </div>
+
+        <!-- Request List -->
+        <div class="cm-list-box">
+          <div id="authorRequestListContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN COMIC DATA MANAGEMENT CONTENT (Admin only) -->
     <div class="cm-card" id="comicManagementContent">
 
       <!-- Card Header -->
@@ -142,9 +336,9 @@
           </button>
         </div>
 
-        <!-- Creator Role Badge (Right side of toolbar) -->
-        <div class="cm-role-badge" id="toolbarRoleBadge">
-          Creator
+        <!-- Admin Role Badge (Right side of toolbar) -->
+        <div class="cm-role-badge cm-role-badge-admin" id="toolbarRoleBadge">
+          👑 Admin
         </div>
       </div>
 
@@ -171,13 +365,123 @@
 
   </main>
 
+  <!-- AUTHOR REQUEST COMIC MODAL -->
+  <div class="cm-modal-overlay" id="requestComicModal">
+    <div class="cm-modal-card">
+      <div class="cm-modal-header">
+        <h3 class="cm-modal-title" id="requestComicModalTitle">📄 Request Comic Submission</h3>
+        <div class="cm-modal-header-right">
+          <span class="cm-modal-badge-creator">✍️ Author</span>
+          <button type="button" class="cm-modal-close" id="closeRequestComicModalBtn" aria-label="Close modal">✕</button>
+        </div>
+      </div>
+
+      <form id="requestComicForm">
+        <div class="cm-modal-body">
+
+          <!-- Left Column: Cover Photo -->
+          <div class="cm-photo-col">
+            <div class="cm-photo-box" id="reqPhotoDropArea" title="Click to upload or select cover">
+              <div class="cm-photo-placeholder" id="reqPhotoPlaceholder">
+                <span class="cm-photo-placeholder-icon">📷</span>
+                <span class="cm-photo-placeholder-text">Add Photo</span>
+                <span class="cm-photo-placeholder-sub">Click to browse or drop image</span>
+              </div>
+              <img src="" alt="Comic Cover Preview" class="cm-photo-preview-img" id="reqPhotoPreviewImg" />
+              <div class="cm-photo-change-overlay" id="reqPhotoChangeOverlay">
+                <span>🔄 Change Photo</span>
+              </div>
+            </div>
+            <input type="file" id="reqCoverFileInput" accept="image/*" style="display: none;" />
+            <label for="reqCoverPresetSelect" style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 10px;">
+              Or choose existing asset cover:
+            </label>
+            <select id="reqCoverPresetSelect" class="cm-photo-preset-select" aria-label="Choose preset asset cover">
+              <option value="">-- Choose Preset Asset Cover --</option>
+              <option value="../assets/world-after-fall.gif">The World After The Fall</option>
+              <option value="../assets/magic-emperor.gif">Magic Emperor</option>
+              <option value="../assets/martial-reigns.gif">Martial Reigns</option>
+              <option value="../assets/ranker-second.gif">Ranker Second</option>
+              <option value="../assets/versatile-mage.gif">Versatile Mage</option>
+              <option value="../assets/evil-god.gif">Evil God</option>
+              <option value="../assets/go-toubun.gif">Go-Toubun</option>
+              <option value="../assets/shenwu-tianzun.jpg">Shenwu Tianzun</option>
+              <option value="../assets/reverse-world.gif">Reverse World</option>
+            </select>
+          </div>
+
+          <!-- Right Column: Fields -->
+          <div class="cm-fields-col">
+
+            <div class="cm-form-group">
+              <label class="cm-label" for="reqTitleInput">Comic Title :</label>
+              <input type="text" class="cm-input-pill" id="reqTitleInput" placeholder="e.g. The World After The Fall" required />
+            </div>
+
+            <div class="cm-subgrid">
+              <div class="cm-subcol">
+                <div class="cm-form-group">
+                  <label class="cm-label" for="reqAuthorInput">Author :</label>
+                  <input type="text" class="cm-input-pill" id="reqAuthorInput" placeholder="e.g. Sing-Shong" required />
+                </div>
+                <div class="cm-form-group">
+                  <label class="cm-label" for="reqStudioInput">Studio :</label>
+                  <input type="text" class="cm-input-pill" id="reqStudioInput" placeholder="e.g. Redice Studio" />
+                </div>
+                <div class="cm-form-group">
+                  <label class="cm-label" for="reqCategoryInput">Category :</label>
+                  <input type="text" class="cm-input-pill" id="reqCategoryInput" placeholder="e.g. Manhwa" />
+                </div>
+              </div>
+              <div class="cm-subcol">
+                <div class="cm-form-group">
+                  <label class="cm-label" for="reqGenreInput">Genre :</label>
+                  <input type="text" class="cm-input-pill" id="reqGenreInput" placeholder="e.g. Action, Adventure, Fantasy" />
+                </div>
+                <div class="cm-form-group">
+                  <label class="cm-label" for="reqDescInput">Description :</label>
+                  <textarea class="cm-textarea-pill" id="reqDescInput" placeholder="Brief description of the comic..."></textarea>
+                </div>
+                <div class="cm-upload-file-row">
+                  <label class="cm-btn-upload-file" for="reqChapterFileInput">
+                    <span>☁</span> Upload/File
+                  </label>
+                  <input type="file" id="reqChapterFileInput" style="display: none;" />
+                  <span class="cm-file-badge" id="reqFileBadge" style="display: none;">File Attached</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="cm-form-group">
+              <label class="cm-label" for="reqSourceInput">Source :</label>
+              <input type="text" class="cm-input-pill" id="reqSourceInput" placeholder="e.g. https://webtoons.com/..." />
+            </div>
+
+            <!-- Notes field for author request -->
+            <div class="cm-form-group">
+              <label class="cm-label" for="reqNotesInput">Notes for Admin :</label>
+              <textarea class="cm-textarea-pill" id="reqNotesInput" placeholder="Any additional notes or context for the admin review..." style="height: 72px;"></textarea>
+            </div>
+
+            <div class="cm-modal-footer">
+              <button type="button" class="um-btn-cancel" id="cancelRequestComicModalBtn">Cancel</button>
+              <button type="submit" class="cm-btn-request" id="submitRequestComicBtn">
+                📄 Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ADD / EDIT COMIC MODAL (Matches Wireframe Images 1 & 3) -->
   <div class="cm-modal-overlay" id="comicModal">
     <div class="cm-modal-card">
       <div class="cm-modal-header">
         <h3 class="cm-modal-title" id="comicModalTitle">Add Comic</h3>
         <div class="cm-modal-header-right">
-          <span class="cm-modal-badge-creator">Creator</span>
+          <span class="cm-modal-badge-admin">👑 Admin</span>
           <button type="button" class="cm-modal-close" id="closeComicModalBtn" aria-label="Close modal">✕</button>
         </div>
       </div>
@@ -486,19 +790,20 @@
       localStorage.setItem("comic_management_data", JSON.stringify(comics));
     }
 
-    // ── ROLE ACCESS CONTROL CHECK (AUTHOR & ADMIN ONLY) ─────────────────────
+    // ── ROLE ACCESS CONTROL CHECK (ADMIN ONLY for management; AUTHOR gets request form) ───
     function checkAccess() {
       const currentRole = localStorage.getItem("current_user_role") || "user";
       const headerSelect = document.getElementById("headerRoleSelect");
       if (headerSelect) headerSelect.value = currentRole;
 
-      const deniedView = document.getElementById("accessDeniedView");
-      const contentView = document.getElementById("comicManagementContent");
-      const deniedRoleName = document.getElementById("deniedRoleName");
-      const navUsersLink = document.getElementById("navUsersLink");
-      const toolbarRoleBadge = document.getElementById("toolbarRoleBadge");
+      const deniedView        = document.getElementById("accessDeniedView");
+      const contentView       = document.getElementById("comicManagementContent");
+      const authorRequestView = document.getElementById("authorRequestView");
+      const deniedRoleName    = document.getElementById("deniedRoleName");
+      const navUsersLink      = document.getElementById("navUsersLink");
+      const toolbarRoleBadge  = document.getElementById("toolbarRoleBadge");
 
-      // Admin only nav links
+      // Admin-only nav links
       if (navUsersLink) {
         navUsersLink.style.display = currentRole === "admin" ? "inline-block" : "none";
       }
@@ -512,16 +817,26 @@
       }
 
       if (toolbarRoleBadge) {
-        toolbarRoleBadge.textContent = currentRole === "admin" ? "Admin" : "Creator";
+        toolbarRoleBadge.innerHTML = "&#x1F451; Admin";
+        toolbarRoleBadge.className = "cm-role-badge cm-role-badge-admin";
       }
 
-      // Access granted to author AND admin
-      if (currentRole === "admin" || currentRole === "author") {
-        deniedView.style.display = "none";
+      // Hide all panels first
+      deniedView.style.display        = "none";
+      contentView.style.display       = "none";
+      authorRequestView.style.display = "none";
+
+      if (currentRole === "admin") {
+        // Admin: full comic management
         contentView.style.display = "block";
+      } else if (currentRole === "author") {
+        // Author: request-only form
+        authorRequestView.style.display = "block";
+        renderAuthorRequestList();
+        updateAuthorMetrics();
       } else {
+        // User / unknown: access denied
         deniedView.style.display = "block";
-        contentView.style.display = "none";
         if (deniedRoleName) {
           deniedRoleName.textContent = currentRole.toUpperCase();
         }
@@ -543,6 +858,8 @@
     if (btnSwitchAuthor) {
       btnSwitchAuthor.addEventListener("click", () => {
         localStorage.setItem("current_user_role", "author");
+        const sel = document.getElementById("headerRoleSelect");
+        if (sel) sel.value = "author";
         checkAccess();
       });
     }
@@ -551,6 +868,8 @@
     if (btnSwitchAdmin) {
       btnSwitchAdmin.addEventListener("click", () => {
         localStorage.setItem("current_user_role", "admin");
+        const sel = document.getElementById("headerRoleSelect");
+        if (sel) sel.value = "admin";
         checkAccess();
       });
     }
@@ -921,6 +1240,466 @@
         btn.classList.add("active");
       });
     });
+
+    // ── AUTHOR REQUEST SYSTEM (Striking Purple UI) ──────────────────────────
+    // Storage key for author requests (pending approval queue)
+    const AUTHOR_REQUESTS_KEY = "comic_author_requests";
+
+    function getAuthorRequests() {
+      return JSON.parse(localStorage.getItem(AUTHOR_REQUESTS_KEY)) || [];
+    }
+
+    function saveAuthorRequests(reqs) {
+      localStorage.setItem(AUTHOR_REQUESTS_KEY, JSON.stringify(reqs));
+    }
+
+    function updateAuthorMetrics() {
+      const reqs = getAuthorRequests();
+      const pending  = reqs.filter(r => r.status === "pending").length;
+      const approved = reqs.filter(r => r.status === "approved").length;
+      const el = (id) => document.getElementById(id);
+      if (el("authorMetricPending"))  el("authorMetricPending").textContent  = pending;
+      if (el("authorMetricApproved")) el("authorMetricApproved").textContent = approved;
+      if (el("authorMetricTotal"))    el("authorMetricTotal").textContent    = reqs.length;
+    }
+
+    function renderAuthorRequestList() {
+      const container = document.getElementById("authorRequestListContainer");
+      if (!container) return;
+      const query = ((document.getElementById("authorRequestSearchInput") || {}).value || "").toLowerCase().trim();
+      const reqs = getAuthorRequests().filter(r =>
+        r.title.toLowerCase().includes(query) ||
+        (r.author && r.author.toLowerCase().includes(query))
+      );
+
+      if (reqs.length === 0) {
+        container.innerHTML = `
+          <div class="cm-empty-state" style="border-color: rgba(168, 85, 247, 0.25);">
+            There is no comic request submitted yet. Use the <strong>Form above</strong> or click <strong>📄 New Request</strong> to submit your first comic.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = reqs.map((r, i) => {
+        const statusColor = r.status === "approved"
+          ? "#c084fc" : r.status === "rejected" ? "#ef4444" : "#fbbf24";
+        const statusLabel = r.status === "approved" ? "✅ Approved"
+          : r.status === "rejected" ? "❌ Rejected" : "⏳ Waiting for Review";
+        const coverSrc = r.cover || "../assets/world-after-fall.gif";
+        return `
+          <div class="cm-row" data-req-id="${r.id}" style="border-color: rgba(168, 85, 247, 0.18);">
+            <div class="cm-num-box" style="border-color: rgba(168, 85, 247, 0.3); color: #d8b4fe;">${i + 1}</div>
+            <div class="cm-title-pill" onclick="loadRequestIntoInlineForm('${r.id}')" title="Click to edit form: ${escapeHtml(r.title)}" style="border-color: rgba(168, 85, 247, 0.25);">
+              <div class="cm-title-left">
+                <img src="${coverSrc}" alt="${escapeHtml(r.title)}" class="cm-thumb-img"
+                  onerror="this.src='../assets/world-after-fall.gif'" />
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span class="cm-title-text">${escapeHtml(r.title)}</span>
+                  <div style="font-size:11.5px;color:var(--text-muted);font-weight:500;">
+                    ${r.author ? `<span>by ${escapeHtml(r.author)}</span>` : ""}
+                    ${r.studio ? `<span style="opacity:.7"> • ${escapeHtml(r.studio)}</span>` : ""}
+                  </div>
+                </div>
+              </div>
+              <div class="cm-title-meta">
+                ${r.category ? `<span class="cm-title-category-badge" style="background: rgba(168, 85, 247, 0.16); color: #d8b4fe; border-color: rgba(168, 85, 247, 0.35);">${escapeHtml(r.category)}</span>` : ""}
+                <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusLabel}</span>
+              </div>
+            </div>
+            <div class="cm-actions">
+              <button type="button" class="cm-btn-action cm-btn-edit"
+                onclick="loadRequestIntoInlineForm('${r.id}')" title="Edit in Form"
+                aria-label="Edit form ${escapeHtml(r.title)}">
+                ✏️
+              </button>
+              <button type="button" class="cm-btn-action cm-btn-delete"
+                onclick="deleteAuthorRequest('${r.id}')" title="Withdraw Request"
+                aria-label="Withdraw request ${escapeHtml(r.title)}">
+                🗑️
+              </button>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    // ── AUTHOR INLINE FORM HANDLING ──────────────────────────────────────────
+    let inlineEditingRequestId = null;
+    let inlineReqCoverDataUrl  = "";
+
+    const authorInlineFormSection   = document.getElementById("authorInlineFormSection");
+    const authorInlineComicForm     = document.getElementById("authorInlineComicForm");
+    const authorInlineFormTitle     = document.getElementById("authorInlineFormTitle");
+    const authorFormModeBadge       = document.getElementById("authorFormModeBadge");
+    const authorFormResetBtn        = document.getElementById("authorFormResetBtn");
+    const inlineSubmitRequestBtn    = document.getElementById("inlineSubmitRequestBtn");
+
+    const inlineReqTitleInput    = document.getElementById("inlineReqTitleInput");
+    const inlineReqAuthorInput   = document.getElementById("inlineReqAuthorInput");
+    const inlineReqStudioInput   = document.getElementById("inlineReqStudioInput");
+    const inlineReqCategoryInput = document.getElementById("inlineReqCategoryInput");
+    const inlineReqGenreInput    = document.getElementById("inlineReqGenreInput");
+    const inlineReqDescInput     = document.getElementById("inlineReqDescInput");
+    const inlineReqSourceInput   = document.getElementById("inlineReqSourceInput");
+    const inlineReqNotesInput    = document.getElementById("inlineReqNotesInput");
+
+    const inlineReqPhotoDropArea    = document.getElementById("inlineReqPhotoDropArea");
+    const inlineReqPhotoPlaceholder = document.getElementById("inlineReqPhotoPlaceholder");
+    const inlineReqPhotoPreviewImg  = document.getElementById("inlineReqPhotoPreviewImg");
+    const inlineReqCoverFileInput   = document.getElementById("inlineReqCoverFileInput");
+    const inlineReqCoverPresetSelect = document.getElementById("inlineReqCoverPresetSelect");
+    const inlineReqChapterFileInput = document.getElementById("inlineReqChapterFileInput");
+    const inlineReqFileBadge        = document.getElementById("inlineReqFileBadge");
+
+    function setInlineCoverPreview(src) {
+      inlineReqCoverDataUrl = src || "";
+      if (src) {
+        if (inlineReqPhotoPreviewImg) {
+          inlineReqPhotoPreviewImg.src = src;
+          inlineReqPhotoPreviewImg.style.display = "block";
+        }
+        if (inlineReqPhotoPlaceholder) inlineReqPhotoPlaceholder.style.display = "none";
+      } else {
+        if (inlineReqPhotoPreviewImg) {
+          inlineReqPhotoPreviewImg.src = "";
+          inlineReqPhotoPreviewImg.style.display = "none";
+        }
+        if (inlineReqPhotoPlaceholder) inlineReqPhotoPlaceholder.style.display = "flex";
+      }
+    }
+
+    if (inlineReqPhotoDropArea) {
+      inlineReqPhotoDropArea.addEventListener("click", () => {
+        if (inlineReqCoverFileInput) inlineReqCoverFileInput.click();
+      });
+    }
+
+    if (inlineReqCoverFileInput) {
+      inlineReqCoverFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            setInlineCoverPreview(ev.target.result);
+            if (inlineReqCoverPresetSelect) inlineReqCoverPresetSelect.value = "";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    if (inlineReqCoverPresetSelect) {
+      inlineReqCoverPresetSelect.addEventListener("change", (e) => {
+        if (e.target.value) setInlineCoverPreview(e.target.value);
+      });
+    }
+
+    if (inlineReqChapterFileInput) {
+      inlineReqChapterFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file && inlineReqFileBadge) {
+          inlineReqFileBadge.textContent = `File: ${file.name.substring(0, 14)}...`;
+          inlineReqFileBadge.style.display = "inline-flex";
+        }
+      });
+    }
+
+    function resetInlineAuthorForm() {
+      inlineEditingRequestId = null;
+      if (authorInlineComicForm) authorInlineComicForm.reset();
+      setInlineCoverPreview("");
+      if (inlineReqFileBadge) inlineReqFileBadge.style.display = "none";
+      if (authorInlineFormTitle) authorInlineFormTitle.textContent = "Comic Submission Form";
+      if (authorFormModeBadge) {
+        authorFormModeBadge.textContent = "✨ New Submission";
+        authorFormModeBadge.style.borderColor = "rgba(168, 85, 247, 0.45)";
+        authorFormModeBadge.style.color = "#d8b4fe";
+      }
+      if (inlineSubmitRequestBtn) inlineSubmitRequestBtn.innerHTML = "<span>📄</span> Request";
+      if (authorFormResetBtn) authorFormResetBtn.style.display = "none";
+      if (authorInlineFormSection) authorInlineFormSection.classList.remove("is-editing");
+    }
+
+    if (authorFormResetBtn) {
+      authorFormResetBtn.addEventListener("click", resetInlineAuthorForm);
+    }
+
+    window.loadRequestIntoInlineForm = function(id) {
+      const reqs = getAuthorRequests();
+      const found = reqs.find(r => r.id === id);
+      if (!found) return;
+
+      inlineEditingRequestId = id;
+      if (authorInlineFormTitle) authorInlineFormTitle.textContent = `✏️ Edit Request: ${found.title}`;
+      if (authorFormModeBadge) {
+        authorFormModeBadge.textContent = "✏️ Editing Mode";
+        authorFormModeBadge.style.borderColor = "#c084fc";
+        authorFormModeBadge.style.color = "#ffffff";
+      }
+      if (inlineSubmitRequestBtn) inlineSubmitRequestBtn.innerHTML = "<span>📄</span> Request Changes";
+      if (authorFormResetBtn) authorFormResetBtn.style.display = "inline-flex";
+
+      if (inlineReqTitleInput)    inlineReqTitleInput.value    = found.title || "";
+      if (inlineReqAuthorInput)   inlineReqAuthorInput.value   = found.author || "";
+      if (inlineReqStudioInput)   inlineReqStudioInput.value   = found.studio || "";
+      if (inlineReqCategoryInput) inlineReqCategoryInput.value = found.category || "";
+      if (inlineReqGenreInput)    inlineReqGenreInput.value    = found.genre || "";
+      if (inlineReqDescInput)     inlineReqDescInput.value     = found.description || "";
+      if (inlineReqSourceInput)   inlineReqSourceInput.value   = found.source || "";
+      if (inlineReqNotesInput)    inlineReqNotesInput.value    = found.notes || "";
+
+      setInlineCoverPreview(found.cover || "");
+
+      if (inlineReqFileBadge) {
+        inlineReqFileBadge.textContent = "File Attached";
+        inlineReqFileBadge.style.display = "inline-flex";
+      }
+
+      if (authorInlineFormSection) {
+        authorInlineFormSection.classList.add("is-editing");
+        authorInlineFormSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      if (inlineReqTitleInput) inlineReqTitleInput.focus();
+    };
+
+    if (authorInlineComicForm) {
+      authorInlineComicForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title    = (inlineReqTitleInput    ? inlineReqTitleInput.value.trim()    : "");
+        const author   = (inlineReqAuthorInput   ? inlineReqAuthorInput.value.trim()   : "");
+        const studio   = (inlineReqStudioInput   ? inlineReqStudioInput.value.trim()   : "");
+        const category = (inlineReqCategoryInput ? inlineReqCategoryInput.value.trim() : "");
+        const genre    = (inlineReqGenreInput    ? inlineReqGenreInput.value.trim()    : "");
+        const description = (inlineReqDescInput  ? inlineReqDescInput.value.trim()     : "");
+        const source   = (inlineReqSourceInput   ? inlineReqSourceInput.value.trim()   : "");
+        const notes    = (inlineReqNotesInput    ? inlineReqNotesInput.value.trim()    : "");
+        const cover    = inlineReqCoverDataUrl || "../assets/world-after-fall.gif";
+
+        if (!title) {
+          if (inlineReqTitleInput) inlineReqTitleInput.focus();
+          return;
+        }
+
+        let reqs = getAuthorRequests();
+        const isEditing = inlineEditingRequestId !== null;
+
+        if (isEditing) {
+          const idx = reqs.findIndex(r => r.id === inlineEditingRequestId);
+          if (idx !== -1) {
+            reqs[idx] = {
+              ...reqs[idx],
+              title,
+              author,
+              studio,
+              category,
+              genre,
+              description,
+              source,
+              notes,
+              cover: inlineReqCoverDataUrl || reqs[idx].cover,
+              updatedAt: new Date().toISOString()
+            };
+          }
+        } else {
+          const newReq = {
+            id: `req_${Date.now()}`,
+            title,
+            author,
+            studio,
+            category,
+            genre,
+            description,
+            source,
+            notes,
+            cover,
+            status: "pending",
+            submittedAt: new Date().toISOString()
+          };
+          reqs.unshift(newReq);
+        }
+
+        saveAuthorRequests(reqs);
+        renderAuthorRequestList();
+        updateAuthorMetrics();
+        resetInlineAuthorForm();
+
+        openNotice(
+          isEditing
+            ? `Comic request for "${escapeHtml(title)}" updated successfully! ✅ The submission has been forwarded to Admin.`
+            : `Comic request for "${escapeHtml(title)}" submitted successfully! 📄 Admin will review and publish it shortly.`
+        );
+      });
+    }
+
+    // ── TOOLBAR ACTION: "📄 New Request" SCROLLS TO FORM ───────────────────
+    const openRequestFormBtn = document.getElementById("openRequestFormBtn");
+    if (openRequestFormBtn) {
+      openRequestFormBtn.addEventListener("click", () => {
+        resetInlineAuthorForm();
+        if (authorInlineFormSection) {
+          authorInlineFormSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (inlineReqTitleInput) inlineReqTitleInput.focus();
+      });
+    }
+
+    // ── AUTHOR REQUEST MODAL (FALLBACK / COMPATIBILITY) ──────────────────────
+    let editingRequestId = null;
+    let reqCoverDataUrl  = "";
+
+    const requestComicModal       = document.getElementById("requestComicModal");
+    const closeRequestComicModalBtn = document.getElementById("closeRequestComicModalBtn");
+    const cancelRequestComicModalBtn = document.getElementById("cancelRequestComicModalBtn");
+    const requestComicForm        = document.getElementById("requestComicForm");
+    const requestComicModalTitle  = document.getElementById("requestComicModalTitle");
+
+    const reqTitleInput    = document.getElementById("reqTitleInput");
+    const reqAuthorInput   = document.getElementById("reqAuthorInput");
+    const reqStudioInput   = document.getElementById("reqStudioInput");
+    const reqCategoryInput = document.getElementById("reqCategoryInput");
+    const reqGenreInput    = document.getElementById("reqGenreInput");
+    const reqDescInput     = document.getElementById("reqDescInput");
+    const reqSourceInput   = document.getElementById("reqSourceInput");
+    const reqNotesInput    = document.getElementById("reqNotesInput");
+
+    const reqPhotoDropArea    = document.getElementById("reqPhotoDropArea");
+    const reqPhotoPlaceholder = document.getElementById("reqPhotoPlaceholder");
+    const reqPhotoPreviewImg  = document.getElementById("reqPhotoPreviewImg");
+    const reqCoverFileInput   = document.getElementById("reqCoverFileInput");
+    const reqCoverPresetSelect = document.getElementById("reqCoverPresetSelect");
+    const reqChapterFileInput = document.getElementById("reqChapterFileInput");
+    const reqFileBadge        = document.getElementById("reqFileBadge");
+
+    function setReqCoverPreview(src) {
+      reqCoverDataUrl = src || "";
+      if (src) {
+        if (reqPhotoPreviewImg) {
+          reqPhotoPreviewImg.src = src;
+          reqPhotoPreviewImg.style.display = "block";
+        }
+        if (reqPhotoPlaceholder) reqPhotoPlaceholder.style.display = "none";
+      } else {
+        if (reqPhotoPreviewImg) {
+          reqPhotoPreviewImg.src = "";
+          reqPhotoPreviewImg.style.display = "none";
+        }
+        if (reqPhotoPlaceholder) reqPhotoPlaceholder.style.display = "flex";
+      }
+    }
+
+    if (reqPhotoDropArea) {
+      reqPhotoDropArea.addEventListener("click", () => {
+        if (reqCoverFileInput) reqCoverFileInput.click();
+      });
+    }
+    if (reqCoverFileInput) {
+      reqCoverFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            setReqCoverPreview(ev.target.result);
+            if (reqCoverPresetSelect) reqCoverPresetSelect.value = "";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    if (reqCoverPresetSelect) {
+      reqCoverPresetSelect.addEventListener("change", (e) => {
+        if (e.target.value) setReqCoverPreview(e.target.value);
+      });
+    }
+    if (reqChapterFileInput) {
+      reqChapterFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file && reqFileBadge) {
+          reqFileBadge.textContent = `File: ${file.name.substring(0, 14)}...`;
+          reqFileBadge.style.display = "inline-flex";
+        }
+      });
+    }
+
+    function openAddRequestModal() {
+      editingRequestId = null;
+      if (requestComicModalTitle) requestComicModalTitle.textContent = "📄 Request Comic Submission";
+      if (requestComicForm) requestComicForm.reset();
+      setReqCoverPreview("");
+      if (reqFileBadge) reqFileBadge.style.display = "none";
+      if (requestComicModal) requestComicModal.classList.add("open");
+    }
+
+    window.openEditRequestModal = function(id) {
+      loadRequestIntoInlineForm(id);
+    };
+
+    function closeRequestModal() {
+      if (requestComicModal) requestComicModal.classList.remove("open");
+      editingRequestId = null;
+    }
+
+    if (closeRequestComicModalBtn) closeRequestComicModalBtn.addEventListener("click", closeRequestModal);
+    if (cancelRequestComicModalBtn) cancelRequestComicModalBtn.addEventListener("click", closeRequestModal);
+
+    if (requestComicModal) {
+      requestComicModal.addEventListener("click", (e) => {
+        if (e.target === requestComicModal) closeRequestModal();
+      });
+    }
+
+    // Search in author request list
+    const authorReqSearchInput = document.getElementById("authorRequestSearchInput");
+    if (authorReqSearchInput) {
+      authorReqSearchInput.addEventListener("input", renderAuthorRequestList);
+    }
+
+    if (requestComicForm) {
+      requestComicForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title    = (reqTitleInput    ? reqTitleInput.value.trim()    : "");
+        const author   = (reqAuthorInput   ? reqAuthorInput.value.trim()   : "");
+        const studio   = (reqStudioInput   ? reqStudioInput.value.trim()   : "");
+        const category = (reqCategoryInput ? reqCategoryInput.value.trim() : "");
+        const genre    = (reqGenreInput    ? reqGenreInput.value.trim()    : "");
+        const description = (reqDescInput  ? reqDescInput.value.trim()     : "");
+        const source   = (reqSourceInput   ? reqSourceInput.value.trim()   : "");
+        const notes    = (reqNotesInput    ? reqNotesInput.value.trim()    : "");
+        const cover    = reqCoverDataUrl || "../assets/world-after-fall.gif";
+        if (!title) return;
+
+        let reqs = getAuthorRequests();
+        if (editingRequestId !== null) {
+          const idx = reqs.findIndex(r => r.id === editingRequestId);
+          if (idx !== -1) {
+            reqs[idx] = { ...reqs[idx], title, author, studio, category, genre, description, source, notes, cover: reqCoverDataUrl || reqs[idx].cover };
+          }
+        } else {
+          reqs.unshift({ id: `req_${Date.now()}`, title, author, studio, category, genre, description, source, notes, cover, status: "pending", submittedAt: new Date().toISOString() });
+        }
+        saveAuthorRequests(reqs);
+        renderAuthorRequestList();
+        updateAuthorMetrics();
+        closeRequestModal();
+        openNotice(editingRequestId ? "Comic request updated successfully! ✅" : "Comic request submitted successfully! 📄 An admin will review it shortly.");
+      });
+    }
+
+    window.deleteAuthorRequest = function(id) {
+      openDeleteConfirm(
+        "Are you sure you want to withdraw this comic request? This action cannot be undone.",
+        "Withdraw Request",
+        () => {
+          let reqs = getAuthorRequests();
+          reqs = reqs.filter(r => r.id !== id);
+          saveAuthorRequests(reqs);
+          if (inlineEditingRequestId === id) {
+            resetInlineAuthorForm();
+          }
+          renderAuthorRequestList();
+          updateAuthorMetrics();
+        }
+      );
+    };
 
     // Initialize
     checkAccess();
