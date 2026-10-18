@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="User Management - Manage comic platform users, roles, and permissions." />
+  <title>User Management – Comic Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/comics.css" />
+  <link rel="stylesheet" href="../css/user-management.css" />
+</head>
+<body>
+
+  <!-- Sticky Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="home.html" class="action-btn" aria-label="Go to Home" title="Back to Home">
+          ←
+        </a>
+        <h1 class="page-title-heading" style="font-size: 20px;">User Management</h1>
+      </div>
+
+      <nav class="header-nav">
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="analytics.html" class="nav-link" id="navAnalyticsLink" style="display: none;">Analytics</a>
+        <a href="user-management.html" class="nav-link active">Users</a>
+        <a href="comic-management.html" class="nav-link">Comics</a>
+        <a href="category-management.html" class="nav-link">Categories</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Role Indicator / Switcher -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label for="headerRoleSelect" style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">Current Role:</label>
+          <select id="headerRoleSelect" class="drawer-role-select" style="width: auto;" aria-label="Change current user role">
+            <option value="user">User</option>
+            <option value="author">Author</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <!-- Theme Switcher -->
+        <button class="action-btn" id="themeToggleBtn" aria-label="Toggle dark/light theme" title="Toggle Theme">
+          ☀️
+        </button>
+        <!-- Home Link -->
+        <a href="home.html" class="action-btn" aria-label="Home page" title="Home">
+          🏠
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="um-wrapper">
+
+    <!-- ACCESS DENIED VIEW (Shown when user is not admin) -->
+    <div class="um-access-denied" id="accessDeniedView" style="display: none;">
+      <div class="um-denied-icon">🔒</div>
+      <h2 class="um-denied-title">Access Restricted</h2>
+      <p class="um-denied-desc">
+        The <strong>User Management</strong> page is only accessible by accounts with the <strong>Admin</strong> role.<br />
+        Your current role: <strong id="deniedRoleName" style="color: var(--purple-light);">User</strong>.
+      </p>
+      <div class="um-denied-actions">
+        <button type="button" class="um-btn-switch-admin" id="btnSwitchAdmin">
+          👑 Switch to Admin Role
+        </button>
+        <a href="home.html" class="um-btn-back-home">
+          ← Return to Home
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN USER MANAGEMENT CONTENT (Shown only to Admin) -->
+    <div class="um-card" id="userManagementContent">
+
+      <!-- Card Header -->
+      <div class="um-card-header">
+        <h2 class="um-header-title">👥 User Management</h2>
+        <button type="button" class="um-header-user-btn" aria-label="Account details" title="Administrator Profile">
+          👤
+        </button>
+      </div>
+
+      <!-- Metrics Overview Strip -->
+      <div class="um-metrics-strip">
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👥</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricTotalUsers">9</span>
+            <span class="um-metric-lbl">Total Users</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👑</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricAdmins">3</span>
+            <span class="um-metric-lbl">Admins</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">🎨</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricCreators">4</span>
+            <span class="um-metric-lbl">Creators</span>
+          </div>
+        </div>
+        <div class="um-metric-item">
+          <div class="um-metric-icon">👁️</div>
+          <div class="um-metric-info">
+            <span class="um-metric-val" id="metricViewers">2</span>
+            <span class="um-metric-lbl">Viewers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Filter Toolbar -->
+      <div class="um-toolbar">
+        <div class="um-toolbar-left">
+          <!-- Search Box -->
+          <div class="um-search-box">
+            <span style="opacity: 0.7; font-size: 14px;">🔍</span>
+            <input 
+              type="text" 
+              class="um-search-input" 
+              id="userSearchInput" 
+              placeholder="Search ..." 
+              aria-label="Search users"
+            />
+          </div>
+
+          <!-- Permissions Filter -->
+          <div style="position: relative;">
+            <select class="um-filter-btn" id="permissionFilter" aria-label="Filter by permission">
+              <option value="All">Permissions All ▼</option>
+              <option value="Admin">Admin</option>
+              <option value="Creator">Creator</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+
+          <!-- Joined Filter -->
+          <div style="position: relative;">
+            <select class="um-filter-btn" id="joinedFilter" aria-label="Filter by joined date">
+              <option value="Anytime">Joined Anytime ▼</option>
+              <option value="2025">Year 2025</option>
+              <option value="Recent">Recent Month</option>
+            </select>
+          </div>
+
+          <!-- View Mode Toggle -->
+          <button type="button" class="um-icon-btn" title="Grid View" aria-label="Grid view">
+            ⊞
+          </button>
+        </div>
+
+        <div class="um-toolbar-right">
+          <!-- + Add User Button -->
+          <button type="button" class="um-add-user-btn" id="openAddUserModalBtn">
+            <span>+</span> Add User
+          </button>
+
+          <!-- More Options Dropdown Trigger -->
+          <button type="button" class="um-menu-trigger" id="toolbarMoreBtn" aria-label="More options" aria-haspopup="true">
+            ⋮
+          </button>
+
+          <!-- Dropdown Popover Menu -->
+          <div class="um-dropdown-menu" id="toolbarDropdownMenu">
+            <button type="button" class="um-dropdown-item" id="btnEditSelected">Edit</button>
+            <button type="button" class="um-dropdown-item" id="btnRemoveSelected" style="color: #ef4444;">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Responsive Table Container -->
+      <div class="um-table-container">
+        <table class="um-table" id="usersTable">
+          <thead>
+            <tr>
+              <th style="width: 44px; text-align: center;">
+                <input type="checkbox" class="um-checkbox" id="masterCheckbox" aria-label="Select all users" />
+              </th>
+              <th>Full Name <span class="um-sort-icon">⬍</span></th>
+              <th>Email Address <span class="um-sort-icon">⬍</span></th>
+              <th>Location <span class="um-sort-icon">⬍</span></th>
+              <th>Joined <span class="um-sort-icon">⬍</span></th>
+              <th class="th-permissions">Permissions <span class="um-sort-icon">⬍</span></th>
+              <th style="width: 50px; text-align: center;">📅</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <!-- Dynamically populated from JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer with Pagination & Rows count -->
+      <div class="um-footer">
+        <!-- Pagination Buttons -->
+        <div class="um-pagination">
+          <button type="button" class="um-page-arrow" id="prevPageBtn" aria-label="Previous page">‹</button>
+          <button type="button" class="um-page-btn active">1</button>
+          <button type="button" class="um-page-btn">2</button>
+          <button type="button" class="um-page-btn">3</button>
+          <button type="button" class="um-page-btn">4</button>
+          <span class="um-page-dots">...</span>
+          <button type="button" class="um-page-btn">10</button>
+          <button type="button" class="um-page-arrow" id="nextPageBtn" aria-label="Next page">›</button>
+        </div>
+
+        <!-- Show Rows Dropdown -->
+        <div class="um-rows-selector">
+          <span>Show :</span>
+          <select class="um-rows-dropdown" id="rowsPerPageSelect" aria-label="Rows per page">
+            <option value="9" selected>9 rows ⬍</option>
+            <option value="15">15 rows ⬍</option>
+            <option value="25">25 rows ⬍</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ADD USER MODAL -->
+  <div class="um-modal-overlay" id="addUserModal">
+    <div class="um-modal-card">
+      <div class="um-modal-header">
+        <h3 class="um-modal-title">+ Add New User</h3>
+        <button type="button" class="um-modal-close" id="closeAddUserModalBtn">✕</button>
+      </div>
+      <form id="addUserForm">
+        <div class="um-form-group">
+          <label class="um-form-label" for="newFullName">Full Name</label>
+          <input type="text" class="um-form-input" id="newFullName" placeholder="e.g. Bertrand" required />
+        </div>
+        <div class="um-form-group">
+          <label class="um-form-label" for="newEmail">Email Address</label>
+          <input type="email" class="um-form-input" id="newEmail" placeholder="e.g. user@gmail.com" required />
+        </div>
+        <div class="um-form-group">
+          <label class="um-form-label" for="newLocation">Location</label>
+          <input type="text" class="um-form-input" id="newLocation" placeholder="e.g. Indonesia, East" required />
+        </div>
+        <div class="um-form-group">
+          <label class="um-form-label" for="newPermission">Permissions</label>
+          <select class="um-form-select" id="newPermission">
+            <option value="Admin">Admin</option>
+            <option value="Creator">Creator</option>
+            <option value="Viewer" selected>Viewer</option>
+          </select>
+        </div>
+        <div class="um-modal-footer">
+          <button type="button" class="um-btn-cancel" id="cancelAddUserBtn">Cancel</button>
+          <button type="submit" class="um-btn-primary" id="saveAddUserBtn">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION POPUP MODAL -->
+  <div class="um-modal-overlay" id="deleteConfirmModal">
+    <div class="um-modal-card" style="max-width: 440px;">
+      <div class="um-modal-header">
+        <h3 class="um-modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+          <span>🗑️</span> Confirm Delete
+        </h3>
+        <button type="button" class="um-modal-close" id="closeDeleteModalBtn">✕</button>
+      </div>
+      <div style="padding: 8px 0 20px;">
+        <p id="deleteModalMessage" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+          Are you sure you want to delete this user? This action cannot be undone.
+        </p>
+      </div>
+      <div class="um-modal-footer">
+        <button type="button" class="um-btn-cancel" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="um-btn-danger" id="confirmDeleteBtn">Delete User</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTICE / ALERT POPUP MODAL -->
+  <div class="um-modal-overlay" id="noticeModal">
+    <div class="um-modal-card" style="max-width: 420px;">
+      <div class="um-modal-header">
+        <h3 class="um-modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>⚠️</span> Notice
+        </h3>
+        <button type="button" class="um-modal-close" id="closeNoticeModalBtn">✕</button>
+      </div>
+      <div style="padding: 8px 0 20px;">
+        <p id="noticeModalMessage" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+          Please select at least one user from the list.
+        </p>
+      </div>
+      <div class="um-modal-footer">
+        <button type="button" class="um-btn-primary" id="okNoticeBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/comics-data.js"></script>
+  <script src="../js/comics.js"></script>
+  <script>
+    // ── INITIAL DATA (Exact from user's screenshot) ───────────────────────────
+    const DEFAULT_USERS = [
+      { id: 1, name: "Bertrand", email: "BL2111@gmail.com", location: "Indonesia, East", joined: "January 2, 2025", permission: "Admin", avatar: "🐴" },
+      { id: 2, name: "Bos Jeremy", email: "Jere@gmail.com", location: "Indonesia, East", joined: "January 3, 2025", permission: "Admin", avatar: "👤" },
+      { id: 3, name: "Bima", email: "Bima@gmail.com", location: "Indonesia, East", joined: "January 1, 2025", permission: "Admin", avatar: "🦊" },
+      { id: 4, name: "Fajri", email: "Fajri@gmail.com", location: "Indonesia, East", joined: "July 14, 2025", permission: "Creator", avatar: "🎭" },
+      { id: 5, name: "Kroco", email: "Kroco@gmail.com", location: "Indonesia, East", joined: "October 2, 2025", permission: "Creator", avatar: "🎮" },
+      { id: 6, name: "Hendra Sangar", email: "Gacor@gmail.com", location: "Indonesia, East", joined: "June 5, 2025", permission: "Viewer", avatar: "🥋" },
+      { id: 7, name: "Reza", email: "Reza@gmail.com", location: "Malaysia", joined: "June 15, 2025", permission: "Creator", avatar: "🧢" },
+      { id: 8, name: "Lianto", email: "lianto@gmail.com", location: "Indonesia, East", joined: "March 13, 2025", permission: "Creator", avatar: "🎩" },
+      { id: 9, name: "Joving", email: "Joving@gmail.com", location: "Singapore", joined: "March 14, 2025", permission: "Creator", avatar: "🌟" }
+    ];
+
+    let users = JSON.parse(localStorage.getItem("um_users_data")) || DEFAULT_USERS;
+
+    function saveUsers() {
+      localStorage.setItem("um_users_data", JSON.stringify(users));
+    }
+
+    // ── ROLE ACCESS CONTROL CHECK ──────────────────────────────────────────
+    function checkAccess() {
+      const currentRole = localStorage.getItem("current_user_role") || "user";
+      const headerSelect = document.getElementById("headerRoleSelect");
+      if (headerSelect) headerSelect.value = currentRole;
+
+      const navAnalyticsLink = document.getElementById("navAnalyticsLink");
+      if (navAnalyticsLink) {
+        navAnalyticsLink.style.display = currentRole === "admin" ? "inline-block" : "none";
+      }
+
+      const deniedView = document.getElementById("accessDeniedView");
+      const contentView = document.getElementById("userManagementContent");
+      const deniedRoleName = document.getElementById("deniedRoleName");
+
+      if (currentRole === "admin") {
+        deniedView.style.display = "none";
+        contentView.style.display = "block";
+      } else {
+        deniedView.style.display = "block";
+        contentView.style.display = "none";
+        if (deniedRoleName) {
+          deniedRoleName.textContent = currentRole.toUpperCase();
+        }
+      }
+    }
+
+    // Handle header role switcher
+    const headerRoleSelect = document.getElementById("headerRoleSelect");
+    if (headerRoleSelect) {
+      headerRoleSelect.addEventListener("change", (e) => {
+        const nextRole = e.target.value;
+        localStorage.setItem("current_user_role", nextRole);
+        checkAccess();
+      });
+    }
+
+    // Handle "Switch to Admin" shortcut button
+    const btnSwitchAdmin = document.getElementById("btnSwitchAdmin");
+    if (btnSwitchAdmin) {
+      btnSwitchAdmin.addEventListener("click", () => {
+        localStorage.setItem("current_user_role", "admin");
+        checkAccess();
+      });
+    }
+
+    // ── TABLE RENDERING & METRICS ──────────────────────────────────────────
+    const tableBody = document.getElementById("usersTableBody");
+    const masterCheckbox = document.getElementById("masterCheckbox");
+    const searchInput = document.getElementById("userSearchInput");
+    const permissionFilter = document.getElementById("permissionFilter");
+
+    function updateUserMetrics() {
+      const totalEl = document.getElementById("metricTotalUsers");
+      const adminsEl = document.getElementById("metricAdmins");
+      const creatorsEl = document.getElementById("metricCreators");
+      const viewersEl = document.getElementById("metricViewers");
+
+      if (totalEl) totalEl.textContent = users.length;
+      if (adminsEl) adminsEl.textContent = users.filter(u => u.permission === "Admin").length;
+      if (creatorsEl) creatorsEl.textContent = users.filter(u => u.permission === "Creator").length;
+      if (viewersEl) viewersEl.textContent = users.filter(u => u.permission === "Viewer").length;
+    }
+
+    function renderTable() {
+      updateUserMetrics();
+      const query = (searchInput ? searchInput.value : "").toLowerCase().trim();
+      const selectedPerm = permissionFilter ? permissionFilter.value : "All";
+
+      const filtered = users.filter((u) => {
+        const matchesQuery = 
+          u.name.toLowerCase().includes(query) || 
+          u.email.toLowerCase().includes(query) || 
+          u.location.toLowerCase().includes(query);
+        const matchesPerm = selectedPerm === "All" || u.permission === selectedPerm;
+        return matchesQuery && matchesPerm;
+      });
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No users match your search query or filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = filtered.map((u) => {
+        let badgeIcon = "👁️";
+        if (u.permission === "Admin") badgeIcon = "👑";
+        else if (u.permission === "Creator") badgeIcon = "🎨";
+
+        return `
+        <tr data-user-id="${u.id}">
+          <td style="text-align: center;">
+            <input type="checkbox" class="um-checkbox row-checkbox" data-id="${u.id}" />
+          </td>
+          <td>
+            <div class="um-user-cell">
+              <div class="um-avatar-box">
+                <div class="um-avatar-img" style="display: grid; place-items: center; font-size: 18px; background: rgba(108,75,147,0.3);">
+                  ${u.avatar || "👤"}
+                </div>
+                <span class="um-online-dot"></span>
+              </div>
+              <span class="um-user-name">${u.name}</span>
+            </div>
+          </td>
+          <td class="um-email">${u.email}</td>
+          <td>
+            <div class="um-location">
+              <span class="um-pin-icon">📍</span>
+              <span>${u.location}</span>
+            </div>
+          </td>
+          <td class="um-joined">${u.joined}</td>
+          <td>
+            <span class="um-badge ${u.permission.toLowerCase()}">
+              ${badgeIcon} ${u.permission}
+            </span>
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="um-action-btn" onclick="deleteUser(${u.id})" title="Delete User">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `;
+      }).join("");
+
+      bindCheckboxEvents();
+    }
+
+    function bindCheckboxEvents() {
+      const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+      rowCheckboxes.forEach((cb) => {
+        cb.addEventListener("change", (e) => {
+          const tr = e.target.closest("tr");
+          if (tr) tr.classList.toggle("selected", e.target.checked);
+          updateMasterCheckbox();
+        });
+      });
+    }
+
+    function updateMasterCheckbox() {
+      const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+      if (!rowCheckboxes.length) return;
+      const allChecked = Array.from(rowCheckboxes).every((cb) => cb.checked);
+      if (masterCheckbox) masterCheckbox.checked = allChecked;
+    }
+
+    if (masterCheckbox) {
+      masterCheckbox.addEventListener("change", (e) => {
+        const checked = e.target.checked;
+        document.querySelectorAll(".row-checkbox").forEach((cb) => {
+          cb.checked = checked;
+          const tr = cb.closest("tr");
+          if (tr) tr.classList.toggle("selected", checked);
+        });
+      });
+    }
+
+    // Search and filter listeners
+    if (searchInput) searchInput.addEventListener("input", renderTable);
+    if (permissionFilter) permissionFilter.addEventListener("change", renderTable);
+
+    // Toolbar more dropdown menu
+    const toolbarMoreBtn = document.getElementById("toolbarMoreBtn");
+    const toolbarDropdownMenu = document.getElementById("toolbarDropdownMenu");
+
+    if (toolbarMoreBtn && toolbarDropdownMenu) {
+      toolbarMoreBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toolbarDropdownMenu.classList.toggle("show");
+      });
+
+      document.addEventListener("click", () => {
+        toolbarDropdownMenu.classList.remove("show");
+      });
+    }
+
+    // ── CUSTOM CONFIRMATION & NOTICE MODALS ──────────────────────────────
+    let pendingDeleteAction = null;
+    const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+    const deleteModalMessage = document.getElementById("deleteModalMessage");
+    const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+    function openDeleteConfirm(messageHtml, confirmBtnText, onConfirm) {
+      if (deleteModalMessage) deleteModalMessage.innerHTML = messageHtml;
+      if (confirmDeleteBtn) confirmDeleteBtn.textContent = confirmBtnText || "Delete";
+      pendingDeleteAction = onConfirm;
+      if (deleteConfirmModal) deleteConfirmModal.classList.add("open");
+    }
+
+    function closeDeleteConfirm() {
+      if (deleteConfirmModal) deleteConfirmModal.classList.remove("open");
+      pendingDeleteAction = null;
+    }
+
+    if (closeDeleteModalBtn) closeDeleteModalBtn.addEventListener("click", closeDeleteConfirm);
+    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener("click", closeDeleteConfirm);
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener("click", () => {
+        if (typeof pendingDeleteAction === "function") {
+          pendingDeleteAction();
+        }
+        closeDeleteConfirm();
+      });
+    }
+
+    const noticeModal = document.getElementById("noticeModal");
+    const noticeModalMessage = document.getElementById("noticeModalMessage");
+    const closeNoticeModalBtn = document.getElementById("closeNoticeModalBtn");
+    const okNoticeBtn = document.getElementById("okNoticeBtn");
+
+    function openNotice(message) {
+      if (noticeModalMessage) noticeModalMessage.textContent = message;
+      if (noticeModal) noticeModal.classList.add("open");
+    }
+
+    function closeNotice() {
+      if (noticeModal) noticeModal.classList.remove("open");
+    }
+
+    if (closeNoticeModalBtn) closeNoticeModalBtn.addEventListener("click", closeNotice);
+    if (okNoticeBtn) okNoticeBtn.addEventListener("click", closeNotice);
+
+    // Close on overlay backdrop click
+    [deleteConfirmModal, noticeModal].forEach((overlay) => {
+      if (overlay) {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove("open");
+          }
+        });
+      }
+    });
+
+    // Remove selected users
+    const btnRemoveSelected = document.getElementById("btnRemoveSelected");
+    if (btnRemoveSelected) {
+      btnRemoveSelected.addEventListener("click", () => {
+        if (toolbarDropdownMenu) toolbarDropdownMenu.classList.remove("show");
+        const checkedIds = Array.from(document.querySelectorAll(".row-checkbox:checked"))
+          .map((cb) => parseInt(cb.getAttribute("data-id"), 10));
+
+        if (!checkedIds.length) {
+          openNotice("Please select at least one user by checking the box in the table.");
+          return;
+        }
+
+        const msg = `Are you sure you want to delete <strong>${checkedIds.length}</strong> selected user(s)? This action cannot be undone.`;
+        openDeleteConfirm(msg, "Delete Users", () => {
+          users = users.filter((u) => !checkedIds.includes(u.id));
+          saveUsers();
+          renderTable();
+          if (masterCheckbox) masterCheckbox.checked = false;
+        });
+      });
+    }
+
+    // Delete single user
+    window.deleteUser = function(id) {
+      const target = users.find((u) => u.id === id);
+      const name = target ? target.name : "this user";
+      const msg = `Are you sure you want to delete <strong>${name}</strong>? This action cannot be undone.`;
+      openDeleteConfirm(msg, "Delete User", () => {
+        users = users.filter((u) => u.id !== id);
+        saveUsers();
+        renderTable();
+      });
+    };
+
+    // ── ADD USER MODAL ────────────────────────────────────────────────────
+    const addUserModal = document.getElementById("addUserModal");
+    const openAddUserModalBtn = document.getElementById("openAddUserModalBtn");
+    const closeAddUserModalBtn = document.getElementById("closeAddUserModalBtn");
+    const cancelAddUserBtn = document.getElementById("cancelAddUserBtn");
+    const addUserForm = document.getElementById("addUserForm");
+
+    function openModal() {
+      if (addUserModal) addUserModal.classList.add("open");
+    }
+
+    function closeModal() {
+      if (addUserModal) addUserModal.classList.remove("open");
+      if (addUserForm) addUserForm.reset();
+    }
+
+    if (openAddUserModalBtn) openAddUserModalBtn.addEventListener("click", openModal);
+    if (closeAddUserModalBtn) closeAddUserModalBtn.addEventListener("click", closeModal);
+    if (cancelAddUserBtn) cancelAddUserBtn.addEventListener("click", closeModal);
+
+    if (addUserModal) {
+      addUserModal.addEventListener("click", (e) => {
+        if (e.target === addUserModal) closeModal();
+      });
+    }
+
+    if (addUserForm) {
+      addUserForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("newFullName").value.trim();
+        const email = document.getElementById("newEmail").value.trim();
+        const location = document.getElementById("newLocation").value.trim();
+        const permission = document.getElementById("newPermission").value;
+
+        if (!name || !email) return;
+
+        const newUser = {
+          id: Date.now(),
+          name,
+          email,
+          location: location || "Indonesia, East",
+          joined: "Today",
+          permission,
+          avatar: "👤"
+        };
+
+        users.unshift(newUser);
+        saveUsers();
+        renderTable();
+        closeModal();
+      });
+    }
+
+    // Initialize check and table
+    checkAccess();
+    renderTable();
+  </script>
+</body>
+</html>
