@@ -1,0 +1,150 @@
+@media (max-width: 900px) {
+    .site-header {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .main-nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .header-actions {
+        margin-left: auto;
+        margin-right: 60px;
+    }
+
+    .hero-content {
+        width: 65%;
+        padding: 30px;
+    }
+
+    .hero-art {
+        width: 35%;
+        opacity: .7;
+    }
+
+    .comic-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .search-section {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .site-header {
+        padding: 14px 5%;
+        padding-right: 90px;
+    }
+
+    .brand {
+        font-size: 19px;
+    }
+
+    .header-actions {
+        gap: 10px;
+        margin-right: 0;
+    }
+
+    .signup-button {
+        padding: 9px 11px;
+    }
+
+    .main-nav {
+        gap: 18px;
+    }
+
+    .home-main {
+        padding: 18px 5% 42px;
+    }
+
+    .hero-carousel,
+    .hero-slide {
+        min-height: 390px;
+    }
+
+    .hero-content {
+        width: 100%;
+        padding: 28px 22px;
+    }
+    
+    .hero-content h1 {
+        max-width: 65%;
+        font-size: 37px;
+        overflow-wrap: anywhere;
+    }
+    
+    .hero-description {
+        width: 65%;
+        max-width: 300px;
+        font-size: 13px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+    }
+    
+    .hero-art {
+        width: 45%;
+        opacity: .35;
+    }
+
+    .hero-art span {
+        font-size: 180px;
+    }
+
+    .button-primary,
+    .button-outline {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .comic-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .cover-title {
+        font-size: 16px;
+    }
+
+    .content-section {
+        margin-top: 42px;
+    }
+
+    .section-heading h2,
+    .search-section h2,
+    .bottom-cta h2 {
+        font-size: 23px;
+    }
+
+    .bottom-cta {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 24px;
+        margin-top: 48px;
+    }
+
+    .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .theme-toggle {
+        top: 16px;
+        right: 14px;
+    }
+}

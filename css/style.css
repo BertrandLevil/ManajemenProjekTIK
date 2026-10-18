@@ -1,0 +1,26 @@
+@import url("./theme.css");
+@import url("./variables.css");
+@import url("./base.css");
+@import url("./header.css");
+@import url("./home.css");
+@import url("./acount.css");
+@import url("./profile.css");
+@import url("./search.css");
+@import url("./comicsCard.css");
+@import url("./comic.css");
+@import url("./reader.css");
+@import url("./footer.css");
+@import url("./responsive.css");
+
+body[data-page="login"] .theme-toggle,
+body[data-page="register"] .theme-toggle,
+body[data-page="profile"] .theme-toggle {
+    position: fixed !important;
+    top: 18px !important;
+    left: 24px !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+}

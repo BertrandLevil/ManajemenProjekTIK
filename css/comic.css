@@ -1,0 +1,235 @@
+.comic-detail-container {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+    padding: 30px 0 70px;
+    background: var(--background);
+    color: var(--text);
+}
+
+.detail-back {
+    display: inline-block;
+    margin-bottom: 24px;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.comic-detail-hero {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 36px;
+    padding: 30px;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.detail-cover img,
+.detail-cover-placeholder {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.detail-cover-placeholder {
+    display: grid;
+    place-items: center;
+    background: #34344a;
+    color: white;
+    font-size: 80px;
+}
+
+.detail-eyebrow {
+    margin: 0 0 8px;
+    color: #9b8cff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.detail-information h1 {
+    margin: 0 0 14px;
+    font-size: clamp(26px, 4vw, 38px);
+}
+
+.detail-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.detail-rating span,
+.rating-stars {
+    color: #f5b942;
+}
+
+.detail-metadata p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.detail-description {
+    margin-top: 24px;
+    line-height: 1.8;
+}
+
+.detail-description h2 {
+    font-size: 18px;
+}
+
+.detail-description p {
+    overflow-wrap: anywhere;
+}
+
+.detail-section {
+    margin-top: 36px;
+    padding: 26px;
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.detail-section h2 {
+    margin: 0 0 20px;
+}
+
+.detail-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.detail-chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.detail-chapter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.detail-chapter-item:hover {
+    background: var(--surface-2);
+}
+
+.chapter-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.chapter-page {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.chapter-page.active {
+    background: #7865e8;
+    color: white;
+}
+
+.chapter-page:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.rating-summary strong {
+    font-size: 28px;
+}
+
+.rating-form,
+.comment-form {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.rating-form select,
+.comment-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+}
+
+.rating-form button,
+.comment-form button {
+    justify-self: start;
+    padding: 11px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #7865e8;
+    color: white;
+    cursor: pointer;
+}
+
+.comment-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.comment-item p {
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.comment-item small,
+.empty-comments {
+    opacity: 0.7;
+}
+
+@media (max-width: 700px) {
+    .comic-detail-hero {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .detail-cover {
+        width: min(220px, 100%);
+        margin: 0 auto;
+    }
+
+    .detail-section {
+        padding: 18px;
+    }
+
+    .detail-chapter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+    .detail-chapter-grid {
+        grid-template-columns: 1fr;
+    }
+}
