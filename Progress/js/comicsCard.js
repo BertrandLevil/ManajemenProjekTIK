@@ -35,7 +35,9 @@ export function comicCard(comic) {
                     <span class="comic-rating">★ ${comic.rating}</span>
                 </div>
 
-                <p class="comic-chapter">Chapter ${comic.chapter}</p>
+                <a href="reader.html?id=${comic.id}&ep=${comic.chapter}"
+                    class="comic-chapter">Chapter ${comic.chapter}
+                </a>
             </div>
         </article>
     `;

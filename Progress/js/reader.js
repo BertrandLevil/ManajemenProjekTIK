@@ -1,5 +1,6 @@
 import { comics } from "./data.js";
 import { header } from "./header.js";
+import { renderReview } from "./review.js";
 
 export function renderReader() {
     const app = document.getElementById("app");
@@ -102,9 +103,15 @@ export function renderReader() {
                         : ""
                 }
             </nav>
+
+            <section class="reader-comments-section">
+                <h2>Komentar Chapter ${chapter}</h2>
+                <div id="reader-comments"></div>
+            </section>
+
         </main>
     `;
-
+    renderReview(comic, chapter);
     updateThemeButtonIfAvailable();
 }
 
