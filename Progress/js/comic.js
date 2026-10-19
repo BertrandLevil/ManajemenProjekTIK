@@ -151,6 +151,7 @@ export function renderComicDetail() {
                         </div>
 
                         <div class="detail-metadata">
+                            <p><strong>Author:</strong> ${escapeHTML(comic.author || "-")}</p>
                             <p><strong>Kategori:</strong> ${escapeHTML(comic.category || "-")}</p>
                             <p><strong>Genre:</strong> ${escapeHTML(genres)}</p>
                             <p><strong>Status:</strong> ${escapeHTML(comic.status || "-")}</p>

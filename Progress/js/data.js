@@ -2,6 +2,7 @@ export const comics = [
     {
         id: 1,
         title: "Solo Leveling",
+        author: "Chugong",
         category: "Manhwa",
         genre: "Fantasy",
         chapter: 179,
@@ -16,6 +17,7 @@ export const comics = [
     {
         id: 2,
         title: "The Siren: Becoming the Villain's Family",
+        author: "Sol Leesu (설이수 / Seol Yi-soo)",
         category: "Manhwa",
         genre: ["Shoujo", "Drama", "Fantasy", "Historical", "Romance"],
         chapter: 181,
@@ -29,6 +31,7 @@ export const comics = [
     {
         id: 3,
         title: "Author of My Destiny",
+        author: "Gyeoulip (겨울잎)",
         category: "Manhwa",
         genre: ["Shoujo", "Fantasy", "Historical"],
         chapter: 150,
@@ -43,6 +46,7 @@ export const comics = [
     {
         id: 4,
         title: "Soul Land II",
+        author: "Tang Jia San Shao",
         category: "Manhua",
         genre: "Romance",
         chapter: 498,
@@ -56,6 +60,7 @@ export const comics = [
     {
         id: 5,
         title: "Shadow Slave",
+        author: "Guiltythree",
         category: "Comic",
         genre: ["Action", "adventure", "Fantasy", "Tragedy"],
         chapter: 40,
@@ -69,6 +74,7 @@ export const comics = [
     {
         id: 6,
         title: "Dedes",
+        author: "Esti Siwi / Egestigi",
         category: "Komik",
         genre: ["Shoujo","Kingdom", "Drama", "Historical", "Transmigration"],
         chapter: 131,
@@ -82,6 +88,7 @@ export const comics = [
     {
         id: 7,
         title: "Chainsaw Man",
+        author: "Tatsuki Fujimoto",
         category: "Manga",
         genre: ["Action", "Comedy", "Drama", "Horror", "Mature", " Shounen", "Supernatural"],
         chapter: 15,
@@ -95,6 +102,7 @@ export const comics = [
     {
         id: 8,
         title: "Magic Emperor",
+        author: "Nightingale",
         category: "Manhua",
         genre: ["Action", "Adventure", "Fantasy", "Xianxia"],
         chapter: 924,
@@ -108,3 +116,4 @@ export const comics = [
 ];
 
 export const popularComics = [1, 5, 6, 2];
+export const COMIC_STATUSES = ["NEW", "ON-GOING", "END", "HIATUS"];
