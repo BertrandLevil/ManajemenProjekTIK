@@ -16,7 +16,6 @@ export function comicCard(comic) {
 
                 <span class="cover-tag">${comic.category}</span>
                 <span class="cover-status">${comic.status}</span>
-                <span class="cover-chapter">CHAPTER ${comic.chapter}</span>
             </a>
 
             <div class="comic-info">

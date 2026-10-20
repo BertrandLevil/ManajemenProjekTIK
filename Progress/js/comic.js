@@ -57,7 +57,6 @@ export function renderComicDetail() {
 
         const chapterItems = [];
 
-        // Urutkan dari chapter terbaru ke terlama
         for (let chapter = end; chapter >= start; chapter--) {
             chapterItems.push(`
                 <a class="detail-chapter-item"
