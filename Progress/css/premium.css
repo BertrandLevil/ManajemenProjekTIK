@@ -1,0 +1,353 @@
+.premium-page {
+  min-height: calc(100vh - 76px);
+  padding: 64px 24px 88px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #8b5cf612, transparent 55%), var(--bg);
+}
+
+.premium-container {
+  width: min(920px, 100%);
+  margin: 0 auto;
+}
+
+.premium-heading {
+  position: relative;
+  margin-bottom: 28px;
+  padding: 26px 30px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse at 95% 0%, #8b5cf61a, transparent 42%),
+    var(--surface);
+}
+
+.premium-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 15px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.3px;
+}
+
+.premium-kicker-mark {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #a78bfa, #6d28d9);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.premium-heading h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 760;
+  letter-spacing: -1.3px;
+  line-height: 1.15;
+}
+
+.premium-heading h1 span {
+  color: var(--accent);
+}
+
+.premium-heading > p:last-child {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.premium-checkout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1.15fr);
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px #00000020;
+}
+
+.premium-plan {
+  display: grid;
+  grid-template-rows: auto minmax(90px, 1fr) auto auto;
+  gap: 16px;
+  align-self: stretch;
+  min-height: 0;
+  padding: 26px;
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 100% 0%, #8b5cf618, transparent 55%),
+    var(--surface);
+}
+
+.premium-plan-label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1.4px;
+}
+
+.premium-plan-top h2 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -0.6px;
+}
+
+.premium-plan-art {
+  display: grid;
+  min-height: 90px;
+  place-items: center;
+  overflow: visible;
+  transform: translateX(-5px);
+}
+
+.premium-plan-art lottie-player {
+  display: block;
+  width: 310px;
+  height: 380px;
+  transform: 1.5;
+  transform-origin: center;
+}
+
+.premium-price-card {
+  align-self: center;
+  width: 100%;
+  margin: 0;
+  padding: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.premium-price-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.premium-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.premium-price strong {
+  font-size: clamp(27px, 3vw, 32px);
+  letter-spacing: -1px;
+}
+
+.premium-price span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.premium-plan-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 12px;
+}
+
+.premium-plan-footer span {
+  color: var(--muted);
+}
+
+.premium-plan-footer strong {
+  color: var(--text);
+}
+
+.premium-payment {
+  padding: 30px;
+}
+
+.premium-section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.premium-section-heading p {
+  margin: 7px 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.premium-method-list {
+  display: grid;
+  gap: 9px;
+}
+
+.premium-method {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.premium-method:hover,
+.premium-method.is-selected {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.premium-method input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.premium-method:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.premium-method-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.premium-method-copy strong {
+  font-size: 13px;
+}
+
+.premium-method-copy span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.premium-radio {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  border: 1px solid var(--muted);
+  border-radius: 50%;
+}
+
+.premium-method.is-selected .premium-radio {
+  border: 5px solid var(--accent);
+}
+
+.premium-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  padding: 17px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.premium-total strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.premium-submit {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent-strong);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: filter 160ms ease;
+}
+
+.premium-submit:hover {
+  filter: brightness(1.12);
+}
+
+.premium-submit span {
+  font-size: 22px;
+  font-weight: 80;
+}
+
+.premium-feedback {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 680px) {
+  .premium-page {
+    padding: 42px 18px 64px;
+  }
+
+  .premium-checkout {
+    grid-template-columns: 1fr;
+  }
+
+  .premium-plan {
+    grid-template-rows: auto auto auto auto;
+    gap: 16px;
+    min-height: 0;
+    padding: 24px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .premium-plan-art {
+    min-height: 70px;
+  }
+
+  .premium-plan-art lottie-player {
+    width: 230px;
+    height: 210px;
+  }
+
+  .premium-price-card {
+    align-self: stretch;
+  }
+
+  .premium-payment {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .premium-heading {
+    padding: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-plan-art {
+    display: none;
+  }
+
+  .premium-plan {
+    grid-template-rows: auto auto auto;
+  }
+}

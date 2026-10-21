@@ -12,6 +12,7 @@
 @import url("./reader.css");
 @import url("./footer.css");
 @import url("./responsive.css");
+@import url("./premium.css");
 
 body[data-page="login"] .theme-toggle,
 body[data-page="register"] .theme-toggle,

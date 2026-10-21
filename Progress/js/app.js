@@ -6,6 +6,7 @@ import { setupSidebar } from "./header.js";
 import { initTheme, updateThemeButton } from "./theme.js";
 import { renderComicDetail } from "./comic.js";
 import { renderReader } from "./reader.js";
+import { renderPremium } from "./premium.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const currentPage = document.body.dataset.page;
@@ -34,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "reader":
             renderReader();
+            break;
+        case "premium":
+            renderPremium();
             break;
     }
     setupSidebar();
