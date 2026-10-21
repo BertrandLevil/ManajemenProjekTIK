@@ -16,7 +16,7 @@
   padding: 26px 30px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 0px;
   background:
     radial-gradient(ellipse at 95% 0%, #8b5cf61a, transparent 42%),
     var(--surface);
@@ -70,7 +70,7 @@
   align-items: stretch;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 0px;
   background: var(--surface);
   box-shadow: 0 24px 70px #00000020;
 }

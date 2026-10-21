@@ -144,7 +144,9 @@
     }
 
     .theme-toggle {
-        top: 16px;
-        right: 14px;
+        top: 50%;
+        left: 5%;
+        right: auto;
+        transform: translateY(-50%);
     }
 }

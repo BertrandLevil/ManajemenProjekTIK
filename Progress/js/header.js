@@ -13,6 +13,7 @@ function escapeHTML(value) {
 export function header() {
     const isLoggedIn =
         localStorage.getItem("comicid_logged_in") === "true";
+    const currentPage = document.body.dataset.page;
 
     return `
         <header class="site-header">
@@ -58,11 +59,11 @@ export function header() {
             </button>
 
             <nav class="sidebar-nav">
-                <a class="nav-link active" href="home.html">Beranda</a>
+                <a class="nav-link ${currentPage === "home" ? "active" : ""}" href="home.html">Beranda</a>
                 <a class="nav-link" href="trending.html">Trending</a>
                 <a class="nav-link" href="latest.html">Terbaru</a>
                 <a class="nav-link" href="bookmark.html">Bookmark</a>
-                <a class="nav-link" href="premium.html">Upgrade Premium</a>
+                <a class="nav-link ${currentPage === "premium" ? "active" : ""}" href="premium.html">Upgrade Premium</a>
             </nav>
 
             <div class="sidebar-actions">
