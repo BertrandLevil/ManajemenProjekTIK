@@ -1,5 +1,5 @@
 .theme-toggle {
-    position: fixed;
+    position: absolute;
     top: 18px;
     left: 24px;
     z-index: 9999;

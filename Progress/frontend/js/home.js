@@ -116,6 +116,7 @@ export function renderHome() {
                         "Xianxia",
                         "Wuxia",
                         "Xuanhuan",
+                        "Cultivation",
                         "Harem",
                         "Reverse Harem",
                         "Reincarnation",

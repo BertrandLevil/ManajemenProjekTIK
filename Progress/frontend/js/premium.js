@@ -1,19 +1,19 @@
 import { header } from "./header.js";
 
 const paymentMethods = [
-  { id: "qris", name: "QRIS", detail: "Pembayaran melalui QRIS" },
-  { id: "ewallet", name: "E-Wallet", detail: "Pembayaran melalui e-wallet" },
-  {
-    id: "bank",
-    name: "Transfer Bank",
-    detail: "Pembayaran melalui transfer bank",
-  },
+    { id: "qris", name: "QRIS", detail: "Pembayaran melalui QRIS" },
+    { id: "ewallet", name: "E-Wallet", detail: "Pembayaran melalui e-wallet" },
+    {
+        id: "bank",
+        name: "Transfer Bank",
+        detail: "Pembayaran melalui transfer bank",
+    },
 ];
 
 function renderMethods() {
-  return paymentMethods
+    return paymentMethods
     .map(
-      (method) => `
+    (method) => `
         <label class="premium-method">
             <input
                 type="radio"
@@ -33,10 +33,10 @@ function renderMethods() {
 }
 
 export function renderPremium() {
-  const app = document.getElementById("app");
-  if (!app) return;
+    const app = document.getElementById("app");
+    if (!app) return;
 
-  app.innerHTML = `
+    app.innerHTML = `
         ${header()}
 
         <main class="premium-page">
@@ -68,7 +68,7 @@ export function renderPremium() {
                         <!-- Area animasi: di antara judul paket dan harga -->
                         <div class="premium-plan-art" aria-hidden="true">
                             <lottie-player
-                                src="../assets/animation01.json"
+                                src="../assets/animationWeb/animation01.json"
                                 background="transparent"
                                 speed="0.7"
                                 loop
@@ -123,38 +123,38 @@ export function renderPremium() {
         </main>
     `;
 
-  const form = document.getElementById("premium-form");
-  const feedback = document.getElementById("premium-feedback");
+    const form = document.getElementById("premium-form");
+    const feedback = document.getElementById("premium-feedback");
 
-  form.addEventListener("change", (event) => {
+    form.addEventListener("change", (event) => {
     if (event.target.name !== "payment-method") return;
 
     form.querySelectorAll(".premium-method").forEach((method) => {
-      const input = method.querySelector("input");
-      method.classList.toggle("is-selected", input.checked);
+        const input = method.querySelector("input");
+        method.classList.toggle("is-selected", input.checked);
     });
 
     feedback.hidden = true;
-  });
+    });
 
-  form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const selectedMethod = form.querySelector(
-      'input[name="payment-method"]:checked',
+        'input[name="payment-method"]:checked',
     );
 
     if (!selectedMethod) {
-      feedback.textContent = "Pilih metode pembayaran terlebih dahulu.";
-      feedback.hidden = false;
-      return;
+        feedback.textContent = "Pilih metode pembayaran terlebih dahulu.";
+        feedback.hidden = false;
+        return;
     }
 
     const method = paymentMethods.find(
-      (item) => item.id === selectedMethod.value,
+        (item) => item.id === selectedMethod.value,
     );
 
     feedback.textContent = `Metode ${method.name} dipilih.`;
     feedback.hidden = false;
-  });
+    });
 }

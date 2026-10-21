@@ -4,7 +4,7 @@ export const comics = [
         title: "Solo Leveling",
         author: "Chugong",
         category: "Manhwa",
-        genre: "Fantasy",
+        genre: ["Fantasy", "Action", "Adventure", "Drama"],
         chapter: 179,
         rating: "9.1",
         color: "purple",
@@ -12,7 +12,7 @@ export const comics = [
         isTrending: true,
         isPopular: true,
         description: "Manhwa Solo Leveling yang dibuat oleh komikus bernama Chugong ini bercerita tentang 10 tahun yang lalu setelah Gerbang yang menghubungkan dunia nyata dengan dunia monster terbuka beberapa orang biasa setiap hari menerima kekuatan untuk berburu monster di dalam Gerbang. Mereka dikenal sebagai Pemburu. Namun tidak semua Pemburu kuat, Nama saya Sung JinWoo seorang Pemburu peringkat E Saya seseorang yang harus mempertaruhkan nyawanya di ruang bawah tanah paling rendah Terlemah di Dunia. Tidak memiliki keterampilan apa pun untuk ditampilkan saya hampir tidak mendapatkan uang yang dibutuhkan dengan bertarung di ruang bawah tanah berlevel rendah. Setidaknya sampai saya menemukan ruang bawah tanah tersembunyi dengan kesulitan tersulit dalam ruang bawah tanah peringkat D. Pada akhirnya saat aku menerima kematian tibatiba aku menerima kekuatan aneh log pencarian yang hanya bisa kulihat rahasia untuk naik level yang hanya aku yang tahu. Jika saya berlatih sesuai dengan pencarian saya dan monster yang diburu level saya akan naik Berubah dari Hunter terlemah menjadi Hunter S rank terkuat.",
-        cover: "../assets/Solev.jpg"
+        cover: "../assets/coverComic/Solev.jpg"
     },
     {
         id: 2,
@@ -26,7 +26,7 @@ export const comics = [
         status: "End",
         isPopular: true,
         description: "Setelah ibunya yang seorang siren meninggal, Aria menjadi burung yang terkurung dan harus bernyanyi untuk kaisar sampai mati. Di saat dia hampir mati, Lloyd, grand duke iblis datang dan membawa Aria keluar dari kandang burung. Saat itu Aria berpikir... 'Kalau ada kehidupan selanjutnya, aku akan menolongmu.' Ketika ia membuka mata, Aria kembali pada waktu di mana dia berusia 10 tahun. Saat itu dia berencana untuk melakukan pernikahan kontrak dengan Lloyd demi melindungi dirinya dan Lloyd.",
-        cover: "../assets/TheSirenVillain.jpg"
+        cover: "../assets/coverComic/TheSirenVillain.jpg"
     },
     {
         id: 3,
@@ -41,21 +41,21 @@ export const comics = [
         isTrending: true,
         isPopular: true,
         description: "Dalam novel “Kaisar dan Saintess,” pemeran utama pria dan pemeran utama wanita mampu mengalahkan naga dan iblis terkutuk, serta bos terakhir di cerita tersebut dengan cinta mereka yang indah. “…Haha. Aku lebih baik mati sekarang, jadi aku bisa pergi dengan tenang.” Daripada memiliki masa depan yang cemerlang dan dipuji sebagai penyihir jenius, aku hanya ingin masa depan yang aman di mana aku bisa memiliki masa pensiun yang nyaman … Itulah yang kuinginkan, tapi ketika dunia ini berakhir, akulah bos terakhirnya. Tolong, biarkan aku hidup … Namun, “Tunggu, bukankah ini pemeran utama pria, Siegren?” “Kenapa dia ada di sini?” Siegren, pemeran pria heroik yang akan menyelamatkan dunia, sedang sekarat tepat di depan mataku? Pemeran pria yang pikiran dan tubuhnya compang-camping karena berguling-guling di medan perang. “Siegren, aku yakin kau akan memiliki banyak hal untuk dilakukan di masa depan.” “Aku berjanji akan membantumu mencapainya.” Ketika aku melihat luka Siegren, aku membuat janji. Orang ini, yang menderita karena kalimat yang kutulis. Aku berjanji untuk memberinya kebahagiaan, masa depan yang cemerlang, dan kehidupan yang nyaman.",
-        cover: "../assets/AuthorofMyOwnDestiny.webp"
+        cover: "../assets/coverComic/AuthorofMyOwnDestiny.webp"
     },
     {
         id: 4,
         title: "Soul Land II",
         author: "Tang Jia San Shao",
         category: "Manhua",
-        genre: "Romance",
+        genre: ["Action", "Adventure", "Cultivation", "Xianxia","Romance"],
         chapter: 498,
         rating: "7.6",
         color: "pink",
         status: "End",
         isPopular: true,
         description: "Setelah kejadian di Soul Land pertama, kehidupan di dunia ini memasuki era baru yang penuh dengan tantangan dan kesempatan bagi para jiwa petarung. Tokoh utama melanjutkan perjalanan untuk mengembangkan kekuatan jiwa mereka dengan menghadapi lawan-lawan yang semakin kuat dan misteri yang tersembunyi di balik dunia jiwa. Dalam perjalanannya, mereka menemukan persahabatan sejati dan belajar arti sejati dari kekuatan dan tanggung jawab. Selain itu, konflik antar kerajaan jiwa dan organisasi rahasia memicu pertarungan yang tidak hanya menguji kemampuan bertarung namun juga strategi dan kecerdasan para tokoh. Seiring waktu berlalu, para protagonis harus menjaga keseimbangan antara dunia nyata dan dunia jiwa agar tidak runtuh, sambil menghadapi ancaman besar yang mengancam kedamaian seluruh Soul Land.",
-        cover: "../assets/SoulLand2.webp"
+        cover: "../assets/coverComic/SoulLand2.webp"
     },
     {
         id: 5,
@@ -69,7 +69,7 @@ export const comics = [
         status: "New",
         isTrending: true,
         description: "Tumbuh dalam kemiskinan, Sunny tidak pernah mengharapkan hal baik dari kehidupan. Namun, bahkan dia pun tidak menduga akan terpilih oleh Nightmare Spell dan menjadi salah satu dari Awakened. Kelompok elit orang-orang yang diberkahi dengan kekuatan supernatural. Berpindah ke dunia sihir yang hancur, ia mendapati dirinya menghadapi monster-monster mengerikan dan para Awakened lainnya dalam pertempuran maut untuk bertahan hidup. Lebih buruk lagi, kekuatan bayangan yang ia terima ternyata memiliki efek samping kecil dan berpotensi fatal. Tapi itu tidak akan menghentikannya. Terlahir sebagai budak. Ditakdirkan untuk mati. Dia memilih untuk bertahan hidup. Tidak peduli berapa pun harganya",
-        cover: "../assets/ShadowSlave.webp"
+        cover: "../assets/coverComic/ShadowSlave.webp"
     },
     {
         id: 6,
@@ -83,7 +83,7 @@ export const comics = [
         status: "End",
         isPopular: true,
         description: "Isekai yang diangkat dari kisah sejarah Indonesia! Seorang mahasiswi tiba-tiba terbangun di tubuh Dedes, seorang gadis yang kelak akan menjadi ibu bagi para raja di tanah Jawa. Tetapi, semakin lama berada dalam tubuh Dedes, dia menyadari bahwa sejarah yang ada tak sepenuhnya benar.",
-        cover: "../assets/Dedes.jpg"
+        cover: "../assets/coverComic/Dedes.jpg"
     },
     {
         id: 7,
@@ -97,7 +97,7 @@ export const comics = [
         status: "End",
         isPopular: true,
         description: "Chainsaw Man mengisahkan Denji, seorang pemuda yang hidupnya penuh dengan hutang warisan ayahnya dan berjuang untuk bertahan hidup dengan bekerja sebagai pemburu iblis bersama anjing setan peliharaannya yang juga menjadi gergaji mesin. Suatu hari, setelah dikhianati dan dibunuh, Denji berhasil dihidupkan kembali dengan menyatu bersama anjing setan tersebut sehingga ia menjadi manusia setengah iblis dengan kemampuan unik. Dengan kekuatan barunya, Denji direkrut oleh organisasi pemburu iblis pemerintah yang memiliki tujuan untuk memberantas ancaman iblis lain di masyarakat. Sambil menghadapi berbagai musuh mematikan, Denji juga berusaha memahami kehidupan dan keinginannya untuk memiliki kebahagiaan sederhana di tengah dunia yang kejam dan penuh bahaya ini.",
-        cover: "../assets/ChainsawMan.jpg"
+        cover: "../assets/coverComic/ChainsawMan.jpg"
     },
     {
         id: 8,
@@ -111,7 +111,7 @@ export const comics = [
         status: "On-going",
         isPopular: true,
         description: "arena dia memiliki warisan Ancient Demonic emperor Demonic Emperor Zhuo Yifan menemui nasib sial karena dikhianati dan dibunuh oleh murid kepercayaannya. Setelah terlahir kembali kultivasinya kembali ke nol dan dia terjebak oleh heart demon tidak diberi pilihan selain menjadi pengurus rumah tangga dari satusatunya nona tertua Keluarga Luo Dari menjadi Demonic Emperor menjadi pengurus rumah tangga yang tidak penting bagaimana dia bisa bergaul dengan eart demon eldest miss dan kekuatan apa yang akan dia peroleh untuk memimpin dirinya sendiri dan keluarga yang menurun untuk bangkit kembali ke puncak benua.",
-        cover: "../assets/MagicEmperor.JPEG"
+        cover: "../assets/coverComic/MagicEmperor.JPEG"
     }
 ];
 

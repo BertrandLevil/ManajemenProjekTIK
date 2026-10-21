@@ -329,14 +329,6 @@
     cursor: pointer;
 }
 
-.theme-toggle {
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    right: auto;
-    transform: translateY(-50%);
-}
-
 .sidebar {
     position: fixed;
     top: 0;

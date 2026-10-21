@@ -142,11 +142,4 @@
         align-items: flex-start;
         flex-direction: column;
     }
-
-    .theme-toggle {
-        top: 50%;
-        left: 5%;
-        right: auto;
-        transform: translateY(-50%);
-    }
 }

@@ -36,9 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
         case "reader":
             renderReader();
             break;
-        case "premium":
-            renderPremium();
-            break;
     }
     setupSidebar();
     initTheme();
