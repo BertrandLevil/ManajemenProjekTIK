@@ -199,18 +199,12 @@
   gap: 16px;
   padding: 14px 15px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 0px;
   background: var(--bg);
   cursor: pointer;
   transition:
     border-color 160ms ease,
     background 160ms ease;
-}
-
-.premium-method:hover,
-.premium-method.is-selected {
-  border-color: var(--accent);
-  background: var(--surface-2);
 }
 
 .premium-method input {
@@ -274,7 +268,7 @@
   justify-content: center;
   padding: 14px 16px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 0px;
   background: var(--accent-strong);
   color: #fff;
   cursor: pointer;
