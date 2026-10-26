@@ -32,7 +32,7 @@ function renderMethods() {
     .join("");
 }
 
-export function renderPremium() {
+export function frontPremium() {
     const app = document.getElementById("app");
     if (!app) return;
 

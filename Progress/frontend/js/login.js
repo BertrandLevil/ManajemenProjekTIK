@@ -1,4 +1,4 @@
-export function renderLogin() {
+export function frontLogin() {
     const app = document.getElementById("app");
 
     if (!app) return;
@@ -91,6 +91,11 @@ export function renderLogin() {
         }
 
         message.hidden = true;
+
+        if (email === "" && password === "") {
+            showMessage("Form login wajib diisi.");
+            return;
+        }
 
         if (!email) {
             showMessage("Email wajib diisi.");

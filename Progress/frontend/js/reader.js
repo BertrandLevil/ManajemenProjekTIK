@@ -1,8 +1,8 @@
 import { comics } from "./data.js";
 import { header } from "./header.js";
-import { renderReview } from "./review.js";
+import { frontReview } from "./review.js";
 
-export function renderReader() {
+export function frontReader() {
     const app = document.getElementById("app");
     if (!app) return;
 
@@ -111,7 +111,7 @@ export function renderReader() {
 
         </main>
     `;
-    renderReview(comic, chapter);
+    frontReview(comic, chapter);
     updateThemeButtonIfAvailable();
 }
 

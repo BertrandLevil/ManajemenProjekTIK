@@ -4,7 +4,7 @@ import { comicSection } from "./comicsCard.js";
 import { heroSlide, setupCarousel } from "./carousel.js";
 import { setupSearch } from "./search.js";
 
-export function renderHome() {
+export function frontHome() {
     const app = document.getElementById("app");
 
     if (!app) return;

@@ -8,7 +8,7 @@ function escapeProfileValue(value) {
     })[character]);
 }
 
-export function renderProfile() {
+export function frontProfile() {
     const app = document.getElementById("app");
     if (!app) return;
 

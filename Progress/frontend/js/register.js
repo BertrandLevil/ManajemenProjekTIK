@@ -1,4 +1,4 @@
-export function renderRegister() {
+export function frontRegister() {
     const app = document.getElementById("app");
 
     if (!app) return;
@@ -110,6 +110,10 @@ export function renderRegister() {
             message.hidden = false;
         }
 
+        if (username === "" && email === "" && password === "" && confirmPassword === "") {
+            showMessage("Form registrasi wajib diisi.");
+            return;
+        }
         if (username.length < 3) {
             showMessage("Nama pengguna minimal 3 karakter.");
             return;
@@ -140,9 +144,19 @@ export function renderRegister() {
             return;
         }
 
+
         const accounts = JSON.parse(
             localStorage.getItem("comicid_accounts") || "[]"
         );
+
+        const usernameExists = accounts.some(
+            account => account.username.toLowerCase() === username.toLowerCase()
+        );
+
+        if (usernameExists) {
+            showMessage("Nama pengguna sudah digunakan.");
+            return;
+        }
 
         const emailExists = accounts.some(
             account => account.email.toLowerCase() === email.toLowerCase()
@@ -160,10 +174,9 @@ export function renderRegister() {
         });
 
         localStorage.setItem("comicid_accounts", JSON.stringify(accounts));
+
         showMessage("Registrasi berhasil! Silakan login.");
 
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 1000);
+        setTimeout(() => {window.location.href = "login.html";}, 1000);
     });
 }

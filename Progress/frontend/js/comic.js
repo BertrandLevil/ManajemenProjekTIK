@@ -1,6 +1,6 @@
 import { comics } from "./data.js";
 import { header } from "./header.js";
-import { renderReview } from "./review.js";
+import { frontReview } from "./review.js";
 
 const escapeHTML = value =>
     String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -11,7 +11,7 @@ const escapeHTML = value =>
         "'": "&#39;"
     })[char]);
 
-export function renderComicDetail() {
+export function frontComicDetail() {
     const app = document.getElementById("app");
     if (!app) return;
 
@@ -51,7 +51,7 @@ export function renderComicDetail() {
         Math.ceil(totalChapters / chaptersPerPage)
     );
 
-    function renderChapters() {
+    function frontChapters() {
         const end = totalChapters - (currentPage - 1) * chaptersPerPage;
         const start = Math.max(1, end - chaptersPerPage + 1);
 
@@ -116,14 +116,14 @@ export function renderComicDetail() {
 
                 currentPage = page;
                 document.getElementById("detail-chapters").innerHTML =
-                    renderChapters();
+                    frontChapters();
 
                 bindPagination();
             };
         });
     }
 
-    function renderPage() {
+    function frontPage() {
         app.innerHTML = `
             ${header()}
 
@@ -190,10 +190,10 @@ export function renderComicDetail() {
         `;
         
         document.getElementById("detail-chapters").innerHTML =
-            renderChapters();
+            frontChapters();
         
         bindPagination();
-        renderReview(comic);
+        frontReview(comic);
     }
-    renderPage();    
+    frontPage();    
 }

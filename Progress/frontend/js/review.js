@@ -7,7 +7,7 @@ const escapeHTML = value =>
         "'": "&#39;"
     })[char]);
 
-export function renderReview(comic, chapter = null) {
+export function frontReview(comic, chapter = null) {
     const ratingKey = `comicid_ratings_${comic.id}`;
     const commentKey = `comicid_comments_${comic.id}`;
 
@@ -36,7 +36,7 @@ export function renderReview(comic, chapter = null) {
 
     localStorage.setItem(commentKey, JSON.stringify(comments));
 
-    function renderRatings() {
+    function frontRatings() {
         const average = ratings.length
             ? ratings.reduce((sum, item) => sum + item.score, 0) / ratings.length
             : Number(comic.rating) || 0;
@@ -63,7 +63,7 @@ export function renderReview(comic, chapter = null) {
         `;
     }
 
-    function renderComments() {
+    function frontComments() {
         const sortedComments = comments
             .filter(comment =>
                 chapter === null || comment.chapter === chapter
@@ -138,14 +138,14 @@ export function renderReview(comic, chapter = null) {
 
         if (!commentsContainer) return;
 
-        commentsContainer.innerHTML = renderComments();
+        commentsContainer.innerHTML = frontComments();
 
         if (chapter === null) {
             const ratingsContainer =
                 document.getElementById("detail-ratings");
 
             if (ratingsContainer) {
-                ratingsContainer.innerHTML = renderRatings();
+                ratingsContainer.innerHTML = frontRatings();
             }
 
             bindRatingEvents();
@@ -251,7 +251,7 @@ export function renderReview(comic, chapter = null) {
         sortSelect.addEventListener("change", () => {
             currentCommentSort = sortSelect.value;
 
-            commentContainer.innerHTML = renderComments();
+            commentContainer.innerHTML = frontComments();
             bindCommentForm();
             bindCommentEvents();
         });

@@ -1,40 +1,40 @@
-import {renderHome} from "./home.js";
-import { renderRegister } from "./register.js";
-import { renderLogin } from "./login.js";
-import { renderProfile } from "./profile.js";
+import { frontHome } from "./home.js";
+import { frontRegister } from "./register.js";
+import { frontLogin } from "./login.js";
+import { frontProfile } from "./profile.js";
 import { setupSidebar } from "./header.js";
 import { initTheme, updateThemeButton } from "./theme.js";
-import { renderComicDetail } from "./comic.js";
-import { renderReader } from "./reader.js";
-import { renderPremium } from "./premium.js";
+import { frontComicDetail } from "./comic.js";
+import { frontReader } from "./reader.js";
+import { frontPremium } from "./premium.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const currentPage = document.body.dataset.page;
 
     switch (currentPage) {
         case "home":
-            renderHome();
+            frontHome();
             break;
         case "register":
-            renderRegister();
+            frontRegister();
             break;
         case "login":
-            renderLogin();
+            frontLogin();
             break;
         case "profile":
-            renderProfile();
+            frontProfile();
             break;
         case "premium":
-            renderPremium();
+            frontPremium();
             break;
         case "comics":
-            renderComics();
+            frontComics();
             break;
         case "comic-detail":
-            renderComicDetail();
+            frontComicDetail();
             break;
         case "reader":
-            renderReader();
+            frontReader();
             break;
     }
     setupSidebar();
