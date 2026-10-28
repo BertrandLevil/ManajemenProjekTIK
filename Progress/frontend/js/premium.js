@@ -10,6 +10,22 @@ const paymentMethods = [
   },
 ];
 
+const paymentChannels = {
+  ewallet: ["GoPay", "OVO", "DANA", "ShopeePay"],
+  bank: ["BCA", "BNI", "BRI", "Mandiri"],
+};
+
+const paymentChannelLogos = {
+  GoPay: "gopay.jpg",
+  OVO: "ovo.jpg",
+  DANA: "dana.jpg",
+  ShopeePay: "shopee.jpg",
+  BCA: "bca.jpg",
+  BNI: "bni.jpg",
+  BRI: "bri.jpg",
+  Mandiri: "mandiri.jpg",
+};
+
 function renderMethods() {
   return paymentMethods
     .map(
@@ -32,7 +48,7 @@ function renderMethods() {
     .join("");
 }
 
-function renderCheckout(content, demoMode) {
+function renderCheckout(content) {
   content.innerHTML = `
       <form id="premium-form" class="premium-checkout">
             <section class="premium-plan" aria-label="Paket Premium">
@@ -96,6 +112,152 @@ function renderCheckout(content, demoMode) {
             </section>
         </form>
     `;
+}
+
+function renderChannelOptions(methodId, channels) {
+  return `
+        <fieldset class="premium-channel-list">
+            <legend>Pilih ${methodId === "ewallet" ? "E-Wallet" : "bank"}</legend>
+            ${channels
+              .map(
+                (channel) => `
+                    <label class="premium-channel">
+                        <input
+                            type="radio"
+                            name="payment-channel"
+                            value="${channel}"
+                            required
+                        >
+                        ${
+                          paymentChannelLogos[channel]
+                            ? `
+                                <span class="premium-channel-logo">
+                                    <img
+                                        src="../assets/methodpaymentlogo/${paymentChannelLogos[channel]}"
+                                        alt=""
+                                        width="44"
+                                        height="44"
+                                    >
+                                </span>
+                            `
+                            : `
+                                <span class="premium-channel-mark" aria-hidden="true">
+                                    ${channel.slice(0, 2).toUpperCase()}
+                                </span>
+                            `
+                        }
+                        <span class="premium-channel-name">${channel}</span>
+                        <span class="premium-channel-check" aria-hidden="true"></span>
+                    </label>
+                `,
+              )
+              .join("")}
+        </fieldset>
+        <p class="premium-payment-instructions" aria-live="polite">
+            Pilih kanal untuk melihat informasi pembayaran.
+        </p>
+    `;
+}
+
+function renderPaymentModal(content, method, demoMode) {
+  const channelOptions = paymentChannels[method.id];
+  const details = channelOptions
+    ? renderChannelOptions(method.id, channelOptions)
+    : `
+        <div class="premium-qr-placeholder" aria-hidden="true">
+            <img
+                class="premium-qr-logo"
+                src="../assets/methodpaymentlogo/qris.jpg"
+                alt=""
+                width="90"
+                height="60"
+            >
+            <strong>QRIS</strong>
+            <small>QR tersedia setelah gateway terhubung</small>
+        </div>
+    `;
+
+  content.innerHTML = `
+        <div class="premium-modal-backdrop" data-payment-backdrop>
+            <section
+                class="premium-payment-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="premium-modal-title"
+                aria-describedby="premium-modal-description"
+                tabindex="-1"
+            >
+                <header class="premium-modal-header">
+                    <div>
+                        <p class="premium-status-label">METODE PEMBAYARAN</p>
+                        <h2 id="premium-modal-title">
+                            ${
+                              method.id === "qris"
+                                ? "Bayar dengan QRIS"
+                                : `Pilih ${method.name}`
+                            }
+                        </h2>
+                    </div>
+                    <button
+                        class="premium-modal-close"
+                        type="button"
+                        data-payment-action="close"
+                        aria-label="Tutup popup"
+                    >
+                        <span class="premium-modal-close-icon">&times;</span>
+                    </button>
+                </header>
+
+                <div id="premium-modal-description" class="premium-order-summary">
+                    <div>
+                        <span>ComicID Premium</span>
+                        <small>Langganan 30 hari</small>
+                    </div>
+                    <strong>Rp30.000</strong>
+                </div>
+
+                <form id="premium-channel-form">
+                    ${details}
+                    <div class="premium-modal-note" role="note">
+                        <span aria-hidden="true">i</span>
+                        ${
+                          demoMode
+                            ? "Pratinjau checkout. Tidak ada pembayaran yang dikirim."
+                            : "Pembayaran belum dapat diproses karena integrasi gateway belum tersedia."
+                        }
+                    </div>
+                    <div class="premium-modal-actions">
+                        <button
+                            class="premium-demo-button premium-demo-button--secondary"
+                            type="button"
+                            data-payment-action="close"
+                        >
+                            Kembali
+                        </button>
+                        <button class="premium-submit" type="submit">
+                            Lanjutkan
+                        </button>
+                    </div>
+                    <p
+                        id="premium-modal-feedback"
+                        class="premium-feedback"
+                        role="status"
+                        aria-live="polite"
+                        hidden
+                    ></p>
+                </form>
+            </section>
+        </div>
+    `;
+
+  content.querySelector(".premium-modal-close")?.focus();
+}
+
+function renderChannelInstructions(content, channel) {
+  const instructions = content.querySelector(".premium-payment-instructions");
+  if (!instructions) return;
+
+  instructions.textContent = `Pembayaran ${channel} belum dapat diproses saat ini.`;
 }
 
 function renderDemoActions(activeStatus) {
@@ -245,9 +407,18 @@ export function frontPremium() {
   if (!content) return;
 
   let selectedMethod = "";
-  renderCheckout(content, demoMode);
+  let selectedMethodId = "";
+  renderCheckout(content);
 
   content.addEventListener("change", (event) => {
+    const channelInput = event.target.closest(
+      'input[name="payment-channel"]',
+    );
+    if (channelInput) {
+      renderChannelInstructions(content, channelInput.value);
+      return;
+    }
+
     const input = event.target.closest('input[name="payment-method"]');
     if (!input) return;
 
@@ -261,6 +432,35 @@ export function frontPremium() {
   });
 
   content.addEventListener("submit", (event) => {
+    if (event.target.id === "premium-channel-form") {
+      event.preventDefault();
+
+      const channelInput = content.querySelector(
+        'input[name="payment-channel"]:checked',
+      );
+      if (paymentChannels[selectedMethodId] && !channelInput) {
+        const feedback = document.getElementById("premium-modal-feedback");
+        feedback.textContent = "Pilih kanal pembayaran terlebih dahulu.";
+        feedback.hidden = false;
+        return;
+      }
+
+      if (channelInput) {
+        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
+      }
+
+      if (demoMode) {
+        renderPending(content, selectedMethod);
+        return;
+      }
+
+      const feedback = document.getElementById("premium-modal-feedback");
+      feedback.textContent =
+        "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
+      feedback.hidden = false;
+      return;
+    }
+
     if (event.target.id !== "premium-form") return;
     event.preventDefault();
 
@@ -279,19 +479,21 @@ export function frontPremium() {
       (item) => item.id === selectedInput.value,
     );
     selectedMethod = method.name;
-
-    if (demoMode) {
-      renderPending(content, selectedMethod);
-      return;
-    }
-
-    const feedback = document.getElementById("premium-feedback");
-    feedback.textContent =
-      "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
-    feedback.hidden = false;
+    selectedMethodId = method.id;
+    renderPaymentModal(content, method, demoMode);
   });
 
   content.addEventListener("click", (event) => {
+    const paymentAction = event.target.closest("[data-payment-action]");
+    const clickedBackdrop = event.target.matches("[data-payment-backdrop]");
+    if (
+      paymentAction?.dataset.paymentAction === "close" ||
+      clickedBackdrop
+    ) {
+      renderCheckout(content);
+      return;
+    }
+
     const button = event.target.closest("[data-demo-status]");
     if (!button || !demoMode) return;
 
@@ -306,10 +508,16 @@ export function frontPremium() {
         renderFailed(content, selectedMethod);
         break;
       case "checkout":
-        renderCheckout(content, demoMode);
+        renderCheckout(content);
         break;
       default:
         break;
+    }
+  });
+
+  content.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && content.querySelector(".premium-payment-modal")) {
+      renderCheckout(content);
     }
   });
 }
