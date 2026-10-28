@@ -1,10 +1,10 @@
 export function frontLogin() {
-    const app = document.getElementById("app");
+  const app = document.getElementById("app");
 
-    if (!app) return;
+  if (!app) return;
 
-    if (!document.getElementById("login-form")) {
-        app.innerHTML = `
+  if (!document.getElementById("login-form")) {
+    app.innerHTML = `
             <main class="auth-page">
                     <button
                         type="button"
@@ -34,7 +34,7 @@ export function frontLogin() {
                             id="login-email"
                             name="email"
                             type="text"
-                            placeholder="nama@email.com atau username"
+                            placeholder="Masukkan Email atau Username"
                             autocomplete="username"
                             required
                         >
@@ -71,106 +71,106 @@ export function frontLogin() {
                 </section>
             </main>
         `;
+  }
+
+  const form = document.getElementById("login-form");
+  const message = document.getElementById("login-message");
+
+  if (!form || form.dataset.attached === "true") return;
+  form.dataset.attached = "true";
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("login-email").value.trim();
+
+    const password = document.getElementById("login-password").value;
+    const submitBtn = form.querySelector("button[type='submit']");
+
+    function showMessage(text, isError = true) {
+      message.textContent = text;
+      message.hidden = false;
+      message.style.color = isError
+        ? "var(--color-danger, #ef4444)"
+        : "var(--color-success, #22c55e)";
     }
 
-    const form = document.getElementById("login-form");
-    const message = document.getElementById("login-message");
+    message.hidden = true;
 
-    if (!form || form.dataset.attached === "true") return;
-    form.dataset.attached = "true";
+    if (email === "" && password === "") {
+      showMessage("Form login wajib diisi.");
+      return;
+    }
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    if (!email) {
+      showMessage("Email atau username wajib diisi.");
+      return;
+    }
 
-        const email = document
-            .getElementById("login-email")
-            .value.trim();
+    // Jika memasukkan format email, validasi polanya. Jika username, minimal 3 karakter.
+    if (email.includes("@")) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage("Format email tidak valid.");
+        return;
+      }
+    } else if (email.length < 3) {
+      showMessage("Username minimal 3 karakter.");
+      return;
+    }
 
-        const password = document
-            .getElementById("login-password")
-            .value;
-        const submitBtn = form.querySelector("button[type='submit']");
+    if (!password) {
+      showMessage("Password wajib diisi.");
+      return;
+    }
 
-        function showMessage(text, isError = true) {
-            message.textContent = text;
-            message.hidden = false;
-            message.style.color = isError ? "var(--color-danger, #ef4444)" : "var(--color-success, #22c55e)";
-        }
+    if (password.length < 8) {
+      showMessage("Password minimal 8 karakter.");
+      return;
+    }
 
-        message.hidden = true;
+    // Memanggil LoginController Java yang terhubung ke Database MySQL (comicid)
+    try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Memverifikasi...";
+      }
 
-        if (email === "" && password === "") {
-            showMessage("Form login wajib diisi.");
-            return;
-        }
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        if (!email) {
-            showMessage("Email atau username wajib diisi.");
-            return;
-        }
+      const result = await response.json();
 
-        // Jika memasukkan format email, validasi polanya. Jika username, minimal 3 karakter.
-        if (email.includes("@")) {
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showMessage("Format email tidak valid.");
-                return;
-            }
-        } else if (email.length < 3) {
-            showMessage("Username minimal 3 karakter.");
-            return;
-        }
+      if (!response.ok || !result.success) {
+        // Menampilkan pesan error dari controller ("Email atau username tidak terdaftar." / "Password salah.")
+        showMessage(result.message || "Gagal masuk ke akun.");
+        return;
+      }
 
-        if (!password) {
-            showMessage("Password wajib diisi.");
-            return;
-        }
-        
-        if (password.length < 8) {
-            showMessage("Password minimal 8 karakter.");
-            return;
-        }
+      // Menyimpan sesi login ke localStorage agar kompatibel dengan halaman home.html Anda
+      localStorage.setItem("comicid_logged_in_email", result.email);
+      localStorage.setItem("comicid_logged_in", "true");
+      localStorage.setItem("comicid_logged_in_role", result.role);
+      localStorage.setItem(`comicid_username_${result.email}`, result.username);
 
-        // Memanggil LoginController Java yang terhubung ke Database MySQL (comicid)
-        try {
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = "Memverifikasi...";
-            }
+      showMessage("Login berhasil! Mengalihkan ke beranda...", false);
 
-            const response = await fetch("http://localhost:8080/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                // Menampilkan pesan error dari controller ("Email atau username tidak terdaftar." / "Password salah.")
-                showMessage(result.message || "Gagal masuk ke akun.");
-                return;
-            }
-
-            // Menyimpan sesi login ke localStorage agar kompatibel dengan halaman home.html Anda
-            localStorage.setItem("comicid_logged_in_email", result.email);
-            localStorage.setItem("comicid_logged_in", "true");
-            localStorage.setItem("comicid_logged_in_role", result.role);
-            localStorage.setItem(`comicid_username_${result.email}`, result.username);
-
-            showMessage("Login berhasil! Mengalihkan ke beranda...", false);
-
-            setTimeout(() => {
-                window.location.href = "home.html";
-            }, 800);
-        } catch (error) {
-            showMessage("Gagal terhubung ke server backend ComicID. Pastikan backend Java sudah berjalan.");
-        } finally {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Masuk";
-            }
-        }
-    });
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 800);
+    } catch (error) {
+      showMessage(
+        "Gagal terhubung ke server backend ComicID. Pastikan backend Java sudah berjalan.",
+      );
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Masuk";
+      }
+    }
+  });
 }
