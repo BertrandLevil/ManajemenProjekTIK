@@ -28,7 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
             frontPremium();
             break;
         case "comics":
-            frontComics();
+            if (typeof frontComics === "function") {
+                frontComics();
+            }
             break;
         case "comic-detail":
             frontComicDetail();

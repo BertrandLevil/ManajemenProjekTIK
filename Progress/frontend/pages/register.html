@@ -1,17 +1,217 @@
 <!doctype html>
 <html lang="id">
-    <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Register | ComicID</title>
     <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-page="register">
+    <div id="app">
+        <main class="auth-page">
+            <button
+                type="button"
+                class="theme-toggle"
+                id="theme-toggle"
+                aria-label="Ganti tema"
+                title="Ganti tema"
+            >
+                <span class="theme-icon">☀</span>
+            </button>
+
+            <section class="auth-card">
+                <a class="brand auth-brand" href="home.html">
+                    <span class="brand-icon">C</span>
+                    <span>Comic<span class="brand-accent">ID</span></span>
+                </a>
+
+                <p class="section-eyebrow">GABUNG DENGAN COMICID</p>
+                <h1>Buat akun baru</h1>
+                <p class="auth-description">
+                    Daftar dan mulai jelajahi cerita favoritmu.
+                </p>
+
+                <form id="register-form" class="auth-form" novalidate>
+                    <label for="register-username">Nama pengguna</label>
+                    <input
+                        id="register-username"
+                        name="username"
+                        type="text"
+                        placeholder="Masukkan nama pengguna"
+                        minlength="3"
+                        maxlength="30"
+                        autocomplete="username"
+                        required
+                    >
+
+                    <label for="register-email">Email</label>
+                    <input
+                        id="register-email"
+                        name="email"
+                        type="email"
+                        placeholder="nama@email.com"
+                        autocomplete="email"
+                        required
+                    >
+                    
+                    <label for="register-password">Password</label>
+                    <input
+                        id="register-password"
+                        name="password"
+                        type="password"
+                        placeholder="Minimal 8 karakter"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <label for="register-confirm">Konfirmasi password</label>
+                    <input
+                        id="register-confirm"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="Masukkan ulang password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <p id="register-message"
+                        class="auth-message"
+                        role="alert"
+                        hidden></p>
+
+                    <button type="submit" class="signup-button auth-submit">
+                        Daftar
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    Sudah punya akun?
+                    <a href="login.html">Masuk</a>
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script Utama (ES Module jika dibuka via Web Server) -->
     <script type="module" src="../js/app.js"></script>
-    </head>
-    <body data-page="register">
-        <div id="app">
-            <div class="max-w-7xl mx-auto p-8 muted">
-                Loading ComicID...
-            </div>
-        </div>
-    </body>
+
+    <!-- Script Mandiri (Fallback jika dibuka via file:/// tanpa web server) -->
+    <script>
+        (function() {
+            function initFallbackRegister() {
+                const form = document.getElementById("register-form");
+                const message = document.getElementById("register-message");
+                if (!form || form.dataset.attached === "true") return;
+                form.dataset.attached = "true";
+
+                // Setup theme toggle
+                const themeBtn = document.getElementById("theme-toggle");
+                const currentTheme = localStorage.getItem("wc_theme") || "dark";
+                document.documentElement.setAttribute("data-theme", currentTheme);
+                if (themeBtn) {
+                    const icon = themeBtn.querySelector(".theme-icon");
+                    if (icon) icon.textContent = currentTheme === "light" ? "☀" : "☾";
+                    themeBtn.addEventListener("click", () => {
+                        const newTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                        document.documentElement.setAttribute("data-theme", newTheme);
+                        localStorage.setItem("wc_theme", newTheme);
+                        if (icon) icon.textContent = newTheme === "light" ? "☀" : "☾";
+                    });
+                }
+
+                form.addEventListener("submit", async (event) => {
+                    event.preventDefault();
+                    const username = document.getElementById("register-username").value.trim();
+                    const email = document.getElementById("register-email").value.trim();
+                    const password = document.getElementById("register-password").value;
+                    const confirmPassword = document.getElementById("register-confirm").value;
+                    const submitBtn = form.querySelector("button[type='submit']");
+
+                    function showMessage(text, isError = true) {
+                        message.textContent = text;
+                        message.hidden = false;
+                        message.style.color = isError ? "var(--color-danger, #ef4444)" : "var(--color-success, #22c55e)";
+                    }
+
+                    message.hidden = true;
+
+                    if (!username && !email && !password && !confirmPassword) {
+                        showMessage("Form registrasi wajib diisi.");
+                        return;
+                    }
+                    if (username.length < 3) {
+                        showMessage("Nama pengguna minimal 3 karakter.");
+                        return;
+                    }
+                    if (!email) {
+                        showMessage("Email wajib diisi.");
+                        return;
+                    }
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        showMessage("Format email tidak valid.");
+                        return;
+                    }
+                    if (!password) {
+                        showMessage("Password wajib diisi.");
+                        return;
+                    }
+                    if (password.length < 8) {
+                        showMessage("Password minimal 8 karakter.");
+                        return;
+                    }
+                    if (password !== confirmPassword) {
+                        showMessage("Konfirmasi password tidak cocok.");
+                        return;
+                    }
+
+                    try {
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = "Mendaftarkan...";
+                        }
+
+                        const response = await fetch("http://localhost:8080/api/register", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                username: username,
+                                email: email,
+                                password: password,
+                                role: "Pembaca"
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            showMessage(result.message || "Registrasi gagal.");
+                            return;
+                        }
+
+                        showMessage("Registrasi berhasil! Mengalihkan ke login...", false);
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 1200);
+
+                    } catch (error) {
+                        showMessage("Gagal terhubung ke backend (http://localhost:8080). Pastikan run-backend.bat sudah aktif.");
+                    } finally {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Daftar";
+                        }
+                    }
+                });
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", initFallbackRegister);
+            } else {
+                initFallbackRegister();
+            }
+        })();
+    </script>
+</body>
 </html>
