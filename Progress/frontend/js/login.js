@@ -74,7 +74,7 @@ export function frontLogin() {
     const form = document.getElementById("login-form");
     const message = document.getElementById("login-message");
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const email = document
@@ -106,6 +106,7 @@ export function frontLogin() {
             showMessage("Format email tidak valid.");
             return;
         }
+
         if (!password) {
             showMessage("Password wajib diisi.");
             return;
@@ -116,33 +117,39 @@ export function frontLogin() {
             return;
         }
 
-        const accounts = JSON.parse(
-            localStorage.getItem("comicid_accounts") || "[]"
-        );
+        // Memanggil LoginController Java yang terhubung ke Database MySQL (comicid)
+        try {
+            const response = await fetch("http://localhost:8080/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-        const account = accounts.find(
-            account => account.email.toLowerCase() === email.toLowerCase()
-        );
+            const result = await response.json();
 
-        if (!account) {
-            showMessage("Email tidak terdaftar.");
-            return;
+            if (!response.ok || !result.success) {
+                // Menampilkan pesan error dari controller ("Email tidak terdaftar." / "Password salah.")
+                showMessage(result.message || "Gagal masuk ke akun.");
+                return;
+            }
+
+            // Menyimpan sesi login ke localStorage agar kompatibel dengan halaman home.html Anda
+            localStorage.setItem("comicid_logged_in_email", result.email);
+            localStorage.setItem("comicid_logged_in", "true");
+            localStorage.setItem("comicid_logged_in_role", result.role);
+
+            if (!localStorage.getItem(`comicid_username_${result.email}`)) {
+                localStorage.setItem(
+                    `comicid_username_${result.email}`,
+                    result.username
+                );
+            }
+
+            window.location.href = "home.html";
+        } catch (error) {
+            showMessage("Gagal terhubung ke server aplikasi.");
         }
-
-        if (password !== account.password) {
-            showMessage("Password salah.");
-            return;
-        }
-
-        localStorage.setItem("comicid_logged_in_email", account.email);
-        localStorage.setItem("comicid_logged_in", "true");
-
-        if (!localStorage.getItem(`comicid_username_${account.email}`)) {
-            localStorage.setItem(
-                `comicid_username_${account.email}`,
-                account.username
-            );
-        }
-        window.location.href = "home.html";
     });
 }
