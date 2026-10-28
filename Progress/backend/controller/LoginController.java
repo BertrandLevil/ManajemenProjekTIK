@@ -25,10 +25,10 @@ public class LoginController {
     public User loginWithQuery(String emailOrUsername, String passwordInput) throws SQLException {
         // Mendukung login menggunakan Email ataupun Username
         String sql = "SELECT id_pengguna, username, email, password, role, is_premium "
-                   + "FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)";
+                + "FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, emailOrUsername);
             stmt.setString(2, emailOrUsername);
@@ -76,7 +76,7 @@ public class LoginController {
         // Cek apakah username sudah dipakai
         String checkUserSql = "SELECT id_pengguna FROM pengguna WHERE LOWER(username) = LOWER(?)";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)) {
+            PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)) {
             checkStmt.setString(1, username);
             try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next()) {
@@ -88,7 +88,7 @@ public class LoginController {
         // Cek apakah email sudah terdaftar
         String checkEmailSql = "SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?)";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkEmailSql)) {
+            PreparedStatement checkStmt = conn.prepareStatement(checkEmailSql)) {
             checkStmt.setString(1, email);
             try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next()) {

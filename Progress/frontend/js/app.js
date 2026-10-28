@@ -27,14 +27,21 @@ document.addEventListener("DOMContentLoaded", () => {
         case "premium":
             frontPremium();
             break;
-        case "comics":
-            if (typeof frontComics === "function") {
-                frontComics();
-            }
-            break;
+        // case "comics":
+        //     if (typeof frontComics === "function") {
+        //         frontComics();
+        //     }
+        //     break;
         case "comic-detail":
+        console.log("Halaman comic-detail terdeteksi");
+        
+        try {
             frontComicDetail();
-            break;
+            console.log("frontComicDetail berhasil dipanggil");
+        } catch (error) {
+            console.error("Gagal menampilkan detail komik:", error);
+        }
+        break;
         case "reader":
             frontReader();
             break;

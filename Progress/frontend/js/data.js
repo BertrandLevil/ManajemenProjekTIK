@@ -19,7 +19,7 @@ export const comics = [
         id: 2,
         title: "The Siren: Becoming the Villain's Family",
         author: "Sol Leesu (설이수 / Seol Yi-soo)",
-        studio: "ODR",
+        studio: ["ODR"],
         category: "Manhwa",
         genre: ["Shoujo", "Drama", "Fantasy", "Historical", "Romance"],
         chapter: 181,
