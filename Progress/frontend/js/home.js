@@ -111,6 +111,7 @@ export function frontHome() {
                         "Horror",
                         "Martial Arts",
                         "Mature",
+                        "Mystery",
                         "Murim",
                         "Violence",
                         "Xianxia",

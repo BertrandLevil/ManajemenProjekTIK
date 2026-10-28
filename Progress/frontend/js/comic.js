@@ -151,15 +151,30 @@ export function frontComicDetail() {
 
                         <div class="detail-metadata">
                             <p><strong>Author:</strong> ${escapeHTML(comic.author || "-")}</p>
+                            <p><strong>Studio:</strong> ${escapeHTML(comic.studio.join(", "))}</p>
                             <p><strong>Kategori:</strong> ${escapeHTML(comic.category || "-")}</p>
                             <p><strong>Genre:</strong> ${escapeHTML(genres)}</p>
                             <p><strong>Status:</strong> ${escapeHTML(comic.status || "-")}</p>
                             <p><strong>Jumlah chapter:</strong> ${totalChapters}</p>
                         </div>
 
-                        <div class="detail-description">
+                        <div class="comic-description">
                             <h2>Sinopsis</h2>
-                            <p>${escapeHTML(description)}</p>
+                            <p class="description-text collapsed" id="comic-description">
+                                ${escapeHTML(comic.description || "Belum ada deskripsi.")}
+                            </p>
+
+                            <button
+                                type="button"
+                                class="description-toggle"
+                                id="description-toggle"
+                                aria-expanded="false"
+                                aria-controls="comic-description"
+                                hidden
+                            >
+                                <span class="description-arrow">⌄</span>
+                                <span class="description-toggle-text">Selengkapnya</span>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -189,6 +204,30 @@ export function frontComicDetail() {
             </main>
         `;
         
+        const description = document.getElementById("comic-description");
+        const toggleButton = document.getElementById("description-toggle");
+
+        if (description && toggleButton) {
+            requestAnimationFrame(() => {
+                const isLong =
+                    description.scrollHeight > description.clientHeight + 1;
+            
+                toggleButton.hidden = !isLong;
+            });
+        
+            toggleButton.addEventListener("click", () => {
+                const isExpanded =
+                    toggleButton.getAttribute("aria-expanded") === "true";
+            
+                description.classList.toggle("collapsed", isExpanded);
+            
+                toggleButton.setAttribute("aria-expanded", String(!isExpanded));
+            
+                toggleButton.querySelector(".description-toggle-text").textContent =
+                    isExpanded ? "Selengkapnya" : "Lebih sedikit";
+            });
+        }
+
         document.getElementById("detail-chapters").innerHTML =
             frontChapters();
         

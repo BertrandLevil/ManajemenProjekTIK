@@ -204,16 +204,19 @@ export function frontReview(comic, chapter = null) {
         commentForm.addEventListener("submit", event => {
             event.preventDefault();
 
-            const commentInput =
-                document.getElementById("comic-comment");
-
-            const commentText = commentInput.value.trim();
-
-            if (!commentText) return;
-
             const email = localStorage.getItem(
                 "comicid_logged_in_email"
             );
+
+            if (!email) {
+                alert("Silakan login terlebih dahulu untuk memberi komentar.");
+                return;
+            }
+
+            const commentInput = document.getElementById("comic-comment");
+            const commentText = commentInput.value.trim();
+
+            if (!commentText) return;
 
             const username = email
                 ? localStorage.getItem(`comicid_username_${email}`) || "Pembaca"
