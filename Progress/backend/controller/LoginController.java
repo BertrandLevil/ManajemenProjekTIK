@@ -444,7 +444,7 @@ public class LoginController {
         System.out.println(" Backend & Web Server ComicID Berhasil Dimulai! ");
         System.out.println("==================================================");
         System.out.println(" - Buka di Browser : http://localhost:" + port + "/");
-        System.out.println(" - Halaman Login   : http://localhost:" + port + "/pages/login.html");
+        System.out.println(" - Halaman Login   : http://localhost:" + port + "/pages/home.html");
         System.out.println(" - Halaman Daftar  : http://localhost:" + port + "/pages/register.html");
         System.out.println(" - Endpoint API    : http://localhost:" + port + "/api/login");
         System.out.println("--------------------------------------------------");
