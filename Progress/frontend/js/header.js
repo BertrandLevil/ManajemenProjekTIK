@@ -17,11 +17,6 @@ export function header() {
 
     return `
         <header class="site-header">
-            <a class="brand" href="home.html">
-                <span class="brand-icon">C</span>
-                <span>Comic<span class="brand-accent">ID</span></span>
-            </a>
-
             <button
                 type="button"
                 class="menu-toggle"
@@ -32,6 +27,11 @@ export function header() {
             >
                 ☰
             </button>
+
+            <a class="brand" href="home.html">
+                <span class="brand-icon">C</span>
+                <span>Comic<span class="brand-accent">ID</span></span>
+            </a>
 
             <button
                 type="button"

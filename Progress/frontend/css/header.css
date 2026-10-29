@@ -1,20 +1,62 @@
 .site-header {
     min-height: 76px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 16px 5%;
-    padding-right: 112px;
+    display: block !important;
+    position: relative !important;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--line);
     background: var(--bg);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.site-header .menu-toggle {
+    position: absolute !important;
+    left: 24px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    z-index: 100 !important;
+}
+
+.site-header .brand {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px;
+    z-index: 90 !important;
+}
+
+.site-header .header-actions {
+    position: absolute !important;
+    right: 24px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px;
+    z-index: 100 !important;
+}
+
+.site-header .theme-toggle {
+    position: absolute !important;
+    right: 24px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    z-index: 100 !important;
 }
 
 .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -.8px;
@@ -35,8 +77,7 @@
     color: var(--accent);
 }
 
-.main-nav,
-.header-actions {
+.main-nav {
     display: flex;
     align-items: center;
     gap: 22px;
@@ -52,11 +93,6 @@
 .nav-link:hover,
 .nav-link.active {
     color: var(--accent);
-}
-
-.header-actions {
-    gap: 12px;
-    flex-shrink: 0;
 }
 
 .login-link {
@@ -87,11 +123,24 @@
 }
 
 .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
     width: 250px;
+    height: 100vh !important;
     max-width: 80vw;
     box-sizing: border-box;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 20px;
+    background: var(--bg);
+    z-index: 9999 !important;
+    transform: translateX(-100%) !important; 
+    transition: transform 0.3s ease-in-out !important;
+}
+
+.sidebar.active,
+.sidebar.open {
+    transform: translateX(0) !important;
 }
 
 .sidebar .nav-link,

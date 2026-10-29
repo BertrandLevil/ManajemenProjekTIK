@@ -1,7 +1,7 @@
 .theme-toggle {
     position: absolute;
     top: 18px;
-    left: 24px;
+    right: 24px;
     z-index: 9999;
     width: 68px;
     height: 36px;

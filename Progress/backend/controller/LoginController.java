@@ -272,49 +272,113 @@ public class LoginController {
 
         public StaticFileHandler() {
             // Mencari folder Progress/frontend
-            java.io.File current = new java.io.File(".").getAbsoluteFile();
-            java.io.File candidate = new java.io.File(current, "..");
-            if (!new java.io.File(candidate, "pages").exists()) {
-                candidate = new java.io.File("Progress/frontend").getAbsoluteFile();
+            this.baseDir = new java.io.File("../../../Progress/frontend")
+                .getAbsoluteFile()
+                .toPath()
+                .normalize()
+                .toFile();
+
+            System.out.println(
+                "[StaticFileHandler] Folder frontend: "
+            + this.baseDir.getAbsolutePath()
+            );
+        
+            // Memeriksa apakah halaman home benar-benar tersedia.
+            java.io.File homeFile =
+                    new java.io.File(this.baseDir, "pages/home.html");
+        
+            if (!homeFile.exists()) {
+                System.err.println(
+                    "[PERINGATAN] File login tidak ditemukan: "
+                    + homeFile.getAbsolutePath()
+                );
             }
-            if (!new java.io.File(candidate, "pages").exists()) {
-                candidate = new java.io.File("c:/ManajemenProjekTIK/ManajemenProjekTIK/Progress/frontend").getAbsoluteFile();
-            }
-            this.baseDir = candidate;
         }
+
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             String path = exchange.getRequestURI().getPath();
+        
+            // API ditangani oleh handler masing-masing.
             if (path.startsWith("/api/")) {
                 sendJson(exchange, 404, "{\"error\":\"Not found\"}");
                 return;
             }
-
+                        // Homepage menjadi halaman awal.
             if (path.equals("/") || path.isEmpty()) {
-                path = "/pages/login.html";
+                path = "/pages/home.html";
             }
+                        // Ubah URL menjadi path relatif terhadap folder frontend.
+            String relativePath = path.replaceFirst("^/+", "")
+                    .replace("/", java.io.File.separator);
+                        java.io.File target = new java.io.File(baseDir, relativePath)
+                    .getCanonicalFile();
+                        // Jika URL HTML tidak ditemukan, coba cari berdasarkan
+            // nama file di dalam folder pages.
+            if (!target.exists()
+                    && path.toLowerCase().endsWith(".html")) {
+                    
+                String fileName = path.substring(
+                        path.lastIndexOf("/") + 1
+                );
+            
+                target = new java.io.File(
+                        baseDir,
+                        "pages" + java.io.File.separator + fileName
+                ).getCanonicalFile();
+            }
+        
+            // Pastikan file tetap berada di dalam folder frontend.
+            String basePath = baseDir.getCanonicalPath()
+                    + java.io.File.separator;
 
-            java.io.File target = new java.io.File(baseDir, path.replace("/", java.io.File.separator)).getCanonicalFile();
-            if (!target.exists() || target.isDirectory()) {
-                sendJson(exchange, 404, "{\"error\":\"File tidak ditemukan: " + path + "\"}");
+            if (!target.getCanonicalPath().startsWith(basePath)
+                    || !target.exists()
+                    || target.isDirectory()) {
+                    
+                sendJson(
+                    exchange,
+                    404,
+                    "{\"error\":\"File tidak ditemukan: "
+                        + escapeJson(path) + "\"}"
+                );
                 return;
             }
 
-            String contentType = "text/plain";
+            // Tentukan tipe konten berdasarkan ekstensi file.
             String lower = target.getName().toLowerCase();
-            if (lower.endsWith(".html")) contentType = "text/html; charset=UTF-8";
-            else if (lower.endsWith(".css")) contentType = "text/css; charset=UTF-8";
-            else if (lower.endsWith(".js")) contentType = "application/javascript; charset=UTF-8";
-            else if (lower.endsWith(".png")) contentType = "image/png";
-            else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
-            else if (lower.endsWith(".svg")) contentType = "image/svg+xml";
-            else if (lower.endsWith(".json")) contentType = "application/json; charset=UTF-8";
+            String contentType = "application/octet-stream";
 
+            if (lower.endsWith(".html")) {
+                contentType = "text/html; charset=UTF-8";
+            } else if (lower.endsWith(".css")) {
+                contentType = "text/css; charset=UTF-8";
+            } else if (lower.endsWith(".js")) {
+                contentType = "application/javascript; charset=UTF-8";
+            } else if (lower.endsWith(".json")) {
+                contentType = "application/json; charset=UTF-8";
+            } else if (lower.endsWith(".png")) {
+                contentType = "image/png";
+            } else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+                contentType = "image/jpeg";
+            } else if (lower.endsWith(".webp")) {
+                contentType = "image/webp";
+            } else if (lower.endsWith(".gif")) {
+                contentType = "image/gif";
+            } else if (lower.endsWith(".svg")) {
+                contentType = "image/svg+xml";
+            } else if (lower.endsWith(".ico")) {
+                contentType = "image/x-icon";
+            }
+        
             exchange.getResponseHeaders().set("Content-Type", contentType);
-            exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().set("X-Content-Type-Options", "nosniff");
+        
             byte[] bytes = java.nio.file.Files.readAllBytes(target.toPath());
+        
             exchange.sendResponseHeaders(200, bytes.length);
+        
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(bytes);
             }
