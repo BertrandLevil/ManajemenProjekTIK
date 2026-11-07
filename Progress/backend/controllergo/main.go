@@ -64,15 +64,21 @@ func main() {
 	// Endpoint Komik
 	mux.HandleFunc("/api/comics", ComicsHttpHandler(komikCtrl))
 	mux.HandleFunc("/api/comics/detail", ComicsDetailHttpHandler(komikCtrl))
+	mux.HandleFunc("/api/comics/verify", ComicsVerifyHttpHandler(komikCtrl))
+	mux.HandleFunc("/api/comics/stats", ComicsStatsHttpHandler(komikCtrl))
 
 	// Endpoint Bab
 	mux.HandleFunc("/api/chapters", ChaptersHttpHandler(babCtrl))
+	mux.HandleFunc("/api/chapters/detail", ChaptersDetailHttpHandler(babCtrl))
 
 	// Endpoint Kategori
 	mux.HandleFunc("/api/categories", CategoriesHttpHandler(kategoriCtrl))
+	mux.HandleFunc("/api/categories/detail", CategoriesDetailHttpHandler(kategoriCtrl))
 
 	// Endpoint Ulasan
 	mux.HandleFunc("/api/reviews", ReviewsHttpHandler(reviewCtrl))
+	mux.HandleFunc("/api/reviews/detail", ReviewsDetailHttpHandler(reviewCtrl))
+	mux.HandleFunc("/api/author/reviews", AuthorReviewsHttpHandler(reviewCtrl))
 
 	// Endpoint Bookmark & Histori
 	mux.HandleFunc("/api/bookmarks", BookmarksHttpHandler(bookmarkCtrl))
@@ -81,6 +87,8 @@ func main() {
 	// Endpoint Pembayaran
 	mux.HandleFunc("/api/payment/checkout", PaymentCheckoutHttpHandler(pembayaranCtrl))
 	mux.HandleFunc("/api/payment/process", PaymentProcessHttpHandler(pembayaranCtrl))
+	mux.HandleFunc("/api/payment/history", UserTransactionsHttpHandler(pembayaranCtrl))
+	mux.HandleFunc("/api/admin/transactions", AdminTransactionsHttpHandler(pembayaranCtrl))
 
 	// Static Web Files
 	mux.HandleFunc("/", StaticFileHandler(frontendDir))
@@ -95,12 +103,12 @@ func main() {
 	fmt.Println(" Controller & API Endpoints Terdaftar: ")
 	fmt.Println(" [Autentikasi] : /api/login, /api/register, /api/health")
 	fmt.Println(" [Pengguna]    : /api/user/profile, /api/admin/users")
-	fmt.Println(" [Komik]       : /api/comics, /api/comics/detail")
-	fmt.Println(" [Bab/Chapter] : /api/chapters")
-	fmt.Println(" [Kategori]    : /api/categories")
-	fmt.Println(" [Ulasan]      : /api/reviews")
+	fmt.Println(" [Komik]       : /api/comics, /api/comics/detail, /api/comics/verify, /api/comics/stats")
+	fmt.Println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail")
+	fmt.Println(" [Kategori]    : /api/categories, /api/categories/detail")
+	fmt.Println(" [Ulasan]      : /api/reviews, /api/reviews/detail, /api/author/reviews")
 	fmt.Println(" [Bookmark]    : /api/bookmarks, /api/history")
-	fmt.Println(" [Pembayaran]  : /api/payment/checkout, /api/payment/process")
+	fmt.Println(" [Pembayaran]  : /api/payment/checkout, /api/payment/process, /api/payment/history, /api/admin/transactions")
 	fmt.Println("--------------------------------------------------")
 
 	if TestConnection() {

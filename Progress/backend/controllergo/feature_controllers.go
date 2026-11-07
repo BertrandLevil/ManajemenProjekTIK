@@ -39,6 +39,23 @@ func (c *KategoriController) GetAllKategori() ([]KategoriModel, error) {
 	return list, nil
 }
 
+func (c *KategoriController) GetKategoriById(id int) (*KategoriModel, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var k KategoriModel
+	err = conn.QueryRow("SELECT id_kategori, nama_kategori FROM kategori WHERE id_kategori = ?", id).Scan(&k.IdKategori, &k.NamaKategori)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &k, nil
+}
+
 func (c *KategoriController) CreateKategori(nama string) (bool, error) {
 	nama = strings.TrimSpace(nama)
 	if nama == "" {
@@ -60,6 +77,25 @@ func (c *KategoriController) CreateKategori(nama string) (bool, error) {
 
 	_, err = conn.Exec("INSERT INTO kategori (nama_kategori) VALUES (?)", nama)
 	return err == nil, err
+}
+
+func (c *KategoriController) UpdateKategori(id int, nama string) (bool, error) {
+	nama = strings.TrimSpace(nama)
+	if nama == "" {
+		return false, errors.New("Nama kategori tidak boleh kosong.")
+	}
+
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	res, err := conn.Exec("UPDATE kategori SET nama_kategori = ? WHERE id_kategori = ?", nama, id)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
 }
 
 func (c *KategoriController) DeleteKategori(id int) (bool, error) {
@@ -111,6 +147,27 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 	return list, nil
 }
 
+func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik 
+              FROM bab b JOIN komik k ON b.id_komik = k.id_komik 
+              WHERE b.id_bab = ?`
+
+	var b BabDTO
+	err = conn.QueryRow(query, idBab).Scan(&b.IdBab, &b.IdKomik, &b.NomorBab, &b.TanggalRilis, &b.NamaKomik)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &b, nil
+}
+
 func (c *BabController) CreateBab(idKomik, nomorBab int, tanggalRilis string) (bool, error) {
 	if idKomik <= 0 || nomorBab <= 0 {
 		return false, errors.New("ID Komik dan nomor bab harus lebih dari 0.")
@@ -121,12 +178,37 @@ func (c *BabController) CreateBab(idKomik, nomorBab int, tanggalRilis string) (b
 		return false, err
 	}
 
+	// Cek duplikasi nomor bab
+	var existingId int
+	err = conn.QueryRow("SELECT id_bab FROM bab WHERE id_komik = ? AND nomor_bab = ?", idKomik, nomorBab).Scan(&existingId)
+	if err == nil {
+		return false, errors.New("Nomor bab sudah ada pada komik ini.")
+	}
+
 	if strings.TrimSpace(tanggalRilis) == "" {
 		tanggalRilis = time.Now().Format("2006-01-02")
 	}
 
 	_, err = conn.Exec("INSERT INTO bab (id_komik, nomor_bab, tanggal_rilis) VALUES (?, ?, ?)", idKomik, nomorBab, tanggalRilis)
 	return err == nil, err
+}
+
+func (c *BabController) UpdateBab(idBab, nomorBab int, tanggalRilis string) (bool, error) {
+	if idBab <= 0 || nomorBab <= 0 {
+		return false, errors.New("ID Bab dan nomor bab tidak valid.")
+	}
+
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	res, err := conn.Exec("UPDATE bab SET nomor_bab = ?, tanggal_rilis = ? WHERE id_bab = ?", nomorBab, tanggalRilis, idBab)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
 }
 
 func (c *BabController) DeleteBab(idBab int) (bool, error) {
@@ -206,7 +288,6 @@ func (c *KomikController) GetAllKomik(search, kategori, sortBy string) ([]KomikD
 		list = append(list, k)
 	}
 
-	// Fetch categories for each comic
 	for i := range list {
 		catRows, err := conn.Query(`SELECT kat.nama_kategori FROM komik_kategori kk 
                                     JOIN kategori kat ON kk.id_kategori = kat.id_kategori 
@@ -296,6 +377,36 @@ func (c *KomikController) CreateKomik(idKreator int, title, desc, studio string,
 	return int(newId), nil
 }
 
+func (c *KomikController) UpdateKomik(idKomik, idKreator int, title, desc, studio string, catIds []int) (bool, error) {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return false, errors.New("Judul komik tidak boleh kosong.")
+	}
+
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	res, err := conn.Exec("UPDATE komik SET nama_komik = ?, deskripsi = ?, nama_studio = ? WHERE id_komik = ?",
+		title, desc, studio, idKomik)
+	if err != nil {
+		return false, err
+	}
+
+	if len(catIds) > 0 {
+		_, _ = conn.Exec("DELETE FROM komik_kategori WHERE id_komik = ?", idKomik)
+		for _, cid := range catIds {
+			if cid > 0 {
+				_, _ = conn.Exec("INSERT IGNORE INTO komik_kategori (id_komik, id_kategori) VALUES (?, ?)", idKomik, cid)
+			}
+		}
+	}
+
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
+}
+
 func (c *KomikController) DeleteKomik(id int) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
@@ -307,6 +418,83 @@ func (c *KomikController) DeleteKomik(id int) (bool, error) {
 	}
 	ra, _ := res.RowsAffected()
 	return ra > 0, nil
+}
+
+func (c *KomikController) VerifyKomik(comicId, adminId int) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	var role string
+	err = conn.QueryRow("SELECT role FROM pengguna WHERE id_pengguna = ?", adminId).Scan(&role)
+	if err != nil {
+		return false, errors.New("Admin tidak ditemukan.")
+	}
+	if role != "Admin" {
+		return false, errors.New("Hanya admin yang dapat memverifikasi komik.")
+	}
+	return true, nil
+}
+
+func (c *KomikController) GetKomikStats(comicId int) (map[string]interface{}, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `SELECT k.nama_komik, k.rating_rata_rata,
+              (SELECT COUNT(*) FROM bab WHERE id_komik = k.id_komik) AS total_bab,
+              (SELECT COUNT(*) FROM komentar_rating WHERE id_komik = k.id_komik) AS total_komentar,
+              (SELECT COUNT(*) FROM bookmark WHERE id_komik = k.id_komik) AS total_bookmark
+              FROM komik k WHERE k.id_komik = ?`
+
+	var (
+		title         string
+		rating        float64
+		totalBab      int
+		totalKomentar int
+		totalBookmark int
+	)
+
+	err = conn.QueryRow(query, comicId).Scan(&title, &rating, &totalBab, &totalKomentar, &totalBookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"comic_id":        comicId,
+		"title":           title,
+		"rating":          rating,
+		"total_chapters":  totalBab,
+		"total_comments":  totalKomentar,
+		"total_bookmarks": totalBookmark,
+	}, nil
+}
+
+func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{}, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `SELECT COUNT(*) AS total_komik, COALESCE(AVG(rating_rata_rata), 0) AS avg_rating 
+              FROM komik WHERE id_kreator = ?`
+
+	var (
+		totalKomik int
+		avgRating  float64
+	)
+	err = conn.QueryRow(query, creatorId).Scan(&totalKomik, &avgRating)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"creator_id":     creatorId,
+		"total_comics":   totalKomik,
+		"average_rating": avgRating,
+	}, nil
 }
 
 // =========================================================
@@ -356,6 +544,37 @@ func (c *KomentarRatingController) GetReviewsByComic(comicId int, sort string) (
 	return list, nil
 }
 
+func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `SELECT kr.id_ulasan, kr.id_pengguna, u.username, kr.id_komik, k.nama_komik,
+              kr.isi_komentar, kr.nilai_rating, kr.tanggal_komentar
+              FROM komentar_rating kr
+              JOIN pengguna u ON kr.id_pengguna = u.id_pengguna
+              JOIN komik k ON kr.id_komik = k.id_komik
+              WHERE k.id_kreator = ? 
+              ORDER BY kr.tanggal_komentar DESC`
+
+	rows, err := conn.Query(query, creatorId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]ReviewDTO, 0)
+	for rows.Next() {
+		var r ReviewDTO
+		if err := rows.Scan(&r.IdUlasan, &r.IdPengguna, &r.Username, &r.IdKomik, &r.NamaKomik, &r.IsiKomentar, &r.NilaiRating, &r.TanggalKomentar); err != nil {
+			return nil, err
+		}
+		list = append(list, r)
+	}
+	return list, nil
+}
+
 func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string, rating float64) (bool, error) {
 	if idPengguna <= 0 || idKomik <= 0 {
 		return false, errors.New("idPengguna dan idKomik harus lebih dari 0.")
@@ -381,6 +600,35 @@ func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string
     ) WHERE id_komik = ?`, idKomik, idKomik)
 
 	return true, nil
+}
+
+func (c *KomentarRatingController) DeleteReview(idUlasan, idPengguna int, role string) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	var comicId, ownerId int
+	err = conn.QueryRow("SELECT id_komik, id_pengguna FROM komentar_rating WHERE id_ulasan = ?", idUlasan).Scan(&comicId, &ownerId)
+	if err != nil {
+		return false, err
+	}
+
+	if role != "Admin" && ownerId != idPengguna {
+		return false, errors.New("Anda tidak memiliki hak akses untuk menghapus ulasan ini.")
+	}
+
+	res, err := conn.Exec("DELETE FROM komentar_rating WHERE id_ulasan = ?", idUlasan)
+	if err != nil {
+		return false, err
+	}
+
+	_, _ = conn.Exec(`UPDATE komik SET rating_rata_rata = (
+        SELECT COALESCE(AVG(nilai_rating), 0.0) FROM komentar_rating WHERE id_komik = ?
+    ) WHERE id_komik = ?`, comicId, comicId)
+
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
 }
 
 // =========================================================
@@ -485,6 +733,19 @@ func (c *BookmarkHistoriController) GetHistori(userId int) ([]HistoriDTO, error)
 	return list, nil
 }
 
+func (c *BookmarkHistoriController) DeleteHistori(idHistori, userId int) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+	res, err := conn.Exec("DELETE FROM histori_baca WHERE id_histori = ? AND id_pengguna = ?", idHistori, userId)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
+}
+
 // =========================================================
 // 6. PembayaranController
 // =========================================================
@@ -492,6 +753,19 @@ type PembayaranController struct{}
 
 func NewPembayaranController() *PembayaranController {
 	return &PembayaranController{}
+}
+
+func (c *PembayaranController) GetUserIdByEmail(email string) (int, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return 0, err
+	}
+	var id int
+	err = conn.QueryRow("SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)", email, email).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
 func (c *PembayaranController) Checkout(userId int, method string, amount float64) (int, error) {
@@ -631,6 +905,66 @@ func (c *UserController) GetUserProfile(emailOrUsername string) (*UserDTO, error
 	return &u, nil
 }
 
+func (c *UserController) GetUserById(id int) (*UserDTO, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		u         UserDTO
+		isPremium int
+	)
+	err = conn.QueryRow("SELECT id_pengguna, username, email, role, is_premium FROM pengguna WHERE id_pengguna = ?", id).Scan(
+		&u.IdPengguna, &u.Username, &u.Email, &u.Role, &isPremium,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	u.IsPremium = isPremium == 1
+	return &u, nil
+}
+
+func (c *UserController) UpdateProfile(id int, newUsername, newEmail, newPassword string) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	updates := make([]string, 0)
+	params := make([]interface{}, 0)
+
+	if strings.TrimSpace(newUsername) != "" {
+		updates = append(updates, "username = ?")
+		params = append(params, strings.TrimSpace(newUsername))
+	}
+	if strings.TrimSpace(newEmail) != "" {
+		updates = append(updates, "email = ?")
+		params = append(params, strings.TrimSpace(newEmail))
+	}
+	if strings.TrimSpace(newPassword) != "" {
+		updates = append(updates, "password = ?")
+		params = append(params, strings.TrimSpace(newPassword))
+	}
+
+	if len(updates) == 0 {
+		return true, nil
+	}
+
+	query := "UPDATE pengguna SET " + strings.Join(updates, ", ") + " WHERE id_pengguna = ?"
+	params = append(params, id)
+
+	res, err := conn.Exec(query, params...)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
+}
+
 func (c *UserController) GetAllUsers() ([]UserDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
@@ -656,4 +990,82 @@ func (c *UserController) GetAllUsers() ([]UserDTO, error) {
 		list = append(list, u)
 	}
 	return list, nil
+}
+
+func (c *UserController) CreateUserByAdmin(username, email, password, role string, isPremium bool) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	premiumVal := 0
+	if isPremium && role != "Admin" {
+		premiumVal = 1
+	}
+
+	_, err = conn.Exec("INSERT INTO pengguna (username, email, password, role, is_premium) VALUES (?, ?, ?, ?, ?)",
+		username, email, password, role, premiumVal)
+	return err == nil, err
+}
+
+func (c *UserController) UpdateUserByAdmin(id int, username, email, role string, isPremium *bool, password string) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+
+	updates := make([]string, 0)
+	params := make([]interface{}, 0)
+
+	if strings.TrimSpace(username) != "" {
+		updates = append(updates, "username = ?")
+		params = append(params, strings.TrimSpace(username))
+	}
+	if strings.TrimSpace(email) != "" {
+		updates = append(updates, "email = ?")
+		params = append(params, strings.TrimSpace(email))
+	}
+	if strings.TrimSpace(role) != "" {
+		updates = append(updates, "role = ?")
+		params = append(params, strings.TrimSpace(role))
+	}
+	if isPremium != nil {
+		updates = append(updates, "is_premium = ?")
+		pVal := 0
+		if *isPremium {
+			pVal = 1
+		}
+		params = append(params, pVal)
+	}
+	if strings.TrimSpace(password) != "" {
+		updates = append(updates, "password = ?")
+		params = append(params, strings.TrimSpace(password))
+	}
+
+	if len(updates) == 0 {
+		return true, nil
+	}
+
+	query := "UPDATE pengguna SET " + strings.Join(updates, ", ") + " WHERE id_pengguna = ?"
+	params = append(params, id)
+
+	res, err := conn.Exec(query, params...)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
+}
+
+func (c *UserController) DeleteUserByAdmin(id int) (bool, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return false, err
+	}
+	res, err := conn.Exec("DELETE FROM pengguna WHERE id_pengguna = ?", id)
+	if err != nil {
+		return false, err
+	}
+	ra, _ := res.RowsAffected()
+	return ra > 0, nil
 }

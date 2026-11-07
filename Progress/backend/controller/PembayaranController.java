@@ -40,6 +40,21 @@ public class PembayaranController {
     // =========================================================
     // 1. Method Bisnis & Query Database
     // =========================================================
+    public int getUserIdByEmail(String email) throws SQLException {
+        String sql = "SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email.trim());
+            stmt.setString(2, email.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_pengguna");
+                }
+            }
+        }
+        return -1;
+    }
+
     public int createTransaksi(int idPengguna, String metodePembayaran, double jumlahBayar) throws SQLException {
         if (idPengguna <= 0) {
             throw new IllegalArgumentException("ID Pengguna tidak valid.");
@@ -229,6 +244,14 @@ public class PembayaranController {
             String body = ControllerHelper.readRequestBody(exchange);
             int userId = ControllerHelper.extractJsonInt(body, "user_id", -1);
             if (userId == -1) userId = ControllerHelper.extractJsonInt(body, "id_pengguna", -1);
+            if (userId <= 0) {
+                String email = ControllerHelper.extractJsonValue(body, "email");
+                if (!email.isEmpty()) {
+                    try {
+                        userId = controller.getUserIdByEmail(email);
+                    } catch (SQLException ignored) {}
+                }
+            }
 
             String method = ControllerHelper.extractJsonValue(body, "payment_method");
             if (method.isEmpty()) method = ControllerHelper.extractJsonValue(body, "metode_pembayaran");

@@ -165,10 +165,25 @@ public class LoginController {
                     return;
                 }
 
+                int idPengguna = -1;
                 String role = (user instanceof Admin) ? "Admin" : (user instanceof Author) ? "Kreator" : "Pembaca";
+                if (user instanceof Admin) {
+                    idPengguna = ((Admin) user).getIdAdmin();
+                } else {
+                    // Ambil id pengguna dari database
+                    try (Connection conn = DatabaseConnection.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement("SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)")) {
+                        stmt.setString(1, user.getEmail());
+                        stmt.setString(2, user.getUsername());
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            if (rs.next()) idPengguna = rs.getInt(1);
+                        }
+                    } catch (Exception ignored) {}
+                }
 
                 String jsonResponse = String.format(
-                    "{\"success\":true,\"message\":\"Login berhasil!\",\"email\":\"%s\",\"username\":\"%s\",\"role\":\"%s\"}",
+                    "{\"success\":true,\"message\":\"Login berhasil!\",\"id\":%d,\"email\":\"%s\",\"username\":\"%s\",\"role\":\"%s\"}",
+                    idPengguna,
                     escapeJson(user.getEmail()),
                     escapeJson(user.getUsername()),
                     role

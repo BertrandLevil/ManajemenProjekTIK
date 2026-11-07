@@ -8,7 +8,7 @@ import (
 )
 
 // =========================================================
-// Kategori Handler
+// 1. Kategori Handlers
 // =========================================================
 func CategoriesHttpHandler(ctrl *KategoriController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -44,8 +44,64 @@ func CategoriesHttpHandler(ctrl *KategoriController) http.HandlerFunc {
 	}
 }
 
+func CategoriesDetailHttpHandler(ctrl *KategoriController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		idStr := r.URL.Query().Get("id")
+		id, _ := strconv.Atoi(idStr)
+
+		if r.Method == http.MethodGet {
+			if id <= 0 {
+				sendJSONError(w, http.StatusBadRequest, "Parameter id wajib diisi.")
+				return
+			}
+			kat, err := ctrl.GetKategoriById(id)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			if kat == nil {
+				sendJSONError(w, http.StatusNotFound, "Kategori tidak ditemukan.")
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": kat})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Id   int    `json:"id"`
+				Name string `json:"name"`
+			}
+			_ = json.Unmarshal(body, &req)
+			if req.Id <= 0 {
+				req.Id = id
+			}
+			ok, err := ctrl.UpdateKategori(req.Id, req.Name)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Kategori berhasil diperbarui."})
+		} else if r.Method == http.MethodDelete {
+			ok, err := ctrl.DeleteKategori(id)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Kategori berhasil dihapus."})
+		} else {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+		}
+	}
+}
+
 // =========================================================
-// Chapters Handler
+// 2. Chapters Handlers
 // =========================================================
 func ChaptersHttpHandler(ctrl *BabController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -89,8 +145,65 @@ func ChaptersHttpHandler(ctrl *BabController) http.HandlerFunc {
 	}
 }
 
+func ChaptersDetailHttpHandler(ctrl *BabController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		idStr := r.URL.Query().Get("id")
+		id, _ := strconv.Atoi(idStr)
+
+		if r.Method == http.MethodGet {
+			if id <= 0 {
+				sendJSONError(w, http.StatusBadRequest, "Parameter id wajib diisi.")
+				return
+			}
+			bab, err := ctrl.GetBabDetail(id)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			if bab == nil {
+				sendJSONError(w, http.StatusNotFound, "Bab tidak ditemukan.")
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": bab})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Id            int    `json:"id"`
+				ChapterNumber int    `json:"chapter_number"`
+				ReleaseDate   string `json:"release_date"`
+			}
+			_ = json.Unmarshal(body, &req)
+			if req.Id <= 0 {
+				req.Id = id
+			}
+			ok, err := ctrl.UpdateBab(req.Id, req.ChapterNumber, req.ReleaseDate)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Bab berhasil diperbarui."})
+		} else if r.Method == http.MethodDelete {
+			ok, err := ctrl.DeleteBab(id)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Bab berhasil dihapus."})
+		} else {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+		}
+	}
+}
+
 // =========================================================
-// Comics Handler
+// 3. Comics Handlers
 // =========================================================
 func ComicsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -137,9 +250,6 @@ func ComicsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// Comics Detail Handler
-// =========================================================
 func ComicsDetailHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -166,6 +276,27 @@ func ComicsDetailHttpHandler(ctrl *KomikController) http.HandlerFunc {
 				return
 			}
 			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": komik})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Id          int    `json:"id"`
+				CreatorId   int    `json:"creator_id"`
+				Title       string `json:"title"`
+				Description string `json:"description"`
+				Studio      string `json:"studio"`
+				CategoryIds []int  `json:"category_ids"`
+			}
+			_ = json.Unmarshal(body, &req)
+			if req.Id <= 0 {
+				req.Id = id
+			}
+			ok, err := ctrl.UpdateKomik(req.Id, req.CreatorId, req.Title, req.Description, req.Studio, req.CategoryIds)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Komik berhasil diperbarui."})
 		} else if r.Method == http.MethodDelete {
 			ok, err := ctrl.DeleteKomik(id)
 			if err != nil {
@@ -179,8 +310,73 @@ func ComicsDetailHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	}
 }
 
+func ComicsVerifyHttpHandler(ctrl *KomikController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+			return
+		}
+
+		body, _ := io.ReadAll(r.Body)
+		defer r.Body.Close()
+		var req struct {
+			ComicId int `json:"comic_id"`
+			AdminId int `json:"admin_id"`
+		}
+		_ = json.Unmarshal(body, &req)
+
+		ok, err := ctrl.VerifyKomik(req.ComicId, req.AdminId)
+		if err != nil {
+			sendJSONError(w, http.StatusForbidden, err.Error())
+			return
+		}
+		sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Komik berhasil diverifikasi oleh Admin."})
+	}
+}
+
+func ComicsStatsHttpHandler(ctrl *KomikController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		comicIdStr := r.URL.Query().Get("id")
+		creatorIdStr := r.URL.Query().Get("creator_id")
+
+		if comicIdStr != "" {
+			cId, _ := strconv.Atoi(comicIdStr)
+			stats, err := ctrl.GetKomikStats(cId)
+			if err != nil {
+				sendJSONError(w, http.StatusNotFound, "Komik tidak ditemukan.")
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": stats})
+			return
+		} else if creatorIdStr != "" {
+			crId, _ := strconv.Atoi(creatorIdStr)
+			stats, err := ctrl.GetAuthorStats(crId)
+			if err != nil {
+				sendJSONError(w, http.StatusNotFound, "Kreator tidak ditemukan.")
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": stats})
+			return
+		}
+
+		sendJSONError(w, http.StatusBadRequest, "Parameter id atau creator_id wajib disertakan.")
+	}
+}
+
 // =========================================================
-// Reviews Handler
+// 4. Reviews Handlers
 // =========================================================
 func ReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -222,8 +418,60 @@ func ReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	}
 }
 
+func ReviewsDetailHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method != http.MethodDelete {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+			return
+		}
+
+		idStr := r.URL.Query().Get("id")
+		id, _ := strconv.Atoi(idStr)
+		userIdStr := r.URL.Query().Get("user_id")
+		userId, _ := strconv.Atoi(userIdStr)
+		role := r.URL.Query().Get("role")
+
+		ok, err := ctrl.DeleteReview(id, userId, role)
+		if err != nil {
+			sendJSONError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Ulasan berhasil dihapus."})
+	}
+}
+
+func AuthorReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		creatorIdStr := r.URL.Query().Get("creator_id")
+		creatorId, _ := strconv.Atoi(creatorIdStr)
+		if creatorId <= 0 {
+			sendJSONError(w, http.StatusBadRequest, "creator_id wajib disertakan.")
+			return
+		}
+
+		list, err := ctrl.GetReviewsForAuthor(creatorId)
+		if err != nil {
+			sendJSONError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "total": len(list), "data": list})
+	}
+}
+
 // =========================================================
-// Bookmarks Handler
+// 5. Bookmarks & History Handlers
 // =========================================================
 func BookmarksHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -273,9 +521,6 @@ func BookmarksHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// History Handler
-// =========================================================
 func HistoryHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -307,6 +552,17 @@ func HistoryHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 				return
 			}
 			sendJSON(w, http.StatusCreated, map[string]interface{}{"success": ok, "message": "Riwayat membaca berhasil dicatat."})
+		} else if r.Method == http.MethodDelete {
+			idStr := r.URL.Query().Get("id")
+			userIdStr := r.URL.Query().Get("user_id")
+			id, _ := strconv.Atoi(idStr)
+			userId, _ := strconv.Atoi(userIdStr)
+			ok, err := ctrl.DeleteHistori(id, userId)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Riwayat berhasil dihapus."})
 		} else {
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 		}
@@ -314,7 +570,7 @@ func HistoryHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 }
 
 // =========================================================
-// Payment Checkout & Process Handlers
+// 6. Payment Handlers
 // =========================================================
 func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -333,6 +589,7 @@ func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 		defer r.Body.Close()
 		var req struct {
 			UserId        int     `json:"user_id"`
+			Email         string  `json:"email"`
 			PaymentMethod string  `json:"payment_method"`
 			Amount        float64 `json:"amount"`
 			AutoConfirm   bool    `json:"auto_confirm"`
@@ -342,7 +599,14 @@ func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 			req.Amount = 30000.0
 		}
 
-		txId, err := ctrl.Checkout(req.UserId, req.PaymentMethod, req.Amount)
+		userId := req.UserId
+		if userId <= 0 && req.Email != "" {
+			if id, err := ctrl.GetUserIdByEmail(req.Email); err == nil && id > 0 {
+				userId = id
+			}
+		}
+
+		txId, err := ctrl.Checkout(userId, req.PaymentMethod, req.Amount)
 		if err != nil {
 			sendJSONError(w, http.StatusBadRequest, err.Error())
 			return
@@ -397,8 +661,67 @@ func PaymentProcessHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	}
 }
 
+func UserTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		userIdStr := r.URL.Query().Get("user_id")
+		userId, _ := strconv.Atoi(userIdStr)
+		if userId <= 0 {
+			sendJSONError(w, http.StatusBadRequest, "user_id wajib disertakan.")
+			return
+		}
+
+		list, err := ctrl.GetUserTransactions(userId)
+		if err != nil {
+			sendJSONError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "total": len(list), "data": list})
+	}
+}
+
+func AdminTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method == http.MethodGet {
+			list, err := ctrl.GetAllTransactions()
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "total": len(list), "data": list})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				TransactionId int    `json:"transaction_id"`
+				Status        string `json:"status"`
+			}
+			_ = json.Unmarshal(body, &req)
+			ok, err := ctrl.ProcessPayment(req.TransactionId, req.Status)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Status transaksi berhasil diubah oleh Admin."})
+		} else {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+		}
+	}
+}
+
 // =========================================================
-// User & Admin Handlers
+// 7. User & Admin Handlers
 // =========================================================
 func UserProfileHttpHandler(ctrl *UserController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -413,7 +736,23 @@ func UserProfileHttpHandler(ctrl *UserController) http.HandlerFunc {
 			if email == "" {
 				email = r.URL.Query().Get("username")
 			}
-			user, err := ctrl.GetUserProfile(email)
+			idStr := r.URL.Query().Get("id")
+
+			var (
+				user *UserDTO
+				err  error
+			)
+
+			if idStr != "" {
+				id, _ := strconv.Atoi(idStr)
+				user, err = ctrl.GetUserById(id)
+			} else if email != "" {
+				user, err = ctrl.GetUserProfile(email)
+			} else {
+				sendJSONError(w, http.StatusBadRequest, "Parameter email atau id wajib disertakan.")
+				return
+			}
+
 			if err != nil {
 				sendJSONError(w, http.StatusInternalServerError, err.Error())
 				return
@@ -423,6 +762,22 @@ func UserProfileHttpHandler(ctrl *UserController) http.HandlerFunc {
 				return
 			}
 			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "data": user})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Id       int    `json:"id"`
+				Username string `json:"username"`
+				Email    string `json:"email"`
+				Password string `json:"password"`
+			}
+			_ = json.Unmarshal(body, &req)
+			ok, err := ctrl.UpdateProfile(req.Id, req.Username, req.Email, req.Password)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Profil berhasil diperbarui."})
 		} else {
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 		}
@@ -444,9 +799,52 @@ func AdminUsersHttpHandler(ctrl *UserController) http.HandlerFunc {
 				return
 			}
 			sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "total": len(users), "data": users})
+		} else if r.Method == http.MethodPost {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Username  string `json:"username"`
+				Email     string `json:"email"`
+				Password  string `json:"password"`
+				Role      string `json:"role"`
+				IsPremium bool   `json:"is_premium"`
+			}
+			_ = json.Unmarshal(body, &req)
+			ok, err := ctrl.CreateUserByAdmin(req.Username, req.Email, req.Password, req.Role, req.IsPremium)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusCreated, map[string]interface{}{"success": ok, "message": "Pengguna berhasil ditambahkan oleh Admin."})
+		} else if r.Method == http.MethodPut {
+			body, _ := io.ReadAll(r.Body)
+			defer r.Body.Close()
+			var req struct {
+				Id        int    `json:"id"`
+				Username  string `json:"username"`
+				Email     string `json:"email"`
+				Role      string `json:"role"`
+				IsPremium *bool  `json:"is_premium"`
+				Password  string `json:"password"`
+			}
+			_ = json.Unmarshal(body, &req)
+			ok, err := ctrl.UpdateUserByAdmin(req.Id, req.Username, req.Email, req.Role, req.IsPremium, req.Password)
+			if err != nil {
+				sendJSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Data pengguna berhasil diperbarui."})
+		} else if r.Method == http.MethodDelete {
+			idStr := r.URL.Query().Get("id")
+			id, _ := strconv.Atoi(idStr)
+			ok, err := ctrl.DeleteUserByAdmin(id)
+			if err != nil {
+				sendJSONError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			sendJSON(w, http.StatusOK, map[string]interface{}{"success": ok, "message": "Pengguna berhasil dihapus."})
 		} else {
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 		}
 	}
 }
-

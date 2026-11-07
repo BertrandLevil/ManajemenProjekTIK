@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -14,15 +15,12 @@ var (
 	dbMu sync.Mutex
 )
 
-// Konfigurasi koneksi MySQL / MariaDB (Laragon)
-// Database: comicid, Port default: 3306
-const (
-	dbUser     = "root"
-	dbPassword = "" // Default password MySQL di Laragon adalah kosong ("")
-	dbHost     = "127.0.0.1"
-	dbPort     = "3306"
-	dbName     = "comicid"
-)
+func getEnv(key, defaultVal string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return defaultVal
+}
 
 // GetConnection mengembalikan instance pool koneksi database MySQL
 func GetConnection() (*sql.DB, error) {
@@ -36,6 +34,13 @@ func GetConnection() (*sql.DB, error) {
 		_ = db.Close()
 		db = nil
 	}
+
+	// Konfigurasi koneksi MySQL / MariaDB (Laragon) dengan fallback env var
+	dbUser := getEnv("DB_USER", "root")
+	dbPassword := getEnv("DB_PASSWORD", "")
+	dbHost := getEnv("DB_HOST", "127.0.0.1")
+	dbPort := getEnv("DB_PORT", "3306")
+	dbName := getEnv("DB_NAME", "comicid")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
