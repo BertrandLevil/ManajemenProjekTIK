@@ -39,13 +39,50 @@ func resolveFrontendDir() string {
 
 func main() {
 	port := 8080
-	controller := NewLoginController()
+	loginCtrl := NewLoginController()
+	userCtrl := NewUserController()
+	komikCtrl := NewKomikController()
+	babCtrl := NewBabController()
+	kategoriCtrl := NewKategoriController()
+	reviewCtrl := NewKomentarRatingController()
+	bookmarkCtrl := NewBookmarkHistoriController()
+	pembayaranCtrl := NewPembayaranController()
+
 	frontendDir := resolveFrontendDir()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/login", LoginHttpHandler(controller))
-	mux.HandleFunc("/api/register", RegisterHttpHandler(controller))
+
+	// Endpoint Autentikasi & Health
+	mux.HandleFunc("/api/login", LoginHttpHandler(loginCtrl))
+	mux.HandleFunc("/api/register", RegisterHttpHandler(loginCtrl))
 	mux.HandleFunc("/api/health", HealthHttpHandler())
+
+	// Endpoint Pengguna & Profil
+	mux.HandleFunc("/api/user/profile", UserProfileHttpHandler(userCtrl))
+	mux.HandleFunc("/api/admin/users", AdminUsersHttpHandler(userCtrl))
+
+	// Endpoint Komik
+	mux.HandleFunc("/api/comics", ComicsHttpHandler(komikCtrl))
+	mux.HandleFunc("/api/comics/detail", ComicsDetailHttpHandler(komikCtrl))
+
+	// Endpoint Bab
+	mux.HandleFunc("/api/chapters", ChaptersHttpHandler(babCtrl))
+
+	// Endpoint Kategori
+	mux.HandleFunc("/api/categories", CategoriesHttpHandler(kategoriCtrl))
+
+	// Endpoint Ulasan
+	mux.HandleFunc("/api/reviews", ReviewsHttpHandler(reviewCtrl))
+
+	// Endpoint Bookmark & Histori
+	mux.HandleFunc("/api/bookmarks", BookmarksHttpHandler(bookmarkCtrl))
+	mux.HandleFunc("/api/history", HistoryHttpHandler(bookmarkCtrl))
+
+	// Endpoint Pembayaran
+	mux.HandleFunc("/api/payment/checkout", PaymentCheckoutHttpHandler(pembayaranCtrl))
+	mux.HandleFunc("/api/payment/process", PaymentProcessHttpHandler(pembayaranCtrl))
+
+	// Static Web Files
 	mux.HandleFunc("/", StaticFileHandler(frontendDir))
 
 	fmt.Println("==================================================")
@@ -54,7 +91,16 @@ func main() {
 	fmt.Printf(" - Buka di Browser : http://localhost:%d/\n", port)
 	fmt.Printf(" - Halaman Login   : http://localhost:%d/pages/home.html\n", port)
 	fmt.Printf(" - Halaman Daftar  : http://localhost:%d/pages/register.html\n", port)
-	fmt.Printf(" - Endpoint API    : http://localhost:%d/api/login\n", port)
+	fmt.Println("--------------------------------------------------")
+	fmt.Println(" Controller & API Endpoints Terdaftar: ")
+	fmt.Println(" [Autentikasi] : /api/login, /api/register, /api/health")
+	fmt.Println(" [Pengguna]    : /api/user/profile, /api/admin/users")
+	fmt.Println(" [Komik]       : /api/comics, /api/comics/detail")
+	fmt.Println(" [Bab/Chapter] : /api/chapters")
+	fmt.Println(" [Kategori]    : /api/categories")
+	fmt.Println(" [Ulasan]      : /api/reviews")
+	fmt.Println(" [Bookmark]    : /api/bookmarks, /api/history")
+	fmt.Println(" [Pembayaran]  : /api/payment/checkout, /api/payment/process")
 	fmt.Println("--------------------------------------------------")
 
 	if TestConnection() {

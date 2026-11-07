@@ -434,9 +434,45 @@ public class LoginController {
         int port = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
+        // Endpoint Autentikasi & Health
         server.createContext("/api/login", new LoginHttpHandler());
         server.createContext("/api/register", new RegisterHttpHandler());
         server.createContext("/api/health", new HealthHttpHandler());
+
+        // Endpoint Profil & Admin User Management (UserController)
+        server.createContext("/api/user/profile", new UserController.UserProfileHttpHandler());
+        server.createContext("/api/admin/users", new UserController.AdminUsersHttpHandler());
+
+        // Endpoint Komik (KomikController)
+        server.createContext("/api/comics", new KomikController.KomikListHttpHandler());
+        server.createContext("/api/comics/detail", new KomikController.KomikDetailHttpHandler());
+        server.createContext("/api/comics/verify", new KomikController.KomikVerifyHttpHandler());
+        server.createContext("/api/comics/stats", new KomikController.KomikStatsHttpHandler());
+
+        // Endpoint Bab / Chapter (BabController)
+        server.createContext("/api/chapters", new BabController.BabListHttpHandler());
+        server.createContext("/api/chapters/detail", new BabController.BabDetailHttpHandler());
+
+        // Endpoint Kategori (KategoriController)
+        server.createContext("/api/categories", new KategoriController.KategoriListHttpHandler());
+        server.createContext("/api/categories/detail", new KategoriController.KategoriDetailHttpHandler());
+
+        // Endpoint Komentar & Rating (KomentarRatingController)
+        server.createContext("/api/reviews", new KomentarRatingController.ReviewListHttpHandler());
+        server.createContext("/api/reviews/detail", new KomentarRatingController.ReviewDetailHttpHandler());
+        server.createContext("/api/author/reviews", new KomentarRatingController.AuthorReviewsHttpHandler());
+
+        // Endpoint Bookmark & Histori Baca (BookmarkHistoriController)
+        server.createContext("/api/bookmarks", new BookmarkHistoriController.BookmarkHttpHandler());
+        server.createContext("/api/history", new BookmarkHistoriController.HistoriBacaHttpHandler());
+
+        // Endpoint Transaksi & Pembayaran (PembayaranController)
+        server.createContext("/api/payment/checkout", new PembayaranController.PaymentCheckoutHttpHandler());
+        server.createContext("/api/payment/process", new PembayaranController.PaymentProcessHttpHandler());
+        server.createContext("/api/payment/history", new PembayaranController.UserTransactionsHttpHandler());
+        server.createContext("/api/admin/transactions", new PembayaranController.AdminTransactionsHttpHandler());
+
+        // Static Web Files
         server.createContext("/", new StaticFileHandler());
         server.setExecutor(null);
 
@@ -446,7 +482,16 @@ public class LoginController {
         System.out.println(" - Buka di Browser : http://localhost:" + port + "/");
         System.out.println(" - Halaman Login   : http://localhost:" + port + "/pages/home.html");
         System.out.println(" - Halaman Daftar  : http://localhost:" + port + "/pages/register.html");
-        System.out.println(" - Endpoint API    : http://localhost:" + port + "/api/login");
+        System.out.println("--------------------------------------------------");
+        System.out.println(" Controller & API Endpoints Terdaftar: ");
+        System.out.println(" [Autentikasi] : /api/login, /api/register, /api/health");
+        System.out.println(" [Pengguna]    : /api/user/profile, /api/admin/users");
+        System.out.println(" [Komik]       : /api/comics, /api/comics/detail, /api/comics/verify, /api/comics/stats");
+        System.out.println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail");
+        System.out.println(" [Kategori]    : /api/categories, /api/categories/detail");
+        System.out.println(" [Ulasan]      : /api/reviews, /api/reviews/detail, /api/author/reviews");
+        System.out.println(" [Bookmark]    : /api/bookmarks, /api/history");
+        System.out.println(" [Pembayaran]  : /api/payment/checkout, /api/payment/process, /api/payment/history, /api/admin/transactions");
         System.out.println("--------------------------------------------------");
 
         if (DatabaseConnection.testConnection()) {

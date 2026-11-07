@@ -6,6 +6,14 @@ public class Admin extends User {
         this.idAdmin = idAdmin;
     }
 
+    public int getIdAdmin() {
+        return idAdmin;
+    }
+
+    public void setIdAdmin(int idAdmin) {
+        this.idAdmin = idAdmin;
+    }
+
     // Wajib di-override karena abstract method di class User
     @Override
     public boolean register() {

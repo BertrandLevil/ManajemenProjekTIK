@@ -10,7 +10,7 @@ REM Bebaskan port 8080 jika ada proses Java lama yang masih berjalan
 powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 
 echo [1/2] Mengompilasi source code Java...
-javac -encoding UTF-8 -cp ".;lib\mysql-connector-j-8.4.0.jar;..\..\..\IPPL\Implementasi Class Diagram" DatabaseConnection.java LoginController.java
+javac -encoding UTF-8 -cp ".;lib\mysql-connector-j-8.4.0.jar;..\..\..\IPPL\Implementasi Class Diagram" *.java
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Kompilasi gagal! Periksa instalasi JDK Anda.
     pause

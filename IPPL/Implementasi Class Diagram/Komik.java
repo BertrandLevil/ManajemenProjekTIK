@@ -20,6 +20,11 @@ public class Komik {
         this.daftarKomentar = new ArrayList<>();
     }
 
+    public Komik(int idKomik, String namaKomik, String genre, double peringkat) {
+        this(idKomik, namaKomik, genre);
+        this.peringkat = peringkat;
+    }
+
     public void tambahBab(Bab bab) {
         daftarBab.add(bab);
     }
@@ -46,5 +51,13 @@ public class Komik {
     }
 
     public String getNamaKomik() { return namaKomik; }
+    public void setNamaKomik(String namaKomik) { this.namaKomik = namaKomik; }
     public int getIdKomik() { return idKomik; }
+    public void setIdKomik(int idKomik) { this.idKomik = idKomik; }
+    public String getGenre() { return genre; }
+    public void setGenre(String genre) { this.genre = genre; }
+    public double getPeringkat() { return peringkat; }
+    public void setPeringkat(double peringkat) { this.peringkat = peringkat; }
+    public List<Bab> getDaftarBab() { return daftarBab; }
+    public List<KomentarRating> getDaftarKomentar() { return daftarKomentar; }
 }
