@@ -13,6 +13,12 @@ public class Author extends User {
         this.pendapatan = 0.0;
     }
 
+    public String getNamaStudio() { return namaStudio; }
+    public void setNamaStudio(String namaStudio) { this.namaStudio = namaStudio; }
+    public List<Komik> getDaftarKomik() { return daftarKomik; }
+    public double getPendapatan() { return pendapatan; }
+    public void setPendapatan(double pendapatan) { this.pendapatan = pendapatan; }
+
     // Wajib di-override karena abstract method di class User
     @Override
     public boolean register() {

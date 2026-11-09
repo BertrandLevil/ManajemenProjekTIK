@@ -11,6 +11,15 @@ public class Pembayaran {
         this.statusPembayaran = "Pending";
     }
 
+    public int getIdTransaksi() { return idTransaksi; }
+    public void setIdTransaksi(int idTransaksi) { this.idTransaksi = idTransaksi; }
+    public String getMetodePembayaran() { return metodePembayaran; }
+    public void setMetodePembayaran(String metodePembayaran) { this.metodePembayaran = metodePembayaran; }
+    public String getStatusPembayaran() { return statusPembayaran; }
+    public void setStatusPembayaran(String statusPembayaran) { this.statusPembayaran = statusPembayaran; }
+    public double getNominal() { return nominal; }
+    public void setNominal(double nominal) { this.nominal = nominal; }
+
     public void submitPayment() {
         System.out.println("Mengirim data pembayaran sebesar Rp" + nominal + " via " + metodePembayaran);
         this.statusPembayaran = "Processing";

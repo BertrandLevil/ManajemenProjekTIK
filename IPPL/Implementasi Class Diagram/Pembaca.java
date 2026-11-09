@@ -68,4 +68,6 @@ public class Pembaca extends User {
     }
 
     public boolean isPremium() { return isPremium; }
+    public void setPremium(boolean isPremium) { this.isPremium = isPremium; }
+    public List<Integer> getBookmarkKomikIds() { return bookmarkKomikIds; }
 }

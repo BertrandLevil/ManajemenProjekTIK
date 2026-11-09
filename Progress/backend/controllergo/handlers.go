@@ -101,6 +101,7 @@ func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
 		sendJSON(w, http.StatusOK, map[string]interface{}{
 			"success":  true,
 			"message":  "Login berhasil!",
+			"id":       user.GetId(),
 			"email":    user.GetEmail(),
 			"username": user.GetUsername(),
 			"role":     user.GetRole(),

@@ -13,6 +13,12 @@ public class KomentarRating {
         this.tanggal = new Date();
     }
 
+    public int getIdKomentar() { return idKomentar; }
+    public void setIdKomentar(int idKomentar) { this.idKomentar = idKomentar; }
     public double getNilaiRating() { return nilaiRating; }
+    public void setNilaiRating(double nilaiRating) { this.nilaiRating = nilaiRating; }
     public String getIsiKomentar() { return isiKomentar; }
+    public void setIsiKomentar(String isiKomentar) { this.isiKomentar = isiKomentar; }
+    public Date getTanggal() { return tanggal; }
+    public void setTanggal(Date tanggal) { this.tanggal = tanggal; }
 }

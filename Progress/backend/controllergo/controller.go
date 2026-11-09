@@ -57,11 +57,16 @@ func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) 
 
 	switch role {
 	case "Admin":
-		loggedInUser = NewAdmin(username, dbEmail, dbPassword, idPengguna)
+		admin := NewAdmin(username, dbEmail, dbPassword, idPengguna)
+		admin.SetId(idPengguna)
+		loggedInUser = admin
 	case "Kreator":
-		loggedInUser = NewAuthor(username, dbEmail, dbPassword, "-")
+		author := NewAuthor(username, dbEmail, dbPassword, "-")
+		author.SetId(idPengguna)
+		loggedInUser = author
 	default:
 		pembaca := NewPembaca(username, dbEmail, dbPassword)
+		pembaca.SetId(idPengguna)
 		if isPremium == 1 {
 			pembaca.IsPremiumState = true
 		}

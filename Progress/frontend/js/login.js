@@ -152,6 +152,9 @@ export function frontLogin() {
       }
 
       // Menyimpan sesi login ke localStorage agar kompatibel dengan halaman home.html Anda
+      if (result.id) {
+        localStorage.setItem("comicid_user_id", String(result.id));
+      }
       localStorage.setItem("comicid_logged_in_email", result.email);
       localStorage.setItem("comicid_logged_in", "true");
       localStorage.setItem("comicid_logged_in_role", result.role);

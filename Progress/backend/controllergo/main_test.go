@@ -94,3 +94,32 @@ func TestValidationHandlers(t *testing.T) {
 		t.Errorf("Unexpected status code from health check: %d", recHealth.Code)
 	}
 }
+
+func TestFeatureHandlersValidation(t *testing.T) {
+	// Test Chapters without comic_id
+	babCtrl := NewBabController()
+	reqChap := httptest.NewRequest(http.MethodGet, "/api/chapters", nil)
+	recChap := httptest.NewRecorder()
+	ChaptersHttpHandler(babCtrl)(recChap, reqChap)
+	if recChap.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 for chapters without comic_id, got %d", recChap.Code)
+	}
+
+	// Test Payment checkout without method/user
+	payCtrl := NewPembayaranController()
+	reqPay := httptest.NewRequest(http.MethodPost, "/api/payment/checkout", bytes.NewBufferString(`{}`))
+	recPay := httptest.NewRecorder()
+	PaymentCheckoutHttpHandler(payCtrl)(recPay, reqPay)
+	if recPay.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 for checkout without required fields, got %d", recPay.Code)
+	}
+
+	// Test User profile without email or id
+	userCtrl := NewUserController()
+	reqProf := httptest.NewRequest(http.MethodGet, "/api/user/profile", nil)
+	recProf := httptest.NewRecorder()
+	UserProfileHttpHandler(userCtrl)(recProf, reqProf)
+	if recProf.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 for profile without email or id, got %d", recProf.Code)
+	}
+}

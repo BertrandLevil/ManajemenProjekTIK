@@ -459,6 +459,41 @@ export function frontPremium() {
         "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
         feedback.hidden = false;
         return;
+      }
+
+      if (channelInput) {
+        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
+      }
+
+      const email = localStorage.getItem("comicid_logged_in_email") || "";
+      const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+
+      // Memanggil Controller Pembayaran Backend
+      fetch("http://localhost:8080/api/payment/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId,
+          email: email,
+          payment_method: selectedMethod,
+          amount: 30000,
+          auto_confirm: true
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem("comicid_is_premium", "true");
+          renderSuccess(content, selectedMethod);
+        } else {
+          renderPending(content, selectedMethod);
+        }
+      })
+      .catch(() => {
+        // Fallback jika backend offline / demo mode
+        renderPending(content, selectedMethod);
+      });
+      return;
     }
 
     if (event.target.id !== "premium-form") return;

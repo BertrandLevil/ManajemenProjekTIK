@@ -7,6 +7,7 @@ type UserInterface interface {
 	Register() bool
 	Login(inputUsernameOrEmail, inputPassword string) bool
 	Logout()
+	GetId() int
 	GetUsername() string
 	GetEmail() string
 	GetPassword() string
@@ -16,14 +17,16 @@ type UserInterface interface {
 
 // User merepresentasikan entitas dasar Pengguna (sesuai User.java)
 type User struct {
-	Username   string `json:"username"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
+	Id              int    `json:"id"`
+	Username        string `json:"username"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
 	IsLoggedInState bool   `json:"isLoggedIn"`
 }
 
 func NewUser(username, email, password string) User {
 	return User{
+		Id:              0,
 		Username:        username,
 		Email:           email,
 		Password:        password,
@@ -31,6 +34,8 @@ func NewUser(username, email, password string) User {
 	}
 }
 
+func (u *User) GetId() int          { return u.Id }
+func (u *User) SetId(id int)        { u.Id = id }
 func (u *User) Login(inputUsernameOrEmail, inputPassword string) bool {
 	if (inputUsernameOrEmail == u.Username || inputUsernameOrEmail == u.Email) && inputPassword == u.Password {
 		u.IsLoggedInState = true
