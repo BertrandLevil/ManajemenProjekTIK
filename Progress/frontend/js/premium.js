@@ -381,20 +381,24 @@ function renderPageHeading() {
     `;
 }
 
+
 export function frontPremium() {
     const app = document.getElementById("app");
     if (!app) return;
 
+    // Mendeteksi apakah website dijalankan secara lokal
     const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(
-    window.location.hostname,
+        window.location.hostname
     );
-    const demoMode =
-    isLocalhost &&
-    new URLSearchParams(window.location.search).get("demo") === "1";
 
+    // Demo hanya aktif jika URL menggunakan ?demo=1
+    const demoMode =
+        isLocalhost &&
+        new URLSearchParams(window.location.search).get("demo") === "1";
+
+    // Menampilkan halaman Premium
     app.innerHTML = `
         ${header()}
-
         <main class="premium-page">
             <div class="premium-container">
                 ${renderPageHeading()}
@@ -408,151 +412,231 @@ export function frontPremium() {
 
     let selectedMethod = "";
     let selectedMethodId = "";
+
+    // Menampilkan halaman checkout
     renderCheckout(content);
 
+    // 1. EVENT CHANGE
     content.addEventListener("change", (event) => {
-    const channelInput = event.target.closest(
-        'input[name="payment-channel"]',
-    );
-    if (channelInput) {
-        renderChannelInstructions(content, channelInput.value);
-        return;
-    }
 
-    const input = event.target.closest('input[name="payment-method"]');
-    if (!input) return;
+        // Perubahan pilihan kanal pembayaran
+        const channelInput = event.target.closest(
+            'input[name="payment-channel"]'
+        );
 
-    content.querySelectorAll(".premium-method").forEach((method) => {
-        const methodInput = method.querySelector("input");
-        method.classList.toggle("is-selected", methodInput.checked);
+        if (channelInput) {
+            renderChannelInstructions(content, channelInput.value);
+            return;
+        }
+
+        // Perubahan pilihan metode pembayaran
+        const input = event.target.closest(
+            'input[name="payment-method"]'
+        );
+
+        if (!input) return;
+
+        content.querySelectorAll(".premium-method").forEach((method) => {
+            const methodInput = method.querySelector("input");
+
+            method.classList.toggle(
+                "is-selected",
+                methodInput.checked
+            );
+        });
+
+        const feedback = document.getElementById("premium-feedback");
+
+        if (feedback) {
+            feedback.hidden = true;
+        }
     });
 
-    const feedback = document.getElementById("premium-feedback");
-    if (feedback) feedback.hidden = true;
-    });
+    // 2. EVENT SUBMIT
+    content.addEventListener("submit", async (event) => {
 
-    content.addEventListener("submit", (event) => {
-    if (event.target.id === "premium-channel-form") {
+        // FORM PEMILIHAN KANAL PEMBAYARAN
+        if (event.target.id === "premium-channel-form") {
+            event.preventDefault();
+
+            const channelInput = content.querySelector(
+                'input[name="payment-channel"]:checked'
+            );
+
+            // Memastikan kanal pembayaran sudah dipilih
+            if (paymentChannels[selectedMethodId] && !channelInput) {
+                const feedback = document.getElementById(
+                    "premium-modal-feedback"
+                );
+
+                feedback.textContent =
+                    "Pilih kanal pembayaran terlebih dahulu.";
+
+                feedback.hidden = false;
+                return;
+            }
+
+            // Menambahkan kanal ke metode pembayaran
+            if (channelInput) {
+                selectedMethod =
+                    `${selectedMethod} - ${channelInput.value}`;
+            }
+
+            // MODE DEMO: tidak menghubungi backend
+            if (demoMode) {
+                renderPending(content, selectedMethod);
+                return;
+            }
+
+            // MODE NORMAL: BACKEND JAVA
+            const feedback = document.getElementById(
+                "premium-modal-feedback"
+            );
+
+            if (feedback) {
+                feedback.textContent = "Menghubungkan ke server pembayaran...";
+                feedback.hidden = false;
+            }
+
+            const email =
+                localStorage.getItem("comicid_logged_in_email") || "";
+
+            const userId = parseInt(
+                localStorage.getItem("comicid_user_id") || "0",
+                10
+            );
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/api/payment/checkout",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            email: email,
+                            payment_method: selectedMethod,
+                            amount: 30000
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Checkout gagal diproses."
+                    );
+                }
+
+                if (data.success) {
+                    localStorage.setItem(
+                        "comicid_is_premium",
+                        "true"
+                    );
+
+                    renderSuccess(content, selectedMethod);
+                } else {
+                    renderPending(content, selectedMethod);
+                }
+
+            } catch (error) {
+                console.error("Payment checkout error:", error);
+
+                renderFailed(content, selectedMethod);
+            }
+
+            return;
+        }
+
+        // FORM CHECKOUT UTAMA
+        if (event.target.id !== "premium-form") return;
+
         event.preventDefault();
 
-        const channelInput = content.querySelector(
-        'input[name="payment-channel"]:checked',
+        const selectedInput = content.querySelector(
+            'input[name="payment-method"]:checked'
         );
-        if (paymentChannels[selectedMethodId] && !channelInput) {
-            const feedback = document.getElementById("premium-modal-feedback");
-            feedback.textContent = "Pilih kanal pembayaran terlebih dahulu.";
+
+        if (!selectedInput) {
+            const feedback = document.getElementById(
+                "premium-feedback"
+            );
+
+            feedback.textContent =
+                "Pilih metode pembayaran terlebih dahulu.";
+
             feedback.hidden = false;
             return;
         }
 
-        if (channelInput) {
-        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
-        }
+        const method = paymentMethods.find(
+            (item) => item.id === selectedInput.value
+        );
 
-        if (demoMode) {
-            renderPending(content, selectedMethod);
+        if (!method) return;
+
+        selectedMethod = method.name;
+        selectedMethodId = method.id;
+
+        // Menampilkan popup pemilihan kanal pembayaran
+        renderPaymentModal(content, method, demoMode);
+    });
+
+    // 3. EVENT CLICK
+    content.addEventListener("click", (event) => {
+
+        const target = event.target;
+
+        if (!(target instanceof Element)) return;
+
+        // Tombol tutup popup dan kembali
+        const closeButton = target.closest(
+            '[data-payment-action="close"]'
+        );
+
+        if (closeButton) {
+            renderCheckout(content);
             return;
         }
 
-        const feedback = document.getElementById("premium-modal-feedback");
-        feedback.textContent =
-        "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
-        feedback.hidden = false;
-        return;
-      }
+        // Tombol simulasi pembayaran hanya untuk demo
+        const button = target.closest("[data-demo-status]");
 
-      if (channelInput) {
-        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
-      }
+        if (!button || !demoMode) return;
 
-      const email = localStorage.getItem("comicid_logged_in_email") || "";
-      const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+        switch (button.dataset.demoStatus) {
+            case "pending":
+                renderPending(content, selectedMethod);
+                break;
 
-      // Memanggil Controller Pembayaran Backend
-      fetch("http://localhost:8080/api/payment/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          email: email,
-          payment_method: selectedMethod,
-          amount: 30000,
-          auto_confirm: true
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          localStorage.setItem("comicid_is_premium", "true");
-          renderSuccess(content, selectedMethod);
-        } else {
-          renderPending(content, selectedMethod);
+            case "success":
+                renderSuccess(content, selectedMethod);
+                break;
+
+            case "failed":
+                renderFailed(content, selectedMethod);
+                break;
+
+            case "checkout":
+                renderCheckout(content);
+                break;
+
+            default:
+                break;
         }
-      })
-      .catch(() => {
-        // Fallback jika backend offline / demo mode
-        renderPending(content, selectedMethod);
-      });
-      return;
-    }
-
-    if (event.target.id !== "premium-form") return;
-    event.preventDefault();
-
-    const selectedInput = content.querySelector(
-        'input[name="payment-method"]:checked',
-    );
-
-    if (!selectedInput) {
-        const feedback = document.getElementById("premium-feedback");
-        feedback.textContent = "Pilih metode pembayaran terlebih dahulu.";
-        feedback.hidden = false;
-        return;
-    }
-
-    const method = paymentMethods.find(
-        (item) => item.id === selectedInput.value,
-    );
-    selectedMethod = method.name;
-    selectedMethodId = method.id;
-    renderPaymentModal(content, method, demoMode);
     });
 
-    content.addEventListener("click", (event) => {
-    const paymentAction = event.target.closest("[data-payment-action]");
-    const clickedBackdrop = event.target.matches("[data-payment-backdrop]");
-    if (
-        paymentAction?.dataset.paymentAction === "close" ||
-        clickedBackdrop
-    ) {
-        renderCheckout(content);
-        return;
-    }
-
-    const button = event.target.closest("[data-demo-status]");
-    if (!button || !demoMode) return;
-
-    switch (button.dataset.demoStatus) {
-        case "pending":
-            renderPending(content, selectedMethod);
-            break;
-        case "success":
-            renderSuccess(content, selectedMethod);
-            break;
-        case "failed":
-            renderFailed(content, selectedMethod);
-            break;
-        case "checkout":
-            renderCheckout(content);
-            break;
-        default:
-            break;
-    }
-    });
-
+    // 4. EVENT KEYDOWN
     content.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && content.querySelector(".premium-payment-modal")) {
-        renderCheckout(content);
-    }
+
+        if (
+            event.key === "Escape" &&
+            content.querySelector(".premium-payment-modal")
+        ) {
+            renderCheckout(content);
+        }
     });
 }
