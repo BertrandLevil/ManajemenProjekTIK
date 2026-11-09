@@ -54,28 +54,36 @@ export function frontRegister() {
                         >
                         
                         <label for="register-password">Password</label>
-                        <input
-                            id="register-password"
-                            name="password"
-                            type="password"
-                            placeholder="Minimal 8 karakter"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <div class="password-wrapper">
+                            <input
+                                id="register-password"
+                                name="password"
+                                type="password"
+                                placeholder="Minimal 8 karakter"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" data-target="register-password">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
 
-                        <label for="register-confirm">
-                            Konfirmasi password
-                        </label>
-                        <input
-                            id="register-confirm"
-                            name="confirmPassword"
-                            type="password"
-                            placeholder="Masukkan ulang password"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <label for="register-confirm">Konfirmasi password</label>
+                        <div class="password-wrapper">
+                            <input
+                                id="register-confirm"
+                                name="confirmPassword"
+                                type="password"
+                                placeholder="Masukkan ulang password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" data-target="register-confirm">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
 
                         <p id="register-message"
                             class="auth-message"
@@ -106,7 +114,7 @@ export function frontRegister() {
         event.preventDefault();
 
         const username = document.getElementById("register-username").value.trim();
-        const email = document.getElementById("register-email").value.trim();
+        const email = document.getElementById("register-email").value.trim().toLowerCase();
         const password = document.getElementById("register-password").value;
         const confirmPassword = document.getElementById("register-confirm").value;
         const submitBtn = form.querySelector("button[type='submit']");
@@ -204,5 +212,25 @@ export function frontRegister() {
                 submitBtn.textContent = "Daftar";
             }
         }
+    });
+
+    const toggleButtons = form.querySelectorAll(".toggle-password");
+    
+    const eyeOpenSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeOffSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
+
+    toggleButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const targetId = button.getAttribute("data-target");
+            const passwordInput = document.getElementById(targetId);
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                button.innerHTML = eyeOffSvg;
+            } else {
+                passwordInput.type = "password";
+                button.innerHTML = eyeOpenSvg;
+            }
+        });
     });
 }

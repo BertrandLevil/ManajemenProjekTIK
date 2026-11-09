@@ -101,3 +101,37 @@
         padding: 24px 20px;
     }
 }
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 42px !important;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: var(--text, #374151);
+}
+
+.eye-icon {
+    width: 20px;
+    height: 20px;
+    pointer-events: none; /* Mencegah gangguan klik pada bagian dalam garis SVG */
+}

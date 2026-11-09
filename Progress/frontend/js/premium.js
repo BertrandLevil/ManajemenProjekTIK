@@ -1,35 +1,35 @@
 import { header } from "./header.js";
 
 const paymentMethods = [
-  { id: "qris", name: "QRIS", detail: "Pembayaran melalui QRIS" },
-  { id: "ewallet", name: "E-Wallet", detail: "Pembayaran melalui e-wallet" },
-  {
+    { id: "qris", name: "QRIS", detail: "Pembayaran melalui QRIS" },
+    { id: "ewallet", name: "E-Wallet", detail: "Pembayaran melalui e-wallet" },
+    {
     id: "bank",
     name: "Transfer Bank",
     detail: "Pembayaran melalui transfer bank",
-  },
+    },
 ];
 
 const paymentChannels = {
-  ewallet: ["GoPay", "OVO", "DANA", "ShopeePay"],
-  bank: ["BCA", "BNI", "BRI", "Mandiri"],
+    ewallet: ["GoPay", "OVO", "DANA", "ShopeePay"],
+    bank: ["BCA", "BNI", "BRI", "Mandiri"],
 };
 
 const paymentChannelLogos = {
-  GoPay: "gopay.jpg",
-  OVO: "ovo.jpg",
-  DANA: "dana.jpg",
-  ShopeePay: "shopee.jpg",
-  BCA: "bca.jpg",
-  BNI: "bni.jpg",
-  BRI: "bri.jpg",
-  Mandiri: "mandiri.jpg",
+    GoPay: "gopay.jpg",
+    OVO: "ovo.jpg",
+    DANA: "dana.jpg",
+    ShopeePay: "shopee.jpg",
+    BCA: "bca.jpg",
+    BNI: "bni.jpg",
+    BRI: "bri.jpg",
+    Mandiri: "mandiri.jpg",
 };
 
 function renderMethods() {
-  return paymentMethods
+    return paymentMethods
     .map(
-      (method) => `
+        (method) => `
                 <label class="premium-method">
                     <input
                         type="radio"
@@ -49,8 +49,8 @@ function renderMethods() {
 }
 
 function renderCheckout(content) {
-  content.innerHTML = `
-      <form id="premium-form" class="premium-checkout">
+    content.innerHTML = `
+        <form id="premium-form" class="premium-checkout">
             <section class="premium-plan" aria-label="Paket Premium">
                 <div class="premium-plan-top">
                     <div>
@@ -115,11 +115,11 @@ function renderCheckout(content) {
 }
 
 function renderChannelOptions(methodId, channels) {
-  return `
+    return `
         <fieldset class="premium-channel-list">
             <legend>Pilih ${methodId === "ewallet" ? "E-Wallet" : "bank"}</legend>
             ${channels
-              .map(
+                .map(
                 (channel) => `
                     <label class="premium-channel">
                         <input
@@ -129,7 +129,7 @@ function renderChannelOptions(methodId, channels) {
                             required
                         >
                         ${
-                          paymentChannelLogos[channel]
+                            paymentChannelLogos[channel]
                             ? `
                                 <span class="premium-channel-logo">
                                     <img
@@ -150,8 +150,8 @@ function renderChannelOptions(methodId, channels) {
                         <span class="premium-channel-check" aria-hidden="true"></span>
                     </label>
                 `,
-              )
-              .join("")}
+            )
+            .join("")}
         </fieldset>
         <p class="premium-payment-instructions" aria-live="polite">
             Pilih kanal untuk melihat informasi pembayaran.
@@ -160,8 +160,8 @@ function renderChannelOptions(methodId, channels) {
 }
 
 function renderPaymentModal(content, method, demoMode) {
-  const channelOptions = paymentChannels[method.id];
-  const details = channelOptions
+    const channelOptions = paymentChannels[method.id];
+    const details = channelOptions
     ? renderChannelOptions(method.id, channelOptions)
     : `
         <div class="premium-qr-placeholder" aria-hidden="true">
@@ -177,7 +177,7 @@ function renderPaymentModal(content, method, demoMode) {
         </div>
     `;
 
-  content.innerHTML = `
+    content.innerHTML = `
         <div class="premium-modal-backdrop" data-payment-backdrop>
             <section
                 class="premium-payment-modal"
@@ -192,7 +192,7 @@ function renderPaymentModal(content, method, demoMode) {
                         <p class="premium-status-label">METODE PEMBAYARAN</p>
                         <h2 id="premium-modal-title">
                             ${
-                              method.id === "qris"
+                                method.id === "qris"
                                 ? "Bayar dengan QRIS"
                                 : `Pilih ${method.name}`
                             }
@@ -221,7 +221,7 @@ function renderPaymentModal(content, method, demoMode) {
                     <div class="premium-modal-note" role="note">
                         <span aria-hidden="true">i</span>
                         ${
-                          demoMode
+                            demoMode
                             ? "Pratinjau checkout. Tidak ada pembayaran yang dikirim."
                             : "Pembayaran belum dapat diproses karena integrasi gateway belum tersedia."
                         }
@@ -250,25 +250,25 @@ function renderPaymentModal(content, method, demoMode) {
         </div>
     `;
 
-  content.querySelector(".premium-modal-close")?.focus();
+    content.querySelector(".premium-modal-close")?.focus();
 }
 
 function renderChannelInstructions(content, channel) {
-  const instructions = content.querySelector(".premium-payment-instructions");
-  if (!instructions) return;
+    const instructions = content.querySelector(".premium-payment-instructions");
+    if (!instructions) return;
 
-  instructions.textContent = `Pembayaran ${channel} belum dapat diproses saat ini.`;
+    instructions.textContent = `Pembayaran ${channel} belum dapat diproses saat ini.`;
 }
 
 function renderDemoActions(activeStatus) {
-  const buttons = [
-    { status: "pending", label: "Uji tampilan menunggu" },
-    { status: "success", label: "Uji tampilan berhasil" },
-    { status: "failed", label: "Uji tampilan gagal" },
-  ]
+        const buttons = [
+        { status: "pending", label: "Uji tampilan menunggu" },
+        { status: "success", label: "Uji tampilan berhasil" },
+        { status: "failed", label: "Uji tampilan gagal" },
+    ]
     .filter((button) => button.status !== activeStatus)
     .map(
-      (button) => `
+        (button) => `
                 <button
                     class="premium-demo-button"
                     type="button"
@@ -280,7 +280,7 @@ function renderDemoActions(activeStatus) {
     )
     .join("");
 
-  return `
+    return `
         <div class="premium-demo-actions" aria-label="Kontrol simulasi pembayaran">
             ${buttons}
             <button
@@ -295,7 +295,7 @@ function renderDemoActions(activeStatus) {
 }
 
 function renderPending(content, selectedMethod) {
-  content.innerHTML = `
+    content.innerHTML = `
         <section class="premium-status premium-status--pending" role="status" aria-live="polite">
             <lottie-player
                 class="premium-loading-animation"
@@ -318,7 +318,7 @@ function renderPending(content, selectedMethod) {
 }
 
 function renderSuccess(content, selectedMethod) {
-  content.innerHTML = `
+    content.innerHTML = `
         <section class="premium-status premium-status--success" role="status" aria-live="polite">
             <lottie-player
                 class="premium-loading-animation"
@@ -341,7 +341,7 @@ function renderSuccess(content, selectedMethod) {
 }
 
 function renderFailed(content, selectedMethod) {
-  content.innerHTML = `
+    content.innerHTML = `
         <section class="premium-status premium-status--failed" role="status" aria-live="polite">
             <lottie-player
                 class="premium-loading-animation"
@@ -363,7 +363,7 @@ function renderFailed(content, selectedMethod) {
 }
 
 function renderPageHeading() {
-  return `
+    return `
         <header class="premium-heading">
             <p class="premium-kicker">
                 <span class="premium-kicker-mark">C</span>
@@ -382,17 +382,17 @@ function renderPageHeading() {
 }
 
 export function frontPremium() {
-  const app = document.getElementById("app");
-  if (!app) return;
+    const app = document.getElementById("app");
+    if (!app) return;
 
-  const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(
+    const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(
     window.location.hostname,
-  );
-  const demoMode =
+    );
+    const demoMode =
     isLocalhost &&
     new URLSearchParams(window.location.search).get("demo") === "1";
 
-  app.innerHTML = `
+    app.innerHTML = `
         ${header()}
 
         <main class="premium-page">
@@ -403,121 +403,121 @@ export function frontPremium() {
         </main>
     `;
 
-  const content = document.getElementById("premium-content");
-  if (!content) return;
+    const content = document.getElementById("premium-content");
+    if (!content) return;
 
-  let selectedMethod = "";
-  let selectedMethodId = "";
-  renderCheckout(content);
+    let selectedMethod = "";
+    let selectedMethodId = "";
+    renderCheckout(content);
 
-  content.addEventListener("change", (event) => {
+    content.addEventListener("change", (event) => {
     const channelInput = event.target.closest(
-      'input[name="payment-channel"]',
+        'input[name="payment-channel"]',
     );
     if (channelInput) {
-      renderChannelInstructions(content, channelInput.value);
-      return;
+        renderChannelInstructions(content, channelInput.value);
+        return;
     }
 
     const input = event.target.closest('input[name="payment-method"]');
     if (!input) return;
 
     content.querySelectorAll(".premium-method").forEach((method) => {
-      const methodInput = method.querySelector("input");
-      method.classList.toggle("is-selected", methodInput.checked);
+        const methodInput = method.querySelector("input");
+        method.classList.toggle("is-selected", methodInput.checked);
     });
 
     const feedback = document.getElementById("premium-feedback");
     if (feedback) feedback.hidden = true;
-  });
+    });
 
-  content.addEventListener("submit", (event) => {
+    content.addEventListener("submit", (event) => {
     if (event.target.id === "premium-channel-form") {
-      event.preventDefault();
+        event.preventDefault();
 
-      const channelInput = content.querySelector(
+        const channelInput = content.querySelector(
         'input[name="payment-channel"]:checked',
-      );
-      if (paymentChannels[selectedMethodId] && !channelInput) {
+        );
+        if (paymentChannels[selectedMethodId] && !channelInput) {
+            const feedback = document.getElementById("premium-modal-feedback");
+            feedback.textContent = "Pilih kanal pembayaran terlebih dahulu.";
+            feedback.hidden = false;
+            return;
+        }
+
+        if (channelInput) {
+        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
+        }
+
+        if (demoMode) {
+            renderPending(content, selectedMethod);
+            return;
+        }
+
         const feedback = document.getElementById("premium-modal-feedback");
-        feedback.textContent = "Pilih kanal pembayaran terlebih dahulu.";
+        feedback.textContent =
+        "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
         feedback.hidden = false;
         return;
-      }
-
-      if (channelInput) {
-        selectedMethod = `${selectedMethod} - ${channelInput.value}`;
-      }
-
-      if (demoMode) {
-        renderPending(content, selectedMethod);
-        return;
-      }
-
-      const feedback = document.getElementById("premium-modal-feedback");
-      feedback.textContent =
-        "Integrasi pembayaran belum tersedia. Belum ada pembayaran yang diproses.";
-      feedback.hidden = false;
-      return;
     }
 
     if (event.target.id !== "premium-form") return;
     event.preventDefault();
 
     const selectedInput = content.querySelector(
-      'input[name="payment-method"]:checked',
+        'input[name="payment-method"]:checked',
     );
 
     if (!selectedInput) {
-      const feedback = document.getElementById("premium-feedback");
-      feedback.textContent = "Pilih metode pembayaran terlebih dahulu.";
-      feedback.hidden = false;
-      return;
+        const feedback = document.getElementById("premium-feedback");
+        feedback.textContent = "Pilih metode pembayaran terlebih dahulu.";
+        feedback.hidden = false;
+        return;
     }
 
     const method = paymentMethods.find(
-      (item) => item.id === selectedInput.value,
+        (item) => item.id === selectedInput.value,
     );
     selectedMethod = method.name;
     selectedMethodId = method.id;
     renderPaymentModal(content, method, demoMode);
-  });
+    });
 
-  content.addEventListener("click", (event) => {
+    content.addEventListener("click", (event) => {
     const paymentAction = event.target.closest("[data-payment-action]");
     const clickedBackdrop = event.target.matches("[data-payment-backdrop]");
     if (
-      paymentAction?.dataset.paymentAction === "close" ||
-      clickedBackdrop
+        paymentAction?.dataset.paymentAction === "close" ||
+        clickedBackdrop
     ) {
-      renderCheckout(content);
-      return;
+        renderCheckout(content);
+        return;
     }
 
     const button = event.target.closest("[data-demo-status]");
     if (!button || !demoMode) return;
 
     switch (button.dataset.demoStatus) {
-      case "pending":
-        renderPending(content, selectedMethod);
-        break;
-      case "success":
-        renderSuccess(content, selectedMethod);
-        break;
-      case "failed":
-        renderFailed(content, selectedMethod);
-        break;
-      case "checkout":
-        renderCheckout(content);
-        break;
-      default:
-        break;
+        case "pending":
+            renderPending(content, selectedMethod);
+            break;
+        case "success":
+            renderSuccess(content, selectedMethod);
+            break;
+        case "failed":
+            renderFailed(content, selectedMethod);
+            break;
+        case "checkout":
+            renderCheckout(content);
+            break;
+        default:
+            break;
     }
-  });
+    });
 
-  content.addEventListener("keydown", (event) => {
+    content.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && content.querySelector(".premium-payment-modal")) {
-      renderCheckout(content);
+        renderCheckout(content);
     }
-  });
+    });
 }
