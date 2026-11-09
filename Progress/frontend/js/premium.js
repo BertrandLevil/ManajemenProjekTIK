@@ -260,23 +260,26 @@ function renderChannelInstructions(content, channel) {
     instructions.textContent = `Pembayaran ${channel} belum dapat diproses saat ini.`;
 }
 
-function renderDemoActions(activeStatus) {
-        const buttons = [
+function renderDemoActions(activeStatus, demoMode) {
+    if (!demoMode) return "";
+    
+    const buttons = [
         { status: "pending", label: "Uji tampilan menunggu" },
         { status: "success", label: "Uji tampilan berhasil" },
         { status: "failed", label: "Uji tampilan gagal" },
     ]
+
     .filter((button) => button.status !== activeStatus)
     .map(
         (button) => `
-                <button
-                    class="premium-demo-button"
-                    type="button"
-                    data-demo-status="${button.status}"
-                >
-                    ${button.label}
-                </button>
-            `,
+            <button
+                class="premium-demo-button"
+                type="button"
+                data-demo-status="${button.status}"
+            >
+                ${button.label}
+            </button>
+        `,
     )
     .join("");
 
@@ -294,7 +297,7 @@ function renderDemoActions(activeStatus) {
     `;
 }
 
-function renderPending(content, selectedMethod) {
+function renderPending(content, selectedMethod, demoMode) {
     content.innerHTML = `
         <section class="premium-status premium-status--pending" role="status" aria-live="polite">
             <lottie-player
@@ -313,11 +316,11 @@ function renderPending(content, selectedMethod) {
                 penyedia pembayaran.
             </p>
         </section>
-        ${renderDemoActions("pending")}
+        ${renderDemoActions("pending", demoMode)}
     `;
 }
 
-function renderSuccess(content, selectedMethod) {
+function renderSuccess(content, selectedMethod, demoMode) {
     content.innerHTML = `
         <section class="premium-status premium-status--success" role="status" aria-live="polite">
             <lottie-player
@@ -336,11 +339,11 @@ function renderSuccess(content, selectedMethod) {
                 akan aktif setelah pembayaran diverifikasi.
             </p>
         </section>
-        ${renderDemoActions("success")}
+        ${renderDemoActions("success", demoMode)}
     `;
 }
 
-function renderFailed(content, selectedMethod) {
+function renderFailed(content, selectedMethod, demoMode) {
     content.innerHTML = `
         <section class="premium-status premium-status--failed" role="status" aria-live="polite">
             <lottie-player
@@ -355,10 +358,11 @@ function renderFailed(content, selectedMethod) {
             <p class="premium-status-label">STATUS</p>
             <h2>Pembayaran gagal diproses</h2>
             <p>
-                Payment gateway tidak dapat diakses. Silakan coba lagi nanti.
+                Pembayaran melalui ${selectedMethod} gagal diproses.
+                Silakan coba lagi nanti.
             </p>
         </section>
-        ${renderDemoActions("failed")}
+        ${renderDemoActions("failed", demoMode)}
     `;
 }
 
@@ -380,7 +384,6 @@ function renderPageHeading() {
         </header>
     `;
 }
-
 
 export function frontPremium() {
     const app = document.getElementById("app");
@@ -476,15 +479,12 @@ export function frontPremium() {
                 return;
             }
 
-            // Menambahkan kanal ke metode pembayaran
-            if (channelInput) {
-                selectedMethod =
-                    `${selectedMethod} - ${channelInput.value}`;
-            }
+            // Menmbuat nama metode pembayaran
+            const paymentMethod = channelInput ? `${selectedMethod} - ${channelInput.value}`: selectedMethod;
 
             // MODE DEMO: tidak menghubungi backend
             if (demoMode) {
-                renderPending(content, selectedMethod);
+                renderPending(content, selectedMethod, demoMode);
                 return;
             }
 
@@ -517,7 +517,7 @@ export function frontPremium() {
                         body: JSON.stringify({
                             user_id: userId,
                             email: email,
-                            payment_method: selectedMethod,
+                            payment_method: paymentMethod,
                             amount: 30000
                         })
                     }
@@ -531,23 +531,18 @@ export function frontPremium() {
                     );
                 }
 
-                if (data.success) {
-                    localStorage.setItem(
-                        "comicid_is_premium",
-                        "true"
-                    );
-
-                    renderSuccess(content, selectedMethod);
+                if (data.status === "Berhasil") {
+                    renderSuccess(content, paymentMethod, demoMode);
+                } else if (data.status === "Menunggu") {
+                    renderPending(content, paymentMethod, demoMode);
                 } else {
-                    renderPending(content, selectedMethod);
+                    renderPending(content, paymentMethod, demoMode);
                 }
 
             } catch (error) {
                 console.error("Payment checkout error:", error);
-
-                renderFailed(content, selectedMethod);
+                renderFailed(content, selectedMethod, demoMode);
             }
-
             return;
         }
 
@@ -609,21 +604,17 @@ export function frontPremium() {
 
         switch (button.dataset.demoStatus) {
             case "pending":
-                renderPending(content, selectedMethod);
+                renderPending(content, selectedMethod, demoMode);
                 break;
-
             case "success":
-                renderSuccess(content, selectedMethod);
+                renderSuccess(content, selectedMethod, demoMode);
                 break;
-
             case "failed":
-                renderFailed(content, selectedMethod);
+                renderFailed(content, selectedMethod, demoMode);
                 break;
-
             case "checkout":
                 renderCheckout(content);
                 break;
-
             default:
                 break;
         }
@@ -631,7 +622,6 @@ export function frontPremium() {
 
     // 4. EVENT KEYDOWN
     content.addEventListener("keydown", (event) => {
-
         if (
             event.key === "Escape" &&
             content.querySelector(".premium-payment-modal")

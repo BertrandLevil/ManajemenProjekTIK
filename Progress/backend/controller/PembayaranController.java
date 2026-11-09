@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 public class PembayaranController {
 
@@ -256,8 +257,8 @@ public class PembayaranController {
             String method = ControllerHelper.extractJsonValue(body, "payment_method");
             if (method.isEmpty()) method = ControllerHelper.extractJsonValue(body, "metode_pembayaran");
 
-            double amount = ControllerHelper.extractJsonDouble(body, "amount", 30000.0);
-            if (amount <= 0) amount = ControllerHelper.extractJsonDouble(body, "jumlah_bayar", 30000.0);
+            double amount = ControllerHelper.extractJsonDouble(body, "amount", 30000.00);
+            if (amount <= 0) amount = ControllerHelper.extractJsonDouble(body, "jumlah_bayar", 30000.00);
 
             // Cek apakah langsung diselesaikan otomatis (misal simulasi demo mode)
             boolean autoConfirm = ControllerHelper.extractJsonBoolean(body, "auto_confirm", false);
@@ -274,6 +275,7 @@ public class PembayaranController {
                         controller.processPaymentResult(txId, "Berhasil");
                     }
                     String response = String.format(
+                        Locale.US,
                         "{\"success\":true,\"message\":\"Checkout berhasil dibuat.\",\"transaction_id\":%d,\"amount\":%.2f,\"status\":\"%s\"}",
                         txId, amount, autoConfirm ? "Berhasil" : "Menunggu"
                     );
