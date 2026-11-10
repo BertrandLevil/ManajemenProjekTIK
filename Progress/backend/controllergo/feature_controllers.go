@@ -120,9 +120,17 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
-              WHERE b.id_komik = ? ORDER BY b.nomor_bab ASC`
+	query := `SELECT
+                b.id_bab,
+                b.id_komik,
+                b.nomor_bab,
+                b.tanggal_rilis,
+                k.nama_komik,
+                b.file_path
+              FROM bab b
+              JOIN komik k ON b.id_komik = k.id_komik
+              WHERE b.id_komik = ?
+              ORDER BY b.nomor_bab ASC`
 
 	rows, err := conn.Query(query, idKomik)
 	if err != nil {
@@ -131,13 +139,28 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 	defer rows.Close()
 
 	list := make([]BabDTO, 0)
+
 	for rows.Next() {
 		var b BabDTO
-		if err := rows.Scan(&b.IdBab, &b.IdKomik, &b.NomorBab, &b.TanggalRilis, &b.NamaKomik); err != nil {
+
+		if err := rows.Scan(
+			&b.IdBab,
+			&b.IdKomik,
+			&b.NomorBab,
+			&b.TanggalRilis,
+			&b.NamaKomik,
+			&b.FilePath,
+		); err != nil {
 			return nil, err
 		}
+
 		list = append(list, b)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return list, nil
 }
 
@@ -147,12 +170,28 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
+	query := `SELECT
+                b.id_bab,
+                b.id_komik,
+                b.nomor_bab,
+                b.tanggal_rilis,
+                k.nama_komik,
+                b.file_path
+              FROM bab b
+              JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_bab = ?`
 
 	var b BabDTO
-	err = conn.QueryRow(query, idBab).Scan(&b.IdBab, &b.IdKomik, &b.NomorBab, &b.TanggalRilis, &b.NamaKomik)
+
+	err = conn.QueryRow(query, idBab).Scan(
+		&b.IdBab,
+		&b.IdKomik,
+		&b.NomorBab,
+		&b.TanggalRilis,
+		&b.NamaKomik,
+		&b.FilePath,
+	)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil

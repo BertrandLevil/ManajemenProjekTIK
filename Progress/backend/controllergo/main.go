@@ -47,8 +47,22 @@ func main() {
 	pembayaranCtrl := NewPembayaranController()
 
 	frontendDir := resolveFrontendDir()
-
 	mux := http.NewServeMux()
+
+	// Lokasi folder penyimpanan PDF dan file lainnya.
+	projectDir := filepath.Dir(frontendDir)
+	storageDir := filepath.Join(projectDir, "backend", "storage")
+
+	fmt.Printf("[Storage] Folder penyimpanan: %s\n", storageDir)
+
+	// Sajikan file dari folder backend/storage melalui URL /storage/.
+	mux.Handle(
+		"/storage/",
+		http.StripPrefix(
+			"/storage/",
+			http.FileServer(http.Dir(storageDir)),
+		),
+	)
 
 	mux.HandleFunc("/api/login", LoginHttpHandler(loginCtrl))
 	mux.HandleFunc("/api/register", RegisterHttpHandler(loginCtrl))
