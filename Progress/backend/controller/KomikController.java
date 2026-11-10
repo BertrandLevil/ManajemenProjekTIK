@@ -216,7 +216,6 @@ public class KomikController {
             linkCategories(newKomikId, kategoriIds);
         }
 
-        // Integrasi OOP Domain Class
         if (newKomikId > 0) {
             Author author = new Author(authorName, authorEmail, authorPass, namaStudio);
             author.login(authorName, authorPass);
@@ -263,7 +262,6 @@ public class KomikController {
     }
 
     public boolean verifyKomik(int idKomik, int idAdmin) throws SQLException {
-        // Admin memverifikasi komik sesuai class Admin.verifyKomik(idKomik)
         String sql = "SELECT username, email, password FROM pengguna WHERE id_pengguna = ? AND role = 'Admin'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

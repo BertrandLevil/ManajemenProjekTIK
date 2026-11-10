@@ -70,7 +70,7 @@ public class BabController {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Bab bab = new Bab(rs.getInt("id_bab"), rs.getInt("nomor_bab"));
-                    bab.loadKonten(); // Panggil fungsi domain model
+                    bab.loadKonten();
 
                     return new BabDTO(
                         bab.getIdBab(),

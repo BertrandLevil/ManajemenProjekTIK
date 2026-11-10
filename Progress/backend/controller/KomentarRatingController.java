@@ -93,7 +93,6 @@ public class KomentarRatingController {
             throw new IllegalArgumentException("Rating harus di antara 1 sampai 5.");
         }
 
-        // Ambil info pengguna untuk memanggil method domain
         String userSql = "SELECT username, email, password FROM pengguna WHERE id_pengguna = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement userStmt = conn.prepareStatement(userSql)) {

@@ -7,7 +7,6 @@ public class Komik {
     private String genre;
     private double peringkat;
     
-    // Asumsi class Bab dan KomentarRating sudah ada dari kode sebelumnya
     private List<Bab> daftarBab;
     private List<KomentarRating> daftarKomentar;
 

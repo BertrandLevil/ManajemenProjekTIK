@@ -163,7 +163,6 @@ public class BookmarkHistoriController {
             throw new IllegalArgumentException("ID Pengguna dan ID Bab wajib diisi.");
         }
 
-        // Ambil data komik dari bab untuk memanggil fungsi domain
         String babSql = "SELECT id_komik FROM bab WHERE id_bab = ?";
         int idKomik = -1;
         try (Connection conn = DatabaseConnection.getConnection();
@@ -176,7 +175,6 @@ public class BookmarkHistoriController {
             }
         }
 
-        // Panggil domain method Pembaca.bacaKomik(idKomik)
         if (idKomik > 0) {
             String userSql = "SELECT username, email, password FROM pengguna WHERE id_pengguna = ?";
             try (Connection conn = DatabaseConnection.getConnection();

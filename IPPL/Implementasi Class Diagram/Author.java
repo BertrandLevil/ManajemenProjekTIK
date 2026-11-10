@@ -19,7 +19,6 @@ public class Author extends User {
     public double getPendapatan() { return pendapatan; }
     public void setPendapatan(double pendapatan) { this.pendapatan = pendapatan; }
 
-    // Wajib di-override karena abstract method di class User
     @Override
     public boolean register() {
         System.out.println("Registrasi Author baru: " + super.getUsername() + " (Studio: " + namaStudio + ") berhasil.");

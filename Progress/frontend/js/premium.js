@@ -482,13 +482,13 @@ export function frontPremium() {
             // Menmbuat nama metode pembayaran
             const paymentMethod = channelInput ? `${selectedMethod} - ${channelInput.value}`: selectedMethod;
 
-            // MODE DEMO: tidak menghubungi backend
+            // MODE DEMO
             if (demoMode) {
                 renderPending(content, selectedMethod, demoMode);
                 return;
             }
 
-            // MODE NORMAL: BACKEND JAVA
+            // MODE NORMAL
             const feedback = document.getElementById(
                 "premium-modal-feedback"
             );

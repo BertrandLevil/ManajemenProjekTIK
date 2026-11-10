@@ -11,7 +11,6 @@ public class Pembaca extends User {
         this.bookmarkKomikIds = new ArrayList<>();
     }
 
-    // Wajib di-override karena abstract method di class User
     @Override
     public boolean register() {
         System.out.println("Registrasi Pembaca baru: " + getUsername() + " berhasil. Selamat membaca!");

@@ -161,7 +161,6 @@ export function frontRegister() {
             return;
         }
 
-        // Memanggil API backend Java yang terhubung ke database MariaDB/MySQL (comicid)
         try {
             if (submitBtn) {
                 submitBtn.disabled = true;

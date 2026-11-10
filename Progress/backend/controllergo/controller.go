@@ -112,7 +112,6 @@ func (c *LoginController) RegisterWithQuery(username, email, password, role stri
 	}
 	isPremium := 0
 
-	// Instansiasi model sesuai class diagram untuk mencatat logika bisnis
 	pembacaBaru := NewPembaca(username, email, password)
 	pembacaBaru.Register()
 

@@ -136,7 +136,6 @@ export function frontLogin() {
       return;
     }
 
-    // Memanggil LoginController Java yang terhubung ke Database MySQL (comicid)
     try {
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -154,12 +153,10 @@ export function frontLogin() {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        // Menampilkan pesan error dari controller ("Email atau username tidak terdaftar." / "Password salah.")
         showMessage(result.message || "Gagal masuk ke akun.");
         return;
       }
 
-      // Menyimpan sesi login ke localStorage agar kompatibel dengan halaman home.html Anda
       if (result.id) {
         localStorage.setItem("comicid_user_id", String(result.id));
       }

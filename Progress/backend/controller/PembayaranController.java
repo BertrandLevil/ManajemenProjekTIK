@@ -88,7 +88,6 @@ public class PembayaranController {
             }
         }
 
-        // Panggil domain class Pembayaran
         if (generatedId > 0) {
             Pembayaran pembayaranDomain = new Pembayaran(generatedId, metodePembayaran, jumlahBayar);
             pembayaranDomain.submitPayment();
@@ -123,7 +122,6 @@ public class PembayaranController {
             }
         }
 
-        // Domain class logic
         Pembayaran pembayaran = new Pembayaran(idTransaksi, metode, jumlahBayar);
         boolean domainResult = pembayaran.processPaymentResult();
 
@@ -145,7 +143,6 @@ public class PembayaranController {
                 stmt.executeUpdate();
             }
 
-            // Panggil method Pembaca.pembayaran
             String userSql = "SELECT username, email, password FROM pengguna WHERE id_pengguna = ?";
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(userSql)) {

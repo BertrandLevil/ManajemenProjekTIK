@@ -1,14 +1,14 @@
-# ComicID Backend (Golang Version)
+# ComicID Backend (Golang)
 
-Folder `controllergo` ini merupakan hasil migrasi/salinan dari folder `controller` (Java) ke dalam bahasa pemrograman **Go (Golang)** dengan fungsi, API endpoint, validasi, dan perilaku yang 100% identik tanpa mengubah fungsi apapun.
+Implementasi backend ComicID menggunakan bahasa pemrograman **Go (Golang)** yang menyediakan endpoint REST API untuk seluruh fitur aplikasi dan terhubung ke database MySQL `comicid`.
 
 ## Arsitektur Berkas
-- **`database.go`**: Manajemen koneksi MySQL/MariaDB (Laragon) dengan database `comicid` (ekivalen dengan `DatabaseConnection.java`), mendukung env var.
-- **`models.go` & `extra_models.go`**: Struktur entitas OOP `User`, `Admin`, `Author`, `Pembaca`, `Komik`, `Bab`, `Kategori`, `Review`, `Bookmark`, `Histori`, dan `Transaksi`.
+- **`database.go`**: Manajemen koneksi MySQL/MariaDB (Laragon) dengan database `comicid`.
+- **`models.go` & `extra_models.go`**: Struktur entitas `User`, `Admin`, `Author`, `Pembaca`, `Komik`, `Bab`, `Kategori`, `Review`, `Bookmark`, `Histori`, dan `Transaksi`.
 - **`controller.go` & `feature_controllers.go`**: Logika bisnis dan query MySQL untuk semua modul (Autentikasi, Komik, Bab, Kategori, Ulasan, Bookmark & Histori, Pembayaran, Profil & Admin User Management).
-- **`handlers.go` & `feature_handlers.go`**: HTTP Handlers lengkap untuk seluruh endpoint REST API dan serving static web files.
-- **`main.go`**: Entry point server backend di port 8080 (menampilkan banner dan route registry).
-- **`run-backend.bat`**: Script runner sekali klik.
+- **`handlers.go` & `feature_handlers.go`**: HTTP Handlers untuk seluruh endpoint REST API dan serving static web files.
+- **`main.go`**: Entry point server backend di port 8080.
+- **`run-backend.bat`**: Script runner backend.
 
 ## Endpoint API yang Disediakan
 - **Autentikasi & Health**:

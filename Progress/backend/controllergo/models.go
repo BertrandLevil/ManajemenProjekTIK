@@ -15,7 +15,7 @@ type UserInterface interface {
 	GetRole() string
 }
 
-// User merepresentasikan entitas dasar Pengguna (sesuai User.java)
+// User merepresentasikan entitas dasar Pengguna
 type User struct {
 	Id              int    `json:"id"`
 	Username        string `json:"username"`
@@ -57,7 +57,7 @@ func (u *User) GetPassword() string { return u.Password }
 func (u *User) IsLoggedIn() bool    { return u.IsLoggedInState }
 
 // =========================================================
-// Admin (sesuai Admin.java)
+// Admin
 // =========================================================
 type Admin struct {
 	User
@@ -100,7 +100,7 @@ func (a *Admin) KelolaPembayaran() {
 func (a *Admin) GetRole() string { return "Admin" }
 
 // =========================================================
-// Author / Kreator (sesuai Author.java)
+// Author / Kreator
 // =========================================================
 type Author struct {
 	User
@@ -159,7 +159,7 @@ func (au *Author) CekPendapatan() float64 {
 func (au *Author) GetRole() string { return "Kreator" }
 
 // =========================================================
-// Pembaca (sesuai Pembaca.java)
+// Pembaca
 // =========================================================
 type Pembaca struct {
 	User

@@ -101,7 +101,6 @@ public class LoginController {
         String finalRole = (role != null && !role.trim().isEmpty()) ? role : "Pembaca";
         int isPremium = 0;
 
-        // Instansiasi model sesuai class diagram untuk mencatat logika bisnis
         Pembaca pembacaBaru = new Pembaca(username, email, password);
         pembacaBaru.register();
 
