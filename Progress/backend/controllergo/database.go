@@ -22,7 +22,6 @@ func getEnv(key, defaultVal string) string {
 	return defaultVal
 }
 
-// GetConnection mengembalikan instance pool koneksi database MySQL
 func GetConnection() (*sql.DB, error) {
 	dbMu.Lock()
 	defer dbMu.Unlock()
@@ -35,7 +34,6 @@ func GetConnection() (*sql.DB, error) {
 		db = nil
 	}
 
-	// Konfigurasi koneksi MySQL / MariaDB (Laragon) dengan fallback env var
 	dbUser := getEnv("DB_USER", "root")
 	dbPassword := getEnv("DB_PASSWORD", "")
 	dbHost := getEnv("DB_HOST", "127.0.0.1")
@@ -64,7 +62,6 @@ func GetConnection() (*sql.DB, error) {
 	return db, nil
 }
 
-// TestConnection menguji apakah koneksi ke database 'comicid' berhasil
 func TestConnection() bool {
 	conn, err := GetConnection()
 	if err != nil {

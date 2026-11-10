@@ -7,9 +7,6 @@ import (
 	"strconv"
 )
 
-// =========================================================
-// 1. Kategori Handlers
-// =========================================================
 func CategoriesHttpHandler(ctrl *KategoriController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -100,9 +97,6 @@ func CategoriesDetailHttpHandler(ctrl *KategoriController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 2. Chapters Handlers
-// =========================================================
 func ChaptersHttpHandler(ctrl *BabController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -202,9 +196,6 @@ func ChaptersDetailHttpHandler(ctrl *BabController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 3. Comics Handlers
-// =========================================================
 func ComicsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -375,9 +366,6 @@ func ComicsStatsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 4. Reviews Handlers
-// =========================================================
 func ReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -470,9 +458,6 @@ func AuthorReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 5. Bookmarks & History Handlers
-// =========================================================
 func BookmarksHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -569,9 +554,6 @@ func HistoryHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 6. Payment Handlers
-// =========================================================
 func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -720,9 +702,6 @@ func AdminTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 7. User & Admin Handlers
-// =========================================================
 func UserProfileHttpHandler(ctrl *UserController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)

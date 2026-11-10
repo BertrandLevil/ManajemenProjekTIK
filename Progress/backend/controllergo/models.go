@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 
-// UserInterface mendefinisikan kontrak method umum untuk User
 type UserInterface interface {
 	Register() bool
 	Login(inputUsernameOrEmail, inputPassword string) bool
@@ -15,7 +14,6 @@ type UserInterface interface {
 	GetRole() string
 }
 
-// User merepresentasikan entitas dasar Pengguna
 type User struct {
 	Id              int    `json:"id"`
 	Username        string `json:"username"`
@@ -34,8 +32,8 @@ func NewUser(username, email, password string) User {
 	}
 }
 
-func (u *User) GetId() int          { return u.Id }
-func (u *User) SetId(id int)        { u.Id = id }
+func (u *User) GetId() int   { return u.Id }
+func (u *User) SetId(id int) { u.Id = id }
 func (u *User) Login(inputUsernameOrEmail, inputPassword string) bool {
 	if (inputUsernameOrEmail == u.Username || inputUsernameOrEmail == u.Email) && inputPassword == u.Password {
 		u.IsLoggedInState = true
@@ -56,9 +54,6 @@ func (u *User) GetEmail() string    { return u.Email }
 func (u *User) GetPassword() string { return u.Password }
 func (u *User) IsLoggedIn() bool    { return u.IsLoggedInState }
 
-// =========================================================
-// Admin
-// =========================================================
 type Admin struct {
 	User
 	IdAdmin int `json:"idAdmin"`
@@ -99,9 +94,6 @@ func (a *Admin) KelolaPembayaran() {
 
 func (a *Admin) GetRole() string { return "Admin" }
 
-// =========================================================
-// Author / Kreator
-// =========================================================
 type Author struct {
 	User
 	NamaStudio  string   `json:"namaStudio"`
@@ -158,9 +150,6 @@ func (au *Author) CekPendapatan() float64 {
 
 func (au *Author) GetRole() string { return "Kreator" }
 
-// =========================================================
-// Pembaca
-// =========================================================
 type Pembaca struct {
 	User
 	IsPremiumState   bool  `json:"isPremium"`
@@ -230,4 +219,4 @@ func (p *Pembaca) Translate() {
 }
 
 func (p *Pembaca) IsPremium() bool { return p.IsPremiumState }
-func (p *Pembaca) GetRole() string  { return "Pembaca" }
+func (p *Pembaca) GetRole() string { return "Pembaca" }

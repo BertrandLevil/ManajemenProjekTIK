@@ -7,9 +7,6 @@ import (
 	"time"
 )
 
-// =========================================================
-// 1. KategoriController
-// =========================================================
 type KategoriController struct{}
 
 func NewKategoriController() *KategoriController {
@@ -111,9 +108,6 @@ func (c *KategoriController) DeleteKategori(id int) (bool, error) {
 	return rowsAffected > 0, nil
 }
 
-// =========================================================
-// 2. BabController
-// =========================================================
 type BabController struct{}
 
 func NewBabController() *BabController {
@@ -126,8 +120,8 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik 
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik 
+	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
+              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_komik = ? ORDER BY b.nomor_bab ASC`
 
 	rows, err := conn.Query(query, idKomik)
@@ -153,8 +147,8 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik 
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik 
+	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
+              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_bab = ?`
 
 	var b BabDTO
@@ -178,7 +172,6 @@ func (c *BabController) CreateBab(idKomik, nomorBab int, tanggalRilis string) (b
 		return false, err
 	}
 
-	// Cek duplikasi nomor bab
 	var existingId int
 	err = conn.QueryRow("SELECT id_bab FROM bab WHERE id_komik = ? AND nomor_bab = ?", idKomik, nomorBab).Scan(&existingId)
 	if err == nil {
@@ -224,9 +217,6 @@ func (c *BabController) DeleteBab(idBab int) (bool, error) {
 	return rowsAffected > 0, nil
 }
 
-// =========================================================
-// 3. KomikController
-// =========================================================
 type KomikController struct{}
 
 func NewKomikController() *KomikController {
@@ -240,7 +230,7 @@ func (c *KomikController) GetAllKomik(search, kategori, sortBy string) ([]KomikD
 	}
 
 	sqlQuery := `SELECT k.id_komik, k.id_kreator, COALESCE(u.username, '') AS nama_kreator,
-                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi, 
+                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi,
                  COALESCE(k.nama_studio, '-') AS nama_studio, k.rating_rata_rata,
                  (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id_komik) AS total_bab
                  FROM komik k
@@ -289,8 +279,8 @@ func (c *KomikController) GetAllKomik(search, kategori, sortBy string) ([]KomikD
 	}
 
 	for i := range list {
-		catRows, err := conn.Query(`SELECT kat.nama_kategori FROM komik_kategori kk 
-                                    JOIN kategori kat ON kk.id_kategori = kat.id_kategori 
+		catRows, err := conn.Query(`SELECT kat.nama_kategori FROM komik_kategori kk
+                                    JOIN kategori kat ON kk.id_kategori = kat.id_kategori
                                     WHERE kk.id_komik = ?`, list[i].IdKomik)
 		if err == nil {
 			for catRows.Next() {
@@ -312,7 +302,7 @@ func (c *KomikController) GetKomikById(id int) (*KomikDTO, error) {
 	}
 
 	sqlQuery := `SELECT k.id_komik, k.id_kreator, COALESCE(u.username, '') AS nama_kreator,
-                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi, 
+                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi,
                  COALESCE(k.nama_studio, '-') AS nama_studio, k.rating_rata_rata,
                  (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id_komik) AS total_bab
                  FROM komik k
@@ -331,8 +321,8 @@ func (c *KomikController) GetKomikById(id int) (*KomikDTO, error) {
 	}
 
 	k.Categories = make([]string, 0)
-	catRows, err := conn.Query(`SELECT kat.nama_kategori FROM komik_kategori kk 
-                                JOIN kategori kat ON kk.id_kategori = kat.id_kategori 
+	catRows, err := conn.Query(`SELECT kat.nama_kategori FROM komik_kategori kk
+                                JOIN kategori kat ON kk.id_kategori = kat.id_kategori
                                 WHERE kk.id_komik = ?`, id)
 	if err == nil {
 		for catRows.Next() {
@@ -478,7 +468,7 @@ func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{},
 		return nil, err
 	}
 
-	query := `SELECT COUNT(*) AS total_komik, COALESCE(AVG(rating_rata_rata), 0) AS avg_rating 
+	query := `SELECT COUNT(*) AS total_komik, COALESCE(AVG(rating_rata_rata), 0) AS avg_rating
               FROM komik WHERE id_kreator = ?`
 
 	var (
@@ -497,9 +487,6 @@ func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{},
 	}, nil
 }
 
-// =========================================================
-// 4. KomentarRatingController
-// =========================================================
 type KomentarRatingController struct{}
 
 func NewKomentarRatingController() *KomentarRatingController {
@@ -555,7 +542,7 @@ func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewD
               FROM komentar_rating kr
               JOIN pengguna u ON kr.id_pengguna = u.id_pengguna
               JOIN komik k ON kr.id_komik = k.id_komik
-              WHERE k.id_kreator = ? 
+              WHERE k.id_kreator = ?
               ORDER BY kr.tanggal_komentar DESC`
 
 	rows, err := conn.Query(query, creatorId)
@@ -594,7 +581,6 @@ func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string
 		return false, err
 	}
 
-	// Recalculate average rating
 	_, _ = conn.Exec(`UPDATE komik SET rating_rata_rata = (
         SELECT COALESCE(AVG(nilai_rating), 0.0) FROM komentar_rating WHERE id_komik = ?
     ) WHERE id_komik = ?`, idKomik, idKomik)
@@ -631,9 +617,6 @@ func (c *KomentarRatingController) DeleteReview(idUlasan, idPengguna int, role s
 	return ra > 0, nil
 }
 
-// =========================================================
-// 5. BookmarkHistoriController
-// =========================================================
 type BookmarkHistoriController struct{}
 
 func NewBookmarkHistoriController() *BookmarkHistoriController {
@@ -746,9 +729,6 @@ func (c *BookmarkHistoriController) DeleteHistori(idHistori, userId int) (bool, 
 	return ra > 0, nil
 }
 
-// =========================================================
-// 6. PembayaranController
-// =========================================================
 type PembayaranController struct{}
 
 func NewPembayaranController() *PembayaranController {
@@ -870,9 +850,6 @@ func (c *PembayaranController) GetAllTransactions() ([]TransaksiDTO, error) {
 	return list, nil
 }
 
-// =========================================================
-// 7. UserController
-// =========================================================
 type UserController struct{}
 
 func NewUserController() *UserController {
@@ -885,7 +862,7 @@ func (c *UserController) GetUserProfile(emailOrUsername string) (*UserDTO, error
 		return nil, err
 	}
 
-	query := `SELECT id_pengguna, username, email, role, is_premium 
+	query := `SELECT id_pengguna, username, email, role, is_premium
               FROM pengguna WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)`
 
 	var (

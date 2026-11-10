@@ -6,27 +6,22 @@ import (
 	"strings"
 )
 
-// ErrInvalidPassword menunjukkan bahwa kata sandi salah
 var ErrInvalidPassword = errors.New("Password salah.")
 
-// LoginController mengelola logika bisnis otentikasi pengguna
 type LoginController struct{}
 
 func NewLoginController() *LoginController {
 	return &LoginController{}
 }
 
-// =========================================================
-// 1. Method Utama Controller: Login (Verifikasi Akun Pengguna)
-// =========================================================
 func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) (UserInterface, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	query := `SELECT id_pengguna, username, email, password, role, is_premium 
-              FROM pengguna 
+	query := `SELECT id_pengguna, username, email, password, role, is_premium
+              FROM pengguna
               WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)`
 
 	var (
@@ -44,7 +39,7 @@ func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) 
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil // Akun belum terdaftar
+			return nil, nil
 		}
 		return nil, err
 	}
@@ -77,16 +72,12 @@ func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) 
 	return loggedInUser, nil
 }
 
-// =========================================================
-// 2. Method Utama Controller: Register (Registrasi Akun Baru)
-// =========================================================
 func (c *LoginController) RegisterWithQuery(username, email, password, role string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
 	}
 
-	// Cek apakah username sudah dipakai
 	checkUserQuery := `SELECT id_pengguna FROM pengguna WHERE LOWER(username) = LOWER(?)`
 	var existingId int
 	err = conn.QueryRow(checkUserQuery, username).Scan(&existingId)
@@ -96,7 +87,6 @@ func (c *LoginController) RegisterWithQuery(username, email, password, role stri
 		return false, err
 	}
 
-	// Cek apakah email sudah terdaftar
 	checkEmailQuery := `SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?)`
 	err = conn.QueryRow(checkEmailQuery, email).Scan(&existingId)
 	if err == nil {
@@ -105,7 +95,6 @@ func (c *LoginController) RegisterWithQuery(username, email, password, role stri
 		return false, err
 	}
 
-	// Default role: Pembaca jika tidak ditentukan
 	finalRole := strings.TrimSpace(role)
 	if finalRole == "" {
 		finalRole = "Pembaca"
@@ -115,7 +104,6 @@ func (c *LoginController) RegisterWithQuery(username, email, password, role stri
 	pembacaBaru := NewPembaca(username, email, password)
 	pembacaBaru.Register()
 
-	// Simpan ke database `pengguna`
 	insertQuery := `INSERT INTO pengguna (username, email, password, role, is_premium) VALUES (?, ?, ?, ?, ?)`
 	res, err := conn.Exec(insertQuery, username, email, password, finalRole, isPremium)
 	if err != nil {

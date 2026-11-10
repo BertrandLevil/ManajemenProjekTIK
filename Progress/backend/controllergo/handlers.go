@@ -32,9 +32,6 @@ func sendJSONError(w http.ResponseWriter, statusCode int, message string) {
 	})
 }
 
-// =========================================================
-// 3. HTTP Handler untuk Login (/api/login)
-// =========================================================
 func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -109,9 +106,6 @@ func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 4. HTTP Handler untuk Register (/api/register)
-// =========================================================
 func RegisterHttpHandler(controller *LoginController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -194,9 +188,6 @@ func RegisterHttpHandler(controller *LoginController) http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 5. HTTP Handler untuk Health Check & DB Status (/api/health)
-// =========================================================
 func HealthHttpHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
@@ -222,9 +213,6 @@ func HealthHttpHandler() http.HandlerFunc {
 	}
 }
 
-// =========================================================
-// 6. HTTP Handler untuk Static Web Files (HTML, CSS, JS)
-// =========================================================
 func StaticFileHandler(baseDir string) http.HandlerFunc {
 	absBaseDir, err := filepath.Abs(baseDir)
 	if err != nil {
@@ -241,7 +229,6 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 
-		// API ditangani oleh handler masing-masing
 		if strings.HasPrefix(path, "/api/") {
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 			w.WriteHeader(http.StatusNotFound)
@@ -249,7 +236,6 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 			return
 		}
 
-		// Homepage menjadi halaman awal
 		if path == "/" || path == "" {
 			path = "/pages/home.html"
 		}
@@ -259,7 +245,6 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 
 		targetPath := filepath.Join(absBaseDir, relPath)
 
-		// Jika URL HTML tidak ditemukan, coba cari di dalam folder pages
 		if _, err := os.Stat(targetPath); os.IsNotExist(err) && strings.HasSuffix(strings.ToLower(path), ".html") {
 			fileName := filepath.Base(path)
 			fallbackPath := filepath.Join(absBaseDir, "pages", fileName)
@@ -268,7 +253,6 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 			}
 		}
 
-		// Security: Pastikan file tetap berada di dalam folder frontend
 		relCheck, err := filepath.Rel(absBaseDir, targetPath)
 		if err != nil || strings.HasPrefix(relCheck, "..") {
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -285,7 +269,6 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 			return
 		}
 
-		// Tentukan tipe konten berdasarkan ekstensi file
 		lower := strings.ToLower(filepath.Ext(targetPath))
 		contentType := "application/octet-stream"
 

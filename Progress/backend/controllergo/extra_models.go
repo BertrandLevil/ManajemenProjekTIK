@@ -1,12 +1,10 @@
 package main
 
-// KategoriModel merepresentasikan kategori komik
 type KategoriModel struct {
 	IdKategori   int    `json:"id"`
 	NamaKategori string `json:"name"`
 }
 
-// KomikDTO merepresentasikan data transfer komik
 type KomikDTO struct {
 	IdKomik        int      `json:"id"`
 	IdKreator      int      `json:"creator_id"`
@@ -19,7 +17,6 @@ type KomikDTO struct {
 	Categories     []string `json:"categories"`
 }
 
-// BabDTO merepresentasikan data chapter
 type BabDTO struct {
 	IdBab        int    `json:"id"`
 	IdKomik      int    `json:"comic_id"`
@@ -28,7 +25,6 @@ type BabDTO struct {
 	NamaKomik    string `json:"comic_name"`
 }
 
-// ReviewDTO merepresentasikan komentar dan rating
 type ReviewDTO struct {
 	IdUlasan        int     `json:"id"`
 	IdPengguna      int     `json:"user_id"`
@@ -40,7 +36,6 @@ type ReviewDTO struct {
 	TanggalKomentar string  `json:"created_at"`
 }
 
-// BookmarkDTO merepresentasikan data komik yang dibookmark
 type BookmarkDTO struct {
 	IdBookmark         int     `json:"id"`
 	IdPengguna         int     `json:"user_id"`
@@ -51,7 +46,6 @@ type BookmarkDTO struct {
 	TanggalDitambahkan string  `json:"added_at"`
 }
 
-// HistoriDTO merepresentasikan data riwayat baca
 type HistoriDTO struct {
 	IdHistori   int    `json:"id"`
 	IdPengguna  int    `json:"user_id"`
@@ -62,7 +56,6 @@ type HistoriDTO struct {
 	TanggalBaca string `json:"read_at"`
 }
 
-// TransaksiDTO merepresentasikan data transaksi pembayaran
 type TransaksiDTO struct {
 	IdTransaksi      int     `json:"id"`
 	IdPengguna       int     `json:"user_id"`
@@ -74,7 +67,6 @@ type TransaksiDTO struct {
 	TanggalTransaksi string  `json:"date"`
 }
 
-// UserDTO merepresentasikan data profil & manajemen pengguna
 type UserDTO struct {
 	IdPengguna int    `json:"id"`
 	Username   string `json:"username"`
@@ -82,4 +74,3 @@ type UserDTO struct {
 	Role       string `json:"role"`
 	IsPremium  bool   `json:"is_premium"`
 }
-

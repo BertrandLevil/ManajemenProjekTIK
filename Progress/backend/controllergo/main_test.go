@@ -9,7 +9,7 @@ import (
 )
 
 func TestModelOOP(t *testing.T) {
-	// Test Admin
+
 	admin := NewAdmin("admin_test", "admin@test.com", "pass1234", 1)
 	if !admin.Register() {
 		t.Errorf("Admin Register failed")
@@ -24,7 +24,6 @@ func TestModelOOP(t *testing.T) {
 		t.Errorf("Expected role Admin, got %s", admin.GetRole())
 	}
 
-	// Test Author
 	author := NewAuthor("author_test", "author@test.com", "pass1234", "Studio A")
 	if !author.Register() {
 		t.Errorf("Author Register failed")
@@ -39,7 +38,6 @@ func TestModelOOP(t *testing.T) {
 		t.Errorf("Expected role Kreator, got %s", author.GetRole())
 	}
 
-	// Test Pembaca
 	pembaca := NewPembaca("reader_test", "reader@test.com", "pass1234")
 	if !pembaca.Register() {
 		t.Errorf("Pembaca Register failed")
@@ -59,7 +57,6 @@ func TestModelOOP(t *testing.T) {
 func TestValidationHandlers(t *testing.T) {
 	controller := NewLoginController()
 
-	// Test Login validation empty body
 	req := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBufferString(`{}`))
 	rec := httptest.NewRecorder()
 	LoginHttpHandler(controller)(rec, req)
@@ -74,7 +71,6 @@ func TestValidationHandlers(t *testing.T) {
 		t.Errorf("Expected success to be false")
 	}
 
-	// Test Register validation invalid email
 	regBody := `{"username":"testuser","email":"invalid-email","password":"password123","role":"Pembaca"}`
 	reqReg := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(regBody))
 	recReg := httptest.NewRecorder()
@@ -84,19 +80,17 @@ func TestValidationHandlers(t *testing.T) {
 		t.Errorf("Expected 400 for invalid email, got %d", recReg.Code)
 	}
 
-	// Test Health handler
 	reqHealth := httptest.NewRequest(http.MethodGet, "/api/health", nil)
 	recHealth := httptest.NewRecorder()
 	HealthHttpHandler()(recHealth, reqHealth)
 
-	// Will return 200 or 503 depending on MySQL running
 	if recHealth.Code != http.StatusOK && recHealth.Code != http.StatusServiceUnavailable {
 		t.Errorf("Unexpected status code from health check: %d", recHealth.Code)
 	}
 }
 
 func TestFeatureHandlersValidation(t *testing.T) {
-	// Test Chapters without comic_id
+
 	babCtrl := NewBabController()
 	reqChap := httptest.NewRequest(http.MethodGet, "/api/chapters", nil)
 	recChap := httptest.NewRecorder()
@@ -105,7 +99,6 @@ func TestFeatureHandlersValidation(t *testing.T) {
 		t.Errorf("Expected 400 for chapters without comic_id, got %d", recChap.Code)
 	}
 
-	// Test Payment checkout without method/user
 	payCtrl := NewPembayaranController()
 	reqPay := httptest.NewRequest(http.MethodPost, "/api/payment/checkout", bytes.NewBufferString(`{}`))
 	recPay := httptest.NewRecorder()
@@ -114,7 +107,6 @@ func TestFeatureHandlersValidation(t *testing.T) {
 		t.Errorf("Expected 400 for checkout without required fields, got %d", recPay.Code)
 	}
 
-	// Test User profile without email or id
 	userCtrl := NewUserController()
 	reqProf := httptest.NewRequest(http.MethodGet, "/api/user/profile", nil)
 	recProf := httptest.NewRecorder()

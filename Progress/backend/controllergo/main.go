@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 )
 
-// resolveFrontendDir mencari lokasi folder Progress/frontend secara dinamis
 func resolveFrontendDir() string {
 	cwd, _ := os.Getwd()
 	exePath, _ := os.Executable()
@@ -32,7 +31,6 @@ func resolveFrontendDir() string {
 		}
 	}
 
-	// Default fallback
 	abs, _ := filepath.Abs(filepath.Join(cwd, "..", "frontend"))
 	return abs
 }
@@ -52,45 +50,36 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Endpoint Autentikasi & Health
 	mux.HandleFunc("/api/login", LoginHttpHandler(loginCtrl))
 	mux.HandleFunc("/api/register", RegisterHttpHandler(loginCtrl))
 	mux.HandleFunc("/api/health", HealthHttpHandler())
 
-	// Endpoint Pengguna & Profil
 	mux.HandleFunc("/api/user/profile", UserProfileHttpHandler(userCtrl))
 	mux.HandleFunc("/api/admin/users", AdminUsersHttpHandler(userCtrl))
 
-	// Endpoint Komik
 	mux.HandleFunc("/api/comics", ComicsHttpHandler(komikCtrl))
 	mux.HandleFunc("/api/comics/detail", ComicsDetailHttpHandler(komikCtrl))
 	mux.HandleFunc("/api/comics/verify", ComicsVerifyHttpHandler(komikCtrl))
 	mux.HandleFunc("/api/comics/stats", ComicsStatsHttpHandler(komikCtrl))
 
-	// Endpoint Bab
 	mux.HandleFunc("/api/chapters", ChaptersHttpHandler(babCtrl))
 	mux.HandleFunc("/api/chapters/detail", ChaptersDetailHttpHandler(babCtrl))
 
-	// Endpoint Kategori
 	mux.HandleFunc("/api/categories", CategoriesHttpHandler(kategoriCtrl))
 	mux.HandleFunc("/api/categories/detail", CategoriesDetailHttpHandler(kategoriCtrl))
 
-	// Endpoint Ulasan
 	mux.HandleFunc("/api/reviews", ReviewsHttpHandler(reviewCtrl))
 	mux.HandleFunc("/api/reviews/detail", ReviewsDetailHttpHandler(reviewCtrl))
 	mux.HandleFunc("/api/author/reviews", AuthorReviewsHttpHandler(reviewCtrl))
 
-	// Endpoint Bookmark & Histori
 	mux.HandleFunc("/api/bookmarks", BookmarksHttpHandler(bookmarkCtrl))
 	mux.HandleFunc("/api/history", HistoryHttpHandler(bookmarkCtrl))
 
-	// Endpoint Pembayaran
 	mux.HandleFunc("/api/payment/checkout", PaymentCheckoutHttpHandler(pembayaranCtrl))
 	mux.HandleFunc("/api/payment/process", PaymentProcessHttpHandler(pembayaranCtrl))
 	mux.HandleFunc("/api/payment/history", UserTransactionsHttpHandler(pembayaranCtrl))
 	mux.HandleFunc("/api/admin/transactions", AdminTransactionsHttpHandler(pembayaranCtrl))
 
-	// Static Web Files
 	mux.HandleFunc("/", StaticFileHandler(frontendDir))
 
 	fmt.Println("==================================================")
