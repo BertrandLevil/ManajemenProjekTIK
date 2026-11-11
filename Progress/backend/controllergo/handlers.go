@@ -310,6 +310,50 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 	}
 }
 
+func ChapterPagesHttpHandler(controller *BabController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+			return
+		}
+
+		chapterID := r.URL.Query().Get("chapter_id")
+
+		if chapterID == "" {
+			sendJSONError(w, http.StatusBadRequest, "ID chapter wajib diisi.")
+			return
+		}
+
+		var idBab int
+
+		_, err := fmt.Sscanf(chapterID, "%d", &idBab)
+		if err != nil || idBab <= 0 {
+			sendJSONError(w, http.StatusBadRequest, "ID chapter tidak valid.")
+			return
+		}
+
+		pages, err := controller.GetHalamanByBab(idBab)
+		if err != nil {
+			fmt.Printf("[ChapterPagesHandler] Error: %v\n", err)
+			sendJSONError(w, http.StatusInternalServerError, "Gagal mengambil halaman chapter.")
+			return
+		}
+
+		sendJSON(w, http.StatusOK, map[string]interface{}{
+			"success": true,
+			"total":   len(pages),
+			"data":    pages,
+		})
+	}
+}
+
 func errorsIs(err, target error) bool {
 	if err == nil {
 		return target == nil

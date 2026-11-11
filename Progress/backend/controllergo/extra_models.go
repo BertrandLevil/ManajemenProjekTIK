@@ -23,6 +23,12 @@ type BabDTO struct {
 	NomorBab     int    `json:"chapter_number"`
 	TanggalRilis string `json:"release_date"`
 	NamaKomik    string `json:"comic_name"`
+}
+
+type HalamanBabDTO struct {
+	IdHalaman    int    `json:"id"`
+	IdBab        int    `json:"chapter_id"`
+	NomorHalaman int    `json:"page_number"`
 	FilePath     string `json:"file_path"`
 }
 

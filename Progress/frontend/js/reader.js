@@ -1,10 +1,6 @@
-
 import { comics } from "./data.js";
 import { header } from "./header.js";
 import { frontReview } from "./review.js";
-
-const PDFJS_WORKER =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 export async function frontReader() {
     const app = document.getElementById("app");
@@ -21,8 +17,8 @@ export async function frontReader() {
         return;
     }
 
-    // Ambil daftar chapter dari backend Go.
     try {
+        // Ambil daftar chapter dari backend Go.
         const response = await fetch(
             `/api/chapters?comic_id=${comicId}`
         );
@@ -38,14 +34,12 @@ export async function frontReader() {
         }
 
         const chapters = result.data.sort(
-            (a, b) => Number(a.chapter_number) - Number(b.chapter_number)
+            (a, b) =>
+                Number(a.chapter_number) - Number(b.chapter_number)
         );
 
-
-        // Ambil jumlah total chapter dari data komik
         const totalChapters = Number(comic.chapter);
 
-        // Pastikan nomor chapter masih dalam rentang yang tersedia
         if (
             !Number.isInteger(chapterNumber) ||
             chapterNumber < 1 ||
@@ -55,20 +49,15 @@ export async function frontReader() {
             return;
         }
 
-        // Cari data chapter di database
+        // Cari chapter berdasarkan nomor chapter.
         const currentChapter = chapters.find(
             item => Number(item.chapter_number) === chapterNumber
         );
 
-        // Navigasi berdasarkan nomor chapter,
-        // bukan berdasarkan data yang tersedia di database
-        const previousChapter = chapterNumber > 1
-            ? { chapter_number: chapterNumber - 1 }
-            : null;
-
-        const nextChapter = chapterNumber < totalChapters
-            ? { chapter_number: chapterNumber + 1 }
-            : null;
+        // Ambil ID chapter dari database.
+        const chapterId = currentChapter ? Number(currentChapter.id) : null;
+        const previousChapter = chapterNumber > 1 ? { chapter_number: chapterNumber - 1 } : null;
+        const nextChapter = chapterNumber < totalChapters ? { chapter_number: chapterNumber + 1 } : null;
 
         app.innerHTML = `
             ${header()}
@@ -93,33 +82,32 @@ export async function frontReader() {
                     previousChapter,
                     nextChapter
                 )}
-            
+
                 <section class="reader-content" id="reader-pdf-content">
                     <p class="reader-loading">
-                        Memuat chapter...
+                        Memuat halaman chapter...
                     </p>
                 </section>
-            
+
                 ${createNavigation(
                     comic.id,
                     previousChapter,
                     nextChapter
                 )}
-            
+
                 <section class="reader-comments-section">
                     <h2>Komentar Chapter ${chapterNumber}</h2>
                     <div id="reader-comments"></div>
                 </section>
-            
+
             </main>
         `;
-            
+
         frontReview(comic, chapterNumber);
         updateThemeButtonIfAvailable();
-            
-        // Jika chapter belum memiliki file PDF, tetap tampilkan halaman reader.
-        if (currentChapter && currentChapter.file_path) {
-            await renderPdf(currentChapter.file_path);
+
+        if (chapterId !== null && chapterId > 0) {
+            await renderChapterImages(chapterId);
         } else {
             document.getElementById("reader-pdf-content").innerHTML = `
                 <div class="reader-loading">
@@ -135,17 +123,19 @@ export async function frontReader() {
     }
 }
 
+
 // Membuat tombol navigasi chapter.
 function createNavigation(comicId, previous, next) {
     return `
         <nav class="reader-navigation">
+
             ${
                 previous
                     ? `<a class="reader-button"
                             href="reader.html?id=${comicId}&ep=${previous.chapter_number}">
                             ← Chapter Sebelumnya
                         </a>`
-                    : ``
+                    : ""
             }
 
             <a class="reader-button"
@@ -159,122 +149,112 @@ function createNavigation(comicId, previous, next) {
                             href="reader.html?id=${comicId}&ep=${next.chapter_number}">
                             Chapter Selanjutnya →
                         </a>`
-                    : ``
+                    : ""
             }
+
         </nav>
     `;
 }
 
-// Merender PDF menjadi halaman canvas vertikal.
-async function renderPdf(filePath) {
+// Mengambil dan menampilkan gambar dari API.
+async function renderChapterImages(chapterId) {
     const container = document.getElementById("reader-pdf-content");
 
     if (!container) return;
 
-    if (!filePath) {
-        throw new Error("File PDF belum memiliki file_path.");
+    const response = await fetch(
+        `/api/chapter-pages?chapter_id=${chapterId}`
+    );
+
+    if (!response.ok) {
+        throw new Error(`Gagal mengambil halaman: HTTP ${response.status}`);
     }
 
-    const pdfjsLib = window.pdfjsLib;
+    const result = await response.json();
 
-    if (!pdfjsLib) {
-        throw new Error("Library PDF.js tidak berhasil dimuat.");
+    if (!result.success || !Array.isArray(result.data)) {
+        throw new Error("Format data halaman tidak valid.");
     }
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+    // Urutkan berdasarkan nomor halaman.
+    const pages = result.data.sort(
+        (a, b) => Number(a.page_number) - Number(b.page_number)
+    );
 
-    // Bentuk URL PDF dari file_path database.
-    const cleanPath = filePath.replace(/^\/+/, "");
-
-    const pdfUrl = "/storage/" +
-        cleanPath.split("/").map(encodeURIComponent).join("/");
-
-    const pdf = await pdfjsLib.getDocument({
-        url: pdfUrl
-    }).promise;
+    if (pages.length === 0) {
+        container.innerHTML = `
+            <div class="reader-loading">
+                <h2>Chapter belum memiliki halaman.</h2>
+                <p>Silakan kembali lagi nanti.</p>
+            </div>
+        `;
+        return;
+    }
 
     container.innerHTML = "";
 
-    // Simpan antrean agar proses render tidak berjalan bersamaan.
-    let renderQueue = Promise.resolve();
-
-    // Mengamati halaman yang mendekati area layar.
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-
-            const wrapper = entry.target;
-
-            observer.unobserve(wrapper);
-
-            renderQueue = renderQueue
-                .then(() => renderPdfPage(
-                    wrapper,
-                    wrapper.pdfPage
-                ))
-                .catch(error => {
-                    console.error("Gagal merender halaman:", error);
-                    wrapper.innerHTML = `
-                        <p class="reader-error">
-                            Halaman gagal ditampilkan.
-                        </p>
-                    `;
-                });
-        });
-    }, {
-        rootMargin: "1000px 0px"
-    });
-
-    // Siapkan semua halaman PDF.
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-
-        const baseViewport = page.getViewport({ scale: 1 });
+    pages.forEach((page, index) => {
+        const imageUrl = normalizeImageUrl(page.file_path);
 
         const wrapper = document.createElement("div");
-        wrapper.className = "reader-pdf-page-wrap";
+        wrapper.className = "reader-image-page-wrap";
 
-        wrapper.style.aspectRatio =
-            `${baseViewport.width} / ${baseViewport.height}`;
+        const image = document.createElement("img");
+        image.className = "reader-image-page";
+        image.src = imageUrl;
+        image.alt = `Halaman ${page.page_number}`;
+        image.loading = "lazy";
+        image.decoding = "async";
 
-        wrapper.pdfPage = page;
+        image.onerror = () => {
+            wrapper.innerHTML = `
+                <p class="reader-error">
+                    Gambar halaman ${page.page_number} gagal dimuat.
+                </p>
+            `;
+        };
 
-        const canvas = document.createElement("canvas");
-        canvas.className = "reader-pdf-page";
-
-        wrapper.appendChild(canvas);
+        wrapper.appendChild(image);
         container.appendChild(wrapper);
-
-        observer.observe(wrapper);
-    }
+    });
 }
 
-// Merender satu halaman PDF ke canvas.
-async function renderPdfPage(wrapper, page) {
-    const canvas = wrapper.querySelector("canvas");
-    const context = canvas.getContext("2d");
 
-    const baseViewport = page.getViewport({ scale: 1 });
+// Mengubah file_path database menjadi URL gambar.
+function normalizeImageUrl(filePath) {
+    if (!filePath) {
+        throw new Error("File path gambar kosong.");
+    }
 
-    const scale = wrapper.clientWidth / baseViewport.width;
-    const viewport = page.getViewport({ scale });
+    let path = String(filePath).replace(/\\/g, "/");
 
-    // Gunakan resolusi layar agar hasil gambar tetap tajam.
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    // Jika sudah berupa URL lengkap.
+    if (/^https?:\/\//i.test(path)) {
+        return path;
+    }
 
-    canvas.width = Math.floor(viewport.width * pixelRatio);
-    canvas.height = Math.floor(viewport.height * pixelRatio);
+    // Jika path sudah dimulai dengan /storage/.
+    if (path.startsWith("/storage/")) {
+        return encodeURI(path);
+    }
 
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
+    // Jika path dimulai dengan storage/.
+    if (path.startsWith("storage/")) {
+        path = path.substring("storage/".length);
+    }
 
-    await page.render({
-        canvasContext: context,
-        viewport: viewport,
-        transform: pixelRatio !== 1
-            ? [pixelRatio, 0, 0, pixelRatio, 0, 0]
-            : null
-    }).promise;
+    // Jika path masih berupa path fisik Windows.
+    const storageIndex = path.lastIndexOf("/storage/");
+
+    if (storageIndex !== -1) {
+        path = path.substring(storageIndex + "/storage/".length);
+    }
+
+    // Jika path masih berupa comics/...
+    path = path.replace(/^\/+/, "");
+
+    return "/storage/" +
+        path.split("/").map(segment => encodeURIComponent(segment)).join("/");
 }
 
 function showError(app, message) {

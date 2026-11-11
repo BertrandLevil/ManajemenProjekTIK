@@ -78,6 +78,8 @@ func main() {
 
 	mux.HandleFunc("/api/chapters", ChaptersHttpHandler(babCtrl))
 	mux.HandleFunc("/api/chapters/detail", ChaptersDetailHttpHandler(babCtrl))
+	mux.HandleFunc("/api/chapter-pages", ChapterPagesHttpHandler(babCtrl))
+	mux.HandleFunc("/api/chapter-pages/upload", ChapterPagesUploadHttpHandler(storageDir))
 
 	mux.HandleFunc("/api/categories", CategoriesHttpHandler(kategoriCtrl))
 	mux.HandleFunc("/api/categories/detail", CategoriesDetailHttpHandler(kategoriCtrl))
@@ -107,7 +109,7 @@ func main() {
 	fmt.Println(" [Autentikasi] : /api/login, /api/register, /api/health")
 	fmt.Println(" [Pengguna]    : /api/user/profile, /api/admin/users")
 	fmt.Println(" [Komik]       : /api/comics, /api/comics/detail, /api/comics/verify, /api/comics/stats")
-	fmt.Println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail")
+	fmt.Println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail, /api/chapter-pages")
 	fmt.Println(" [Kategori]    : /api/categories, /api/categories/detail")
 	fmt.Println(" [Ulasan]      : /api/reviews, /api/reviews/detail, /api/author/reviews")
 	fmt.Println(" [Bookmark]    : /api/bookmarks, /api/history")

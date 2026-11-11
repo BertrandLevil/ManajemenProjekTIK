@@ -125,8 +125,7 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
                 b.id_komik,
                 b.nomor_bab,
                 b.tanggal_rilis,
-                k.nama_komik,
-                b.file_path
+                k.nama_komik
               FROM bab b
               JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_komik = ?
@@ -149,7 +148,6 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 			&b.NomorBab,
 			&b.TanggalRilis,
 			&b.NamaKomik,
-			&b.FilePath,
 		); err != nil {
 			return nil, err
 		}
@@ -175,8 +173,7 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
                 b.id_komik,
                 b.nomor_bab,
                 b.tanggal_rilis,
-                k.nama_komik,
-                b.file_path
+                k.nama_komik
               FROM bab b
               JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_bab = ?`
@@ -189,7 +186,6 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		&b.NomorBab,
 		&b.TanggalRilis,
 		&b.NamaKomik,
-		&b.FilePath,
 	)
 
 	if err != nil {
@@ -199,6 +195,52 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		return nil, err
 	}
 	return &b, nil
+}
+
+func (c *BabController) GetHalamanByBab(idBab int) ([]HalamanBabDTO, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+        SELECT
+            id_halaman,
+            id_bab,
+            nomor_halaman,
+            file_path
+        FROM halaman_bab
+        WHERE id_bab = ?
+        ORDER BY nomor_halaman ASC
+    `
+
+	rows, err := conn.Query(query, idBab)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]HalamanBabDTO, 0)
+
+	for rows.Next() {
+		var halaman HalamanBabDTO
+
+		err := rows.Scan(
+			&halaman.IdHalaman,
+			&halaman.IdBab,
+			&halaman.NomorHalaman,
+			&halaman.FilePath,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, halaman)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (c *BabController) CreateBab(idKomik, nomorBab int, tanggalRilis string) (bool, error) {
