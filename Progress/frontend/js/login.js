@@ -161,7 +161,20 @@ export function frontLogin() {
       }
       localStorage.setItem("comicid_logged_in_email", result.email);
       localStorage.setItem("comicid_logged_in", "true");
-      localStorage.setItem("comicid_logged_in_role", result.role);
+
+      const savedRole = localStorage.getItem(
+          `comicid_role_${result.email}`
+      );
+
+      const effectiveRole =
+          result.role === "Admin"
+              ? "Admin"
+              : (savedRole || result.role);
+
+      localStorage.setItem(
+          "comicid_logged_in_role",
+          effectiveRole
+      );
       localStorage.setItem(`comicid_username_${result.email}`, result.username);
 
       showMessage("Login berhasil! Mengalihkan ke beranda...", false);

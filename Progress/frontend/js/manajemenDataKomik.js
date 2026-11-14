@@ -1,4 +1,5 @@
 import { comics } from "./data.js";
+import { updateThemeButton } from "./theme.js";
 
 export function frontManajemenDataKomik() {
     const app = document.getElementById("app");
@@ -312,7 +313,15 @@ export function frontManajemenDataKomik() {
 
     app.innerHTML = `
         <main class="management-page">
-
+            <button
+                type="button"
+                class="theme-toggle"
+                id="theme-toggle"
+                aria-label="Ganti tema"
+                title="Ganti tema"
+            >
+                <span class="theme-icon"></span>
+            </button>
             <section class="management-header">
                 <div>
                     <p class="management-eyebrow">AREA KREATOR</p>
@@ -331,15 +340,6 @@ export function frontManajemenDataKomik() {
                     >
                         ← Kembali ke Home
                     </a>
-                
-                    <button
-                        type="button"
-                        id="theme-toggle"
-                        class="theme-toggle"
-                        aria-label="Ganti tema"
-                    >
-                        <span class="theme-icon">☾</span>
-                    </button>
                 
                     <button
                         type="button"
@@ -686,6 +686,7 @@ export function frontManajemenDataKomik() {
         </main>
     `;
 
+    updateThemeButton();
     const comicGrid = document.getElementById(
         "management-comic-grid"
     );

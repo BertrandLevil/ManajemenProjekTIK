@@ -2,6 +2,8 @@ import { frontHome } from "./home.js";
 import { frontRegister } from "./register.js";
 import { frontLogin } from "./login.js";
 import { frontProfile } from "./profile.js";
+import { frontUpgradeCreator } from "./upgradeCreator.js";
+import { frontPengajuanCreator } from "./pengajuanCreator.js";
 import { frontManajemenDataKomik} from "./manajemenDataKomik.js";
 import { setupSidebar } from "./header.js";
 import { initTheme, updateThemeButton } from "./theme.js";
@@ -24,6 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "profile":
             frontProfile();
+            break;
+        case "upgrade-creator":
+            frontUpgradeCreator();
+            break;
+        case "pengajuan-creator":
+            frontPengajuanCreator();
             break;
         case "manajemen-data-komik":
             frontManajemenDataKomik();
