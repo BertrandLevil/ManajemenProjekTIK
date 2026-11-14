@@ -17,12 +17,6 @@ export function heroSlide(comic, index) {
                             ? comic.genre.join(", ")
                             : comic.genre
                     }</span>
-                    <span class="hero-rating">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"></path>
-                        </svg>
-                        ${comic.rating}
-                    </span>
                 </p>
 
                 <h1>${comic.title}</h1>
@@ -44,7 +38,13 @@ export function heroSlide(comic, index) {
                 </div>
 
                 <p class="hero-chapter">
-                    Chapter terbaru: ${comic.chapter}
+                    <span>Chapter terbaru: ${comic.chapter}</span>
+                    <span class="hero-rating">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"></path>
+                        </svg>
+                        ${comic.rating}
+                    </span>
                 </p>
             </div>
 

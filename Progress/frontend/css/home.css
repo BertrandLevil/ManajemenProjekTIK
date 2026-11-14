@@ -116,7 +116,7 @@
 }
 
 .hero-genre-list {
-  flex: 1 1 0;
+  flex: 0 1 auto;
   min-width: 0;
   line-height: 1.35;
   letter-spacing: 0.1px;
@@ -204,6 +204,10 @@
 }
 
 .hero-chapter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin: 20px 0 0;
   color: #c3c3d0;
   font-size: 15px;
