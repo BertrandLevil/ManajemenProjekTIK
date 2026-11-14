@@ -73,12 +73,14 @@
 }
 
 .category-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+  gap: 8px;
 }
 
 .category-chip {
+  width: 100%;
+  min-height: 40px;
   padding: 9px 15px;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -102,18 +104,23 @@
 }
 
 .genre-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+  gap: 8px;
 }
 
 .genre-chip {
-  padding: 9px 15px;
+  width: 100%;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
   border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s;

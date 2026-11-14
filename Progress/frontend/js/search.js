@@ -43,7 +43,7 @@ export function setupSearch() {
             const matchesGenre =
                 selectedGenre === "All" ||
                 genres.some(genre =>
-                    genre.toLowerCase() ===
+                    genre.trim().toLowerCase() ===
                     selectedGenre.toLowerCase()
                 );
 
