@@ -1,30 +1,87 @@
 import { header } from "./header.js";
-import { comics, popularComics } from "./data.js";
+import { comics as defaultComics, popularComics } from "./data.js";
 import { comicSection } from "./comicsCard.js";
 import { heroSlide, setupCarousel } from "./carousel.js";
 import { setupSearch } from "./search.js";
+
+function getAllComics() {
+    let savedComics = [];
+
+    try {
+        savedComics = JSON.parse(
+            localStorage.getItem("comicid_creator_comics") || "[]"
+        );
+
+        if (!Array.isArray(savedComics)) {
+            savedComics = [];
+        }
+    } catch (error) {
+        console.error("Gagal membaca komik kreator:", error);
+    }
+
+    const savedMap = new Map(
+        savedComics.map(comic => [Number(comic.id), comic])
+    );
+
+    const allComics = defaultComics.map(comic => {
+        return savedMap.get(Number(comic.id)) || { ...comic };
+    });
+
+    savedComics.forEach(savedComic => {
+        const alreadyExists = allComics.some(
+            comic => Number(comic.id) === Number(savedComic.id)
+        );
+
+        if (!alreadyExists) {
+            allComics.push(savedComic);
+        }
+    });
+
+    return allComics;
+}
 
 export function frontHome() {
     const app = document.getElementById("app");
 
     if (!app) return;
 
+    const allComics = getAllComics();
+
     const Heropopular = popularComics
-        .map(id => comics.find(comic => comic.id === id))
+        .map(id => allComics.find(comic => comic.id === id))
         .filter(Boolean);
 
-    const trending = comics.filter(
+    const trending = allComics.filter(
         comic => comic.isTrending === true
     );
 
-    const popular = [...comics]
+    const popular = [...allComics]
         .filter(comic => comic.isPopular === true)
         .sort((a, b) => Number(b.rating) - Number(a.rating))
         .slice(0, 4);
 
-    const latest = [...comics]
+    const latest = [...allComics]
         .sort((a, b) => Number(b.chapter) - Number(a.chapter))
         .slice(0, 4);
+
+    const email = localStorage.getItem("comicid_logged_in_email");
+    const role = localStorage.getItem("comicid_logged_in_role");
+
+    const creatorId = Number(localStorage.getItem("comicid_user_id"));
+
+    const isCreatorLoggedIn =
+        localStorage.getItem("comicid_logged_in") === "true" &&
+        role === "Kreator" &&
+        email;
+
+    const creatorComics = isCreatorLoggedIn
+        ? allComics.filter(comic =>
+            !defaultComics.some(
+                defaultComic => Number(defaultComic.id) === Number(comic.id)
+            ) &&
+            Number(comic.creatorId) === creatorId
+        )
+        : [];
 
     app.innerHTML = `
         ${header()}
@@ -151,6 +208,16 @@ export function frontHome() {
                 "latest"
             )}
 
+            ${creatorComics.length > 0
+                ? comicSection(
+                    "Komik Kreator",
+                    "KARYA KREATOR COMICID",
+                    creatorComics,
+                    "creator"
+                )
+                : ""
+            }
+
             ${comicSection(
                 "Komik Populer",
                 "YANG PALING BANYAK DIBACA",
@@ -185,5 +252,5 @@ export function frontHome() {
     `;
 
     setupCarousel();
-    setupSearch();
+    setupSearch(allComics);
 }

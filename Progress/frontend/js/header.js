@@ -14,6 +14,8 @@ export function header() {
     const isLoggedIn =
         localStorage.getItem("comicid_logged_in") === "true";
     const currentPage = document.body.dataset.page;
+    const role = localStorage.getItem("comicid_logged_in_role");
+    const isCreator = isLoggedIn && role === "Kreator";
 
     return `
         <header class="site-header">
@@ -62,6 +64,11 @@ export function header() {
                 <a class="nav-link ${currentPage === "home" ? "active" : ""}" href="home.html">Beranda</a>
                 <a class="nav-link" href="trending.html">Trending</a>
                 <a class="nav-link" href="latest.html">Terbaru</a>
+                ${isCreator ? ` <a class="nav-link ${currentPage === "manajemen-data-komik" ? "active" : ""}" href="manajemenDataKomik.html">
+                                    Manajemen Data Komik
+                                </a>
+                            `
+                : ""}
                 <a class="nav-link" href="bookmark.html">Bookmark</a>
                 <a class="nav-link ${currentPage === "premium" ? "active" : ""}" href="premium.html">Upgrade Premium</a>
             </nav>
@@ -99,7 +106,6 @@ export function header() {
         </aside>
     `;
 }
-
 
 export function setupSidebar() {
     const menuToggle = document.getElementById("menu-toggle");
