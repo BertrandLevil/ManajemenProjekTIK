@@ -1,4 +1,4 @@
-import { comics } from "./data.js";
+import { comics as defaultComics  } from "./data.js";
 import { header } from "./header.js";
 import { frontReview } from "./review.js";
 
@@ -11,6 +11,42 @@ const escapeHTML = value =>
         "'": "&#39;"
     })[char]);
 
+function getAllComics() {
+    let savedComics = [];
+
+    try {
+        savedComics = JSON.parse(
+            localStorage.getItem("comicid_creator_comics") || "[]"
+        );
+
+        if (!Array.isArray(savedComics)) {
+            savedComics = [];
+        }
+    } catch (error) {
+        console.error("Gagal membaca komik kreator:", error);
+    }
+
+    const savedMap = new Map(
+        savedComics.map(comic => [Number(comic.id), comic])
+    );
+
+    const allComics = defaultComics.map(comic => {
+        return savedMap.get(Number(comic.id)) || { ...comic };
+    });
+
+    savedComics.forEach(savedComic => {
+        const alreadyExists = allComics.some(
+            comic => Number(comic.id) === Number(savedComic.id)
+        );
+
+        if (!alreadyExists) {
+            allComics.push(savedComic);
+        }
+    });
+
+    return allComics;
+}
+
 export function frontComicDetail() {
     const app = document.getElementById("app");
     if (!app) return;
@@ -18,7 +54,9 @@ export function frontComicDetail() {
     const params = new URLSearchParams(window.location.search);
     const comicId = params.get("id");
 
-    const comic = comics.find(
+    const allComics = getAllComics();
+
+    const comic = allComics.find(
         item => String(item.id) === String(comicId)
     );
 
@@ -33,17 +71,43 @@ export function frontComicDetail() {
         return;
     }
 
-    let currentPage = 1;
+    let localChapters = [];
+
+    try {
+        localChapters = JSON.parse(
+            localStorage.getItem("comicid_creator_chapters") || "[]"
+        );
+
+        if (!Array.isArray(localChapters)) {
+            localChapters = [];
+        }
+    } catch (error) {
+        console.error("Gagal membaca chapter lokal:", error);
+    }
 
     const description = comic.description || comic.desc || "Belum ada deskripsi.";
     const genres = Array.isArray(comic.genre)
         ? comic.genre.join(", ")
         : comic.genre || "-";
 
+    const localComicChapters = localChapters.filter(
+        chapter => Number(chapter.comicId) === Number(comic.id)
+    );
+    
+    const highestLocalChapter = Math.max(
+        0,
+        ...localComicChapters.map(
+            chapter => Number(chapter.number) || 0
+        )
+    );
+    
     const totalChapters = Math.max(
         0,
-        Number.parseInt(comic.chapter ?? comic.episodes ?? 0, 10) || 0
+        Number.parseInt(comic.chapter ?? comic.episodes ?? 0, 10) || 0,
+        highestLocalChapter
     );
+
+    let currentPage = 1;
 
     const chaptersPerPage = 24;
     const totalPages = Math.max(
@@ -151,7 +215,7 @@ export function frontComicDetail() {
 
                         <div class="detail-metadata">
                             <p><strong>Author:</strong> ${escapeHTML(comic.author || "-")}</p>
-                            <p><strong>Studio:</strong> ${escapeHTML(comic.studio.join(", "))}</p>
+                            <p><strong>Studio:</strong> ${escapeHTML(Array.isArray(comic.studio) ? comic.studio.join(", ") : comic.studio || "-")}
                             <p><strong>Kategori:</strong> ${escapeHTML(comic.category || "-")}</p>
                             <p><strong>Genre:</strong> ${escapeHTML(genres)}</p>
                             <p><strong>Status:</strong> ${escapeHTML(comic.status || "-")}</p>

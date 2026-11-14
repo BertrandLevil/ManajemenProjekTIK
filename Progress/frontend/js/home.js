@@ -1,30 +1,89 @@
 import { header } from "./header.js";
-import { comics, popularComics } from "./data.js";
+import { comics as defaultComics, popularComics } from "./data.js";
 import { comicSection } from "./comicsCard.js";
 import { heroSlide, setupCarousel } from "./carousel.js";
 import { setupSearch } from "./search.js";
 
+function getAllComics() {
+    let savedComics = [];
+
+    try {
+        savedComics = JSON.parse(
+            localStorage.getItem("comicid_creator_comics") || "[]"
+        );
+
+        if (!Array.isArray(savedComics)) {
+            savedComics = [];
+        }
+    } catch (error) {
+        console.error("Gagal membaca komik kreator:", error);
+    }
+
+    const savedMap = new Map(
+        savedComics.map(comic => [Number(comic.id), comic])
+    );
+
+    const allComics = defaultComics.map(comic => {
+        return savedMap.get(Number(comic.id)) || { ...comic };
+    });
+
+    savedComics.forEach(savedComic => {
+        const alreadyExists = allComics.some(
+            comic => Number(comic.id) === Number(savedComic.id)
+        );
+
+        if (!alreadyExists) {
+            allComics.push(savedComic);
+        }
+    });
+
+    return allComics;
+}
+
 export function frontHome() {
-  const app = document.getElementById("app");
+    const app = document.getElementById("app");
 
-  if (!app) return;
+    if (!app) return;
 
-  const Heropopular = popularComics
-    .map((id) => comics.find((comic) => comic.id === id))
-    .filter(Boolean);
+    const allComics = getAllComics();
 
-  const trending = comics.filter((comic) => comic.isTrending === true);
+    const Heropopular = popularComics
+        .map(id => allComics.find(comic => comic.id === id))
+        .filter(Boolean);
 
-  const popular = [...comics]
-    .filter((comic) => comic.isPopular === true)
-    .sort((a, b) => Number(b.rating) - Number(a.rating))
-    .slice(0, 4);
+    const trending = allComics.filter(
+        comic => comic.isTrending === true
+    );
 
-  const latest = [...comics]
-    .sort((a, b) => Number(b.chapter) - Number(a.chapter))
-    .slice(0, 4);
+    const popular = [...allComics]
+        .filter(comic => comic.isPopular === true)
+        .sort((a, b) => Number(b.rating) - Number(a.rating))
+        .slice(0, 4);
 
-  app.innerHTML = `
+    const latest = [...allComics]
+        .sort((a, b) => Number(b.chapter) - Number(a.chapter))
+        .slice(0, 4);
+
+    const email = localStorage.getItem("comicid_logged_in_email");
+    const role = localStorage.getItem("comicid_logged_in_role");
+
+    const creatorId = Number(localStorage.getItem("comicid_user_id"));
+
+    const isCreatorLoggedIn =
+        localStorage.getItem("comicid_logged_in") === "true" &&
+        role === "Kreator" &&
+        email;
+
+    const creatorComics = isCreatorLoggedIn
+        ? allComics.filter(comic =>
+            !defaultComics.some(
+                defaultComic => Number(defaultComic.id) === Number(comic.id)
+            ) &&
+            Number(comic.creatorId) === creatorId
+        )
+        : [];
+
+    app.innerHTML = `
         ${header()}
 
         <main class="home-main">
@@ -44,7 +103,7 @@ export function frontHome() {
 
                     <div class="carousel-dots" id="hero-dots">
                         ${Heropopular.map(
-                          (comic, index) => `
+                            (comic, index) => `
                             <button class="carousel-dot ${index === 0 ? "active" : ""}"
                                     data-go-slide="${index}"
                                     aria-label="Banner ${index + 1}">
@@ -85,63 +144,63 @@ export function frontHome() {
             <section class="category-section">
                 <div class="category-list" id="category-list">
                     ${["All", "Komik", "Manga", "Manhwa", "Manhua", "Comic"]
-                      .map(
+                        .map(
                         (category, index) => `
                         <button class="category-chip ${index === 0 ? "active" : ""}"
                                 data-category="${category}">
                             ${category}
                         </button>
                     `,
-                      )
-                      .join("")}
+                        )
+                        .join("")}
                 </div>
             </section>
 
             <section class="genre-section">
                 <div class="genre-list" id="genre-list">
                     ${[
-                      "All",
-                      "Action",
-                      "Fantasy",
-                      "Romance",
-                      "Adventure",
-                      "Sci-Fi",
-                      "Slice of Life",
-                      "Drama",
-                      "Shoujo",
-                      "Shounen",
-                      "Seinin",
-                      "Kingdom",
-                      "Tragedy",
-                      "Thriller",
-                      "Comedy",
-                      "Historical",
-                      "Horror",
-                      "Martial Arts",
-                      "Mature",
-                      "Mystery",
-                      "Murim",
-                      "Violence",
-                      "Xianxia",
-                      "Wuxia",
-                      "Xuanhuan",
-                      "Cultivation",
-                      "Harem",
-                      "Reverse Harem",
-                      "Reincarnation",
-                      "Transmigration",
-                      "Regression",
-                      "Supernatural",
+                        "All",
+                        "Action",
+                        "Fantasy",
+                        "Romance",
+                        "Adventure",
+                        "Sci-Fi",
+                        "Slice of Life",
+                        "Drama",
+                        "Shoujo",
+                        "Shounen",
+                        "Seinin",
+                        "Kingdom",
+                        "Tragedy",
+                        "Thriller",
+                        "Comedy",
+                        "Historical",
+                        "Horror",
+                        "Martial Arts",
+                        "Mature",
+                        "Mystery",
+                        "Murim",
+                        "Violence",
+                        "Xianxia",
+                        "Wuxia",
+                        "Xuanhuan",
+                        "Cultivation",
+                        "Harem",
+                        "Reverse Harem",
+                        "Reincarnation",
+                        "Transmigration",
+                        "Regression",
+                        "Supernatural",
                     ]
-                      .map(
+                        .map(
                         (genre, index) => `
                         <button class="genre-chip ${index === 0 ? "active" : ""}"
                                 data-genre="${genre}">
                             ${genre}
                         </button>
                     `,
-                      )
-                      .join("")}
+                        )
+                        .join("")}
                 </div>
             </section>
 
@@ -150,24 +209,34 @@ export function frontHome() {
                 hidden></div>
 
             ${comicSection(
-              "Trending sekarang",
-              "PALING DIBICARAKAN",
-              trending,
-              "trending",
+                "Trending sekarang",
+                "PALING DIBICARAKAN",
+                trending,
+                "trending",
             )}
 
             ${comicSection(
-              "Update terbaru",
-              "JANGAN LEWATKAN",
-              latest,
-              "latest",
+                "Update terbaru",
+                "JANGAN LEWATKAN",
+                latest,
+                "latest",
             )}
 
+            ${creatorComics.length > 0
+                ? comicSection(
+                    "Komik Kreator",
+                    "KARYA KREATOR COMICID",
+                    creatorComics,
+                    "creator"
+                )
+                : ""
+            }
+
             ${comicSection(
-              "Komik Populer",
-              "YANG PALING BANYAK DIBACA",
-              popular,
-              "popular",
+                "Komik Populer",
+                "YANG PALING BANYAK DIBACA",
+                popular,
+                "popular",
             )}
 
             <section class="bottom-cta">
@@ -196,6 +265,6 @@ export function frontHome() {
         </footer>
     `;
 
-  setupCarousel();
-  setupSearch();
+    setupCarousel();
+    setupSearch(allComics);
 }

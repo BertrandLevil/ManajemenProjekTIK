@@ -1,6 +1,42 @@
-import { comics } from "./data.js";
+import { comics as defaultComics } from "./data.js";
 import { header } from "./header.js";
 import { frontReview } from "./review.js";
+
+function getAllComics() {
+    let savedComics = [];
+
+    try {
+        savedComics = JSON.parse(
+            localStorage.getItem("comicid_creator_comics") || "[]"
+        );
+
+        if (!Array.isArray(savedComics)) {
+            savedComics = [];
+        }
+    } catch (error) {
+        console.error("Gagal membaca komik kreator:", error);
+    }
+
+    const savedMap = new Map(
+        savedComics.map(comic => [Number(comic.id), comic])
+    );
+
+    const allComics = defaultComics.map(comic => {
+        return savedMap.get(Number(comic.id)) || { ...comic };
+    });
+
+    savedComics.forEach(savedComic => {
+        const alreadyExists = allComics.some(
+            comic => Number(comic.id) === Number(savedComic.id)
+        );
+
+        if (!alreadyExists) {
+            allComics.push(savedComic);
+        }
+    });
+
+    return allComics;
+}
 
 export async function frontReader() {
     const app = document.getElementById("app");
@@ -10,54 +46,95 @@ export async function frontReader() {
     const comicId = Number(params.get("id"));
     const chapterNumber = Number(params.get("ep"));
 
-    const comic = comics.find(item => item.id === comicId);
+    const allComics = getAllComics();
+
+    const comic = allComics.find(
+        item => Number(item.id) === comicId
+    );
 
     if (!comic || !Number.isInteger(chapterNumber) || chapterNumber < 1) {
-        showError(app, "Chapter tidak ditemukan.");
+        showError(app, "Komik atau nomor chapter tidak valid.");
         return;
     }
 
     try {
-        // Ambil daftar chapter dari backend Go.
-        const response = await fetch(
-            `/api/chapters?comic_id=${comicId}`
+        const localChapters = getLocalChapters();
+
+        const localComicChapters = localChapters.filter(
+            chapter => Number(chapter.comicId) === comicId
         );
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (!result.success || !Array.isArray(result.data)) {
-            throw new Error("Format data chapter tidak valid.");
-        }
-
-        const chapters = result.data.sort(
-            (a, b) =>
-                Number(a.chapter_number) - Number(b.chapter_number)
+        const localChapter = localComicChapters.find(
+            chapter => Number(chapter.number) === chapterNumber
         );
 
-        const totalChapters = Number(comic.chapter);
+        let backendChapters = [];
+        let currentChapter = null;
+        let chapterSource = null;
 
-        if (
-            !Number.isInteger(chapterNumber) ||
-            chapterNumber < 1 ||
-            chapterNumber > totalChapters
-        ) {
-            showError(app, "Chapter tidak ditemukan.");
+        if (localChapter) {
+            currentChapter = localChapter;
+            chapterSource = "local";
+        } else {
+            try {
+                const response = await fetch(
+                    `/api/chapters?comic_id=${comicId}`
+                );
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    if (result.success && Array.isArray(result.data)) {
+                        backendChapters = result.data;
+
+                        currentChapter = backendChapters.find(
+                            chapter =>
+                                Number(chapter.chapter_number) === chapterNumber
+                        );
+
+                        if (currentChapter) {
+                            chapterSource = "backend";
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Chapter backend tidak dapat diakses:", error);
+            }
+        }
+
+        const highestLocalChapter = Math.max(
+            0,
+            ...localComicChapters.map(
+                chapter => Number(chapter.number) || 0
+            )
+        );
+
+        const highestBackendChapter = Math.max(
+            0,
+            ...backendChapters.map(
+                chapter => Number(chapter.chapter_number) || 0
+            )
+        );
+
+        const totalChapters = Math.max(
+            Number(comic.chapter) || 0,
+            Number(comic.episodes) || 0,
+            highestLocalChapter,
+            highestBackendChapter
+        );
+
+        if (chapterNumber > totalChapters) {
+            showError(app, "Nomor chapter tidak tersedia.");
             return;
         }
 
-        // Cari chapter berdasarkan nomor chapter.
-        const currentChapter = chapters.find(
-            item => Number(item.chapter_number) === chapterNumber
-        );
+        const previousChapter = chapterNumber > 1
+            ? { chapter_number: chapterNumber - 1 }
+            : null;
 
-        // Ambil ID chapter dari database.
-        const chapterId = currentChapter ? Number(currentChapter.id) : null;
-        const previousChapter = chapterNumber > 1 ? { chapter_number: chapterNumber - 1 } : null;
-        const nextChapter = chapterNumber < totalChapters ? { chapter_number: chapterNumber + 1 } : null;
+        const nextChapter = chapterNumber < totalChapters
+            ? { chapter_number: chapterNumber + 1 }
+            : null;
 
         app.innerHTML = `
             ${header()}
@@ -106,25 +183,161 @@ export async function frontReader() {
         frontReview(comic, chapterNumber);
         updateThemeButtonIfAvailable();
 
-        if (chapterId !== null && chapterId > 0) {
-            await renderChapterImages(chapterId);
-        } else {
-            document.getElementById("reader-pdf-content").innerHTML = `
+        const readerContent = document.getElementById(
+            "reader-pdf-content"
+        );
+
+        if (!currentChapter) {
+            readerContent.innerHTML = `
                 <div class="reader-loading">
-                    <h2>Chapter ${chapterNumber} belum tersedia.</h2>
-                    <p>Silakan kembali lagi nanti.</p>
+                    <h2>Chapter ${chapterNumber} belum memiliki konten.</h2>
+                    <p>Halaman chapter belum tersedia.</p>
                 </div>
             `;
+            return;
+        }
+
+        if (chapterSource === "local") {
+            await renderLocalChapterImages(currentChapter);
+        } else if (chapterSource === "backend") {
+            const chapterId = Number(currentChapter.id);
+
+            if (chapterId > 0) {
+                await renderChapterImages(chapterId);
+            } else {
+                readerContent.innerHTML = `
+                    <div class="reader-loading">
+                        <h2>Chapter belum memiliki halaman.</h2>
+                    </div>
+                `;
+            }
         }
 
     } catch (error) {
         console.error("Reader error:", error);
-        showError(app, "Gagal memuat chapter. Periksa koneksi backend.");
+        showError(
+            app,
+            "Gagal memuat chapter. Periksa data chapter dan penyimpanan gambar."
+        );
+    }
+}
+
+function getLocalChapters() {
+    try {
+        const data = localStorage.getItem("comicid_creator_chapters");
+        const chapters = JSON.parse(data || "[]");
+
+        return Array.isArray(chapters) ? chapters : [];
+
+    } catch (error) {
+        console.error("Gagal membaca chapter lokal:", error);
+        return [];
     }
 }
 
 
-// Membuat tombol navigasi chapter.
+const DB_NAME = "ComicIDDB";
+const DB_VERSION = 1;
+const STORE_NAME = "chapter_pages";
+
+function openChapterDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+async function getChapterImage(imageId) {
+    const db = await openChapterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get(imageId);
+
+        request.onsuccess = () => {
+            db.close();
+            resolve(request.result);
+        };
+
+        request.onerror = () => {
+            db.close();
+            reject(request.error);
+        };
+    });
+}
+
+async function renderLocalChapterImages(chapter) {
+    const container = document.getElementById("reader-pdf-content");
+
+    if (!container) return;
+
+    if (!Array.isArray(chapter.pages) || chapter.pages.length === 0) {
+        container.innerHTML = `
+            <div class="reader-loading">
+                <h2>Chapter belum memiliki halaman.</h2>
+            </div>
+        `;
+        return;
+    }
+
+    const pages = [...chapter.pages].sort(
+        (a, b) => Number(a.pageNumber) - Number(b.pageNumber)
+    );
+
+    container.innerHTML = "";
+
+    for (const page of pages) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "reader-image-page-wrap";
+
+        try {
+            const imageData = await getChapterImage(page.imageId);
+
+            if (!imageData || !imageData.blob) {
+                throw new Error(`Gambar ${page.name} tidak ditemukan di IndexedDB.`);
+            }
+
+            const imageUrl = URL.createObjectURL(imageData.blob);
+
+            const image = document.createElement("img");
+            image.className = "reader-image-page";
+            image.src = imageUrl;
+            image.alt = `Halaman ${page.pageNumber}`;
+            image.loading = "lazy";
+            image.decoding = "async";
+
+            image.onerror = () => {
+                URL.revokeObjectURL(imageUrl);
+                wrapper.innerHTML = `
+                    <p class="reader-error">
+                        Gambar halaman ${page.pageNumber} gagal dimuat.
+                    </p>
+                `;
+            };
+
+            wrapper.appendChild(image);
+
+        } catch (error) {
+            console.error("Gagal memuat gambar lokal:", error);
+
+            wrapper.innerHTML = `
+                <p class="reader-error">
+                    Gambar halaman ${page.pageNumber} tidak dapat ditemukan.
+                </p>
+            `;
+        }
+        container.appendChild(wrapper);
+    }
+}
+
 function createNavigation(comicId, previous, next) {
     return `
         <nav class="reader-navigation">
@@ -156,7 +369,6 @@ function createNavigation(comicId, previous, next) {
     `;
 }
 
-// Mengambil dan menampilkan gambar dari API.
 async function renderChapterImages(chapterId) {
     const container = document.getElementById("reader-pdf-content");
 
@@ -176,7 +388,6 @@ async function renderChapterImages(chapterId) {
         throw new Error("Format data halaman tidak valid.");
     }
 
-    // Urutkan berdasarkan nomor halaman.
     const pages = result.data.sort(
         (a, b) => Number(a.page_number) - Number(b.page_number)
     );
@@ -193,7 +404,7 @@ async function renderChapterImages(chapterId) {
 
     container.innerHTML = "";
 
-    pages.forEach((page, index) => {
+    pages.forEach((page) => {
         const imageUrl = normalizeImageUrl(page.file_path);
 
         const wrapper = document.createElement("div");
@@ -219,8 +430,6 @@ async function renderChapterImages(chapterId) {
     });
 }
 
-
-// Mengubah file_path database menjadi URL gambar.
 function normalizeImageUrl(filePath) {
     if (!filePath) {
         throw new Error("File path gambar kosong.");
@@ -228,29 +437,24 @@ function normalizeImageUrl(filePath) {
 
     let path = String(filePath).replace(/\\/g, "/");
 
-    // Jika sudah berupa URL lengkap.
     if (/^https?:\/\//i.test(path)) {
         return path;
     }
 
-    // Jika path sudah dimulai dengan /storage/.
     if (path.startsWith("/storage/")) {
         return encodeURI(path);
     }
 
-    // Jika path dimulai dengan storage/.
     if (path.startsWith("storage/")) {
         path = path.substring("storage/".length);
     }
 
-    // Jika path masih berupa path fisik Windows.
     const storageIndex = path.lastIndexOf("/storage/");
 
     if (storageIndex !== -1) {
         path = path.substring(storageIndex + "/storage/".length);
     }
 
-    // Jika path masih berupa comics/...
     path = path.replace(/^\/+/, "");
 
     return "/storage/" +

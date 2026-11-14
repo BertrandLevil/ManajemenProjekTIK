@@ -2,6 +2,7 @@ import { frontHome } from "./home.js";
 import { frontRegister } from "./register.js";
 import { frontLogin } from "./login.js";
 import { frontProfile } from "./profile.js";
+import { frontManajemenDataKomik} from "./manajemenDataKomik.js";
 import { setupSidebar } from "./header.js";
 import { initTheme, updateThemeButton } from "./theme.js";
 import { frontComicDetail } from "./comic.js";
@@ -24,14 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
         case "profile":
             frontProfile();
             break;
+        case "manajemen-data-komik":
+            frontManajemenDataKomik();
+            break;
         case "premium":
             frontPremium();
             break;
-        // case "comics":
-        //     if (typeof frontComics === "function") {
-        //         frontComics();
-        //     }
-        //     break;
         case "comic-detail":
         console.log("Halaman comic-detail terdeteksi");
         

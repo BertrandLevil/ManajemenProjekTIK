@@ -1,7 +1,6 @@
-import { comics } from "./data.js";
 import { comicCard } from "./comicsCard.js";
 
-export function setupSearch() {
+export function setupSearch(allComics) {
     const searchInput = document.getElementById("comic-search");
     const results = document.getElementById("search-results");
     const categoryButtons = document.querySelectorAll(".category-chip");
@@ -15,7 +14,7 @@ export function setupSearch() {
     function filterComics() {
         const query = searchInput.value.trim().toLowerCase();
 
-        const filtered = comics.filter(comic => {
+        const filtered = allComics.filter(comic => {
             const category = comic.category || "";
 
             const genres = Array.isArray(comic.genre)

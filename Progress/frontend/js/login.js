@@ -115,7 +115,6 @@ export function frontLogin() {
       return;
     }
 
-    // Jika memasukkan format email, validasi polanya. Jika username, minimal 3 karakter.
     if (email.includes("@")) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showMessage("Format email tidak valid.");
