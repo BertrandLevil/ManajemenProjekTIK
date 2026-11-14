@@ -34,22 +34,29 @@
   background: var(--input-bg);
 }
 
-.search-box > span {
+.search-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
   color: var(--accent);
-  font-size: 24px;
-  transform: translateX(3px);
-  transform: translateY(-5px);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
 }
 
 .search-box input {
   width: 100%;
   min-width: 0;
+  height: 20px;
+  padding: 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--text);
   font-size: 13px;
-  transform: translateY(-2px);
+  line-height: 20px;
 }
 
 .search-box input::placeholder {

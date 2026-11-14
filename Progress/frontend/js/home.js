@@ -62,7 +62,10 @@ export function frontHome() {
                 </div>
 
                 <label class="search-box">
-                    <span>⌕</span>
+                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.3"></circle>
+                        <path d="m15.5 15.5 4.2 4.2"></path>
+                    </svg>
                     <input id="comic-search"
                         type="search"
                         placeholder="Cari judul atau genre komik"
