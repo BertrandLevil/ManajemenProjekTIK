@@ -85,4 +85,7 @@ export function setupCarousel() {
     });
 
     showSlide(0);
+    window.setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, 5000);
 }
