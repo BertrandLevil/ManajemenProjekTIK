@@ -42,7 +42,7 @@ export function setupSearch(allComics) {
             const matchesGenre =
                 selectedGenre === "All" ||
                 genres.some(genre =>
-                    genre.toLowerCase() ===
+                    genre.trim().toLowerCase() ===
                     selectedGenre.toLowerCase()
                 );
 

@@ -70,10 +70,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 7px 11px;
+  border: 1px solid #a78bfa45;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #a78bfa24, #ffffff08);
   color: #d6c9ff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 22px #8b5cf61a;
 }
 
 .hero-label-dot {
@@ -85,17 +90,56 @@
 }
 
 .hero-category {
-  margin: 22px 0 10px;
-  color: #d6c9ff;
-  font-size: 18px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid #a78bfa45;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #a78bfa24, #ffffff08);
+  color: #e4d9ff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
 }
 
 .hero-genre {
-  margin: 22px 0 10px;
-  color: #d6c9ff;
-  font-size: 13px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 10px;
+  color: #c8c3d8;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.hero-genre-list {
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+}
+
+.hero-rating {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border: 1px solid #facc1540;
+  border-radius: 10px;
+  background: #facc1514;
+  color: #facc15;
+  font-weight: 800;
+}
+
+.hero-rating svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
 }
 
 .hero-content h1 {
@@ -160,9 +204,13 @@
 }
 
 .hero-chapter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin: 20px 0 0;
   color: #c3c3d0;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .hero-art {
@@ -268,17 +316,23 @@
   height: 34px;
   display: grid;
   place-items: center;
+  padding: 0;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: var(--surface);
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  -webkit-text-stroke: 1.2px currentColor;
+  color: var(--text);
 }
 
-.carousel-arrow span {
-  transform: translateY(-1px);
+.carousel-arrow svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .carousel-arrow:hover {
