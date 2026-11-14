@@ -5,28 +5,26 @@ import { heroSlide, setupCarousel } from "./carousel.js";
 import { setupSearch } from "./search.js";
 
 export function frontHome() {
-    const app = document.getElementById("app");
+  const app = document.getElementById("app");
 
-    if (!app) return;
+  if (!app) return;
 
-    const Heropopular = popularComics
-        .map(id => comics.find(comic => comic.id === id))
-        .filter(Boolean);
+  const Heropopular = popularComics
+    .map((id) => comics.find((comic) => comic.id === id))
+    .filter(Boolean);
 
-    const trending = comics.filter(
-        comic => comic.isTrending === true
-    );
+  const trending = comics.filter((comic) => comic.isTrending === true);
 
-    const popular = [...comics]
-        .filter(comic => comic.isPopular === true)
-        .sort((a, b) => Number(b.rating) - Number(a.rating))
-        .slice(0, 4);
+  const popular = [...comics]
+    .filter((comic) => comic.isPopular === true)
+    .sort((a, b) => Number(b.rating) - Number(a.rating))
+    .slice(0, 4);
 
-    const latest = [...comics]
-        .sort((a, b) => Number(b.chapter) - Number(a.chapter))
-        .slice(0, 4);
+  const latest = [...comics]
+    .sort((a, b) => Number(b.chapter) - Number(a.chapter))
+    .slice(0, 4);
 
-    app.innerHTML = `
+  app.innerHTML = `
         ${header()}
 
         <main class="home-main">
@@ -38,20 +36,22 @@ export function frontHome() {
                 <div class="hero-controls">
                     <button class="carousel-arrow"
                             id="hero-prev"
-                            aria-label="Banner sebelumnya">←</button>
+                            aria-label="Banner sebelumnya"><span>←</span></button>
 
                     <div class="carousel-dots" id="hero-dots">
-                        ${Heropopular.map((comic, index) => `
+                        ${Heropopular.map(
+                          (comic, index) => `
                             <button class="carousel-dot ${index === 0 ? "active" : ""}"
                                     data-go-slide="${index}"
                                     aria-label="Banner ${index + 1}">
                             </button>
-                        `).join("")}
+                        `,
+                        ).join("")}
                     </div>
 
                     <button class="carousel-arrow"
                             id="hero-next"
-                            aria-label="Banner berikutnya">→</button>
+                            aria-label="Banner berikutnya"><span>→</span></button>
                 </div>
             </section>
 
@@ -65,71 +65,72 @@ export function frontHome() {
                     <span>⌕</span>
                     <input id="comic-search"
                         type="search"
-                        placeholder="Cari judul atau genre komik..."
+                        placeholder="Cari judul atau genre komik"
                         autocomplete="off">
                     <kbd>⌕</kbd>
                 </label>
             </section>
 
-            <section class="cateogory-section">
+            <section class="category-section">
                 <div class="category-list" id="category-list">
-                    ${[
-                        "All",
-                        "Komik",
-                        "Manga",
-                        "Manhwa",
-                        "Manhua",
-                        "Comic"
-                    ].map((category, index) => `
+                    ${["All", "Komik", "Manga", "Manhwa", "Manhua", "Comic"]
+                      .map(
+                        (category, index) => `
                         <button class="category-chip ${index === 0 ? "active" : ""}"
                                 data-category="${category}">
                             ${category}
                         </button>
-                    `).join("")}
+                    `,
+                      )
+                      .join("")}
                 </div>
             </section>
 
             <section class="genre-section">
                 <div class="genre-list" id="genre-list">
                     ${[
-                        "All",
-                        "Action",
-                        "Fantasy",
-                        "Romance",
-                        "Adventure",
-                        "Sci-Fi",
-                        "Slice of Life",
-                        "Drama",
-                        "Shoujo",
-                        "Shounen",
-                        "Seinin",
-                        "Kingdom",
-                        "Tragedy",
-                        "Thriller",
-                        "Comedy",
-                        "Historical",
-                        "Horror",
-                        "Martial Arts",
-                        "Mature",
-                        "Mystery",
-                        "Murim",
-                        "Violence",
-                        "Xianxia",
-                        "Wuxia",
-                        "Xuanhuan",
-                        "Cultivation",
-                        "Harem",
-                        "Reverse Harem",
-                        "Reincarnation",
-                        "Transmigration",
-                        "Regression",
-                        "Supernatural"
-                    ].map((genre, index) => `
+                      "All",
+                      "Action",
+                      "Fantasy",
+                      "Romance",
+                      "Adventure",
+                      "Sci-Fi",
+                      "Slice of Life",
+                      "Drama",
+                      "Shoujo",
+                      "Shounen",
+                      "Seinin",
+                      "Kingdom",
+                      "Tragedy",
+                      "Thriller",
+                      "Comedy",
+                      "Historical",
+                      "Horror",
+                      "Martial Arts",
+                      "Mature",
+                      "Mystery",
+                      "Murim",
+                      "Violence",
+                      "Xianxia",
+                      "Wuxia",
+                      "Xuanhuan",
+                      "Cultivation",
+                      "Harem",
+                      "Reverse Harem",
+                      "Reincarnation",
+                      "Transmigration",
+                      "Regression",
+                      "Supernatural",
+                    ]
+                      .map(
+                        (genre, index) => `
                         <button class="genre-chip ${index === 0 ? "active" : ""}"
                                 data-genre="${genre}">
                             ${genre}
                         </button>
-                    `).join("")}
+                    `,
+                      )
+                      .join("")}
                 </div>
             </section>
 
@@ -138,24 +139,24 @@ export function frontHome() {
                 hidden></div>
 
             ${comicSection(
-                "Trending sekarang",
-                "PALING DIBICARAKAN",
-                trending,
-                "trending"
+              "Trending sekarang",
+              "PALING DIBICARAKAN",
+              trending,
+              "trending",
             )}
 
             ${comicSection(
-                "Update terbaru",
-                "JANGAN LEWATKAN",
-                latest,
-                "latest"
+              "Update terbaru",
+              "JANGAN LEWATKAN",
+              latest,
+              "latest",
             )}
 
             ${comicSection(
-                "Komik Populer",
-                "YANG PALING BANYAK DIBACA",
-                popular,
-                "popular"
+              "Komik Populer",
+              "YANG PALING BANYAK DIBACA",
+              popular,
+              "popular",
             )}
 
             <section class="bottom-cta">
@@ -184,6 +185,6 @@ export function frontHome() {
         </footer>
     `;
 
-    setupCarousel();
-    setupSearch();
+  setupCarousel();
+  setupSearch();
 }
