@@ -15,7 +15,7 @@ var emailRegex = regexp.MustCompile(`^[^\s@]+@[^\s@]+\.[^\s@]+$`)
 
 func setCORSHeaders(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
@@ -32,7 +32,9 @@ func sendJSONError(w http.ResponseWriter, statusCode int, message string) {
 	})
 }
 
-func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
+func LoginHttpHandler(controller interface {
+	LoginWithQuery(string, string) (UserInterface, error)
+}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 
@@ -106,7 +108,9 @@ func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
 	}
 }
 
-func RegisterHttpHandler(controller *LoginController) http.HandlerFunc {
+func RegisterHttpHandler(controller interface {
+	RegisterWithQuery(string, string, string, string) (bool, error)
+}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 

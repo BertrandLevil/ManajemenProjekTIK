@@ -115,3 +115,33 @@ func TestFeatureHandlersValidation(t *testing.T) {
 		t.Errorf("Expected 400 for profile without email or id, got %d", recProf.Code)
 	}
 }
+
+func TestSequenceHandlerValidation(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/api/admin/analysis?start_date=bad-date", nil)
+	rec := httptest.NewRecorder()
+	AnalysisHttpHandler()(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 for invalid report date, got %d", rec.Code)
+	}
+
+	reqMethod := httptest.NewRequest(http.MethodGet, "/api/logout", nil)
+	recMethod := httptest.NewRecorder()
+	LogoutHttpHandler()(recMethod, reqMethod)
+	if recMethod.Code != http.StatusMethodNotAllowed {
+		t.Errorf("Expected 405 for GET logout, got %d", recMethod.Code)
+	}
+
+	reqLogout := httptest.NewRequest(http.MethodPost, "/api/logout", nil)
+	recLogout := httptest.NewRecorder()
+	LogoutHttpHandler()(recLogout, reqLogout)
+	if recLogout.Code != http.StatusOK {
+		t.Errorf("Expected 200 for POST logout, got %d", recLogout.Code)
+	}
+
+	reqRecommendations := httptest.NewRequest(http.MethodPost, "/api/recommendations", nil)
+	recRecommendations := httptest.NewRecorder()
+	RecommendationsHttpHandler()(recRecommendations, reqRecommendations)
+	if recRecommendations.Code != http.StatusMethodNotAllowed {
+		t.Errorf("Expected 405 for POST recommendations, got %d", recRecommendations.Code)
+	}
+}

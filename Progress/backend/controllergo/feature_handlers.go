@@ -366,7 +366,7 @@ func ComicsStatsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 	}
 }
 
-func ReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
+func ReviewsHttpHandler(ctrl *KomentarController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -406,7 +406,7 @@ func ReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	}
 }
 
-func ReviewsDetailHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
+func ReviewsDetailHttpHandler(ctrl *KomentarController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -434,7 +434,7 @@ func ReviewsDetailHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
 	}
 }
 
-func AuthorReviewsHttpHandler(ctrl *KomentarRatingController) http.HandlerFunc {
+func AuthorReviewsHttpHandler(ctrl *KomentarController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -554,7 +554,7 @@ func HistoryHttpHandler(ctrl *BookmarkHistoriController) http.HandlerFunc {
 	}
 }
 
-func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+func PaymentCheckoutHttpHandler(ctrl *ProsesPembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -607,7 +607,7 @@ func PaymentCheckoutHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	}
 }
 
-func PaymentProcessHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+func PaymentProcessHttpHandler(ctrl *ProsesPembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -643,7 +643,7 @@ func PaymentProcessHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	}
 }
 
-func UserTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+func UserTransactionsHttpHandler(ctrl *ProsesPembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {
@@ -667,7 +667,7 @@ func UserTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
 	}
 }
 
-func AdminTransactionsHttpHandler(ctrl *PembayaranController) http.HandlerFunc {
+func AdminTransactionsHttpHandler(ctrl *ProsesPembayaranController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 		if r.Method == http.MethodOptions {

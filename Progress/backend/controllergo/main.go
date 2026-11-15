@@ -37,14 +37,15 @@ func resolveFrontendDir() string {
 
 func main() {
 	port := 8080
-	loginCtrl := NewLoginController()
+	registerCtrl := NewRegisterController()
 	userCtrl := NewUserController()
+	analysisCtrl := NewAnalisisController()
 	komikCtrl := NewKomikController()
 	babCtrl := NewBabController()
 	kategoriCtrl := NewKategoriController()
-	reviewCtrl := NewKomentarRatingController()
+	reviewCtrl := NewKomentarController()
 	bookmarkCtrl := NewBookmarkHistoriController()
-	pembayaranCtrl := NewPembayaranController()
+	pembayaranCtrl := NewProsesPembayaranController()
 
 	frontendDir := resolveFrontendDir()
 	mux := http.NewServeMux()
@@ -64,9 +65,12 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("/api/login", LoginHttpHandler(loginCtrl))
-	mux.HandleFunc("/api/register", RegisterHttpHandler(loginCtrl))
+	mux.HandleFunc("/api/login", LoginHttpHandler(userCtrl))
+	mux.HandleFunc("/api/register", RegisterHttpHandler(registerCtrl))
 	mux.HandleFunc("/api/health", HealthHttpHandler())
+	mux.HandleFunc("/api/logout", userCtrl.LogoutHandler())
+	mux.HandleFunc("/api/admin/analysis", analysisCtrl.Handler())
+	mux.HandleFunc("/api/recommendations", RecommendationsHttpHandler())
 
 	mux.HandleFunc("/api/user/profile", UserProfileHttpHandler(userCtrl))
 	mux.HandleFunc("/api/admin/users", AdminUsersHttpHandler(userCtrl))

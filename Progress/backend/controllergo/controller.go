@@ -8,13 +8,14 @@ import (
 
 var ErrInvalidPassword = errors.New("Password salah.")
 
-type LoginController struct{}
+type RegisterController struct{}
 
-func NewLoginController() *LoginController {
-	return &LoginController{}
+func NewRegisterController() *RegisterController {
+	return &RegisterController{}
 }
 
-func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) (UserInterface, error) {
+// LoginWithQuery belongs to UserController in the sequence diagram.
+func (c *UserController) LoginWithQuery(emailOrUsername, passwordInput string) (UserInterface, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (c *LoginController) LoginWithQuery(emailOrUsername, passwordInput string) 
 	return loggedInUser, nil
 }
 
-func (c *LoginController) RegisterWithQuery(username, email, password, role string) (bool, error) {
+func (c *RegisterController) RegisterWithQuery(username, email, password, role string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
@@ -116,4 +117,15 @@ func (c *LoginController) RegisterWithQuery(username, email, password, role stri
 	}
 
 	return affected > 0, nil
+}
+
+// LoginController is retained as a compatibility facade for older callers.
+// The application itself wires RegisterController and UserController separately.
+type LoginController struct {
+	*UserController
+	*RegisterController
+}
+
+func NewLoginController() *LoginController {
+	return &LoginController{UserController: NewUserController(), RegisterController: NewRegisterController()}
 }

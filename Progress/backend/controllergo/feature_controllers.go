@@ -568,13 +568,18 @@ func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{},
 	}, nil
 }
 
-type KomentarRatingController struct{}
+type KomentarController struct{}
 
-func NewKomentarRatingController() *KomentarRatingController {
-	return &KomentarRatingController{}
+func NewKomentarController() *KomentarController {
+	return &KomentarController{}
 }
 
-func (c *KomentarRatingController) GetReviewsByComic(comicId int, sort string) ([]ReviewDTO, error) {
+// Compatibility alias for code written before the SRS naming alignment.
+type KomentarRatingController = KomentarController
+
+func NewKomentarRatingController() *KomentarController { return NewKomentarController() }
+
+func (c *KomentarController) GetReviewsByComic(comicId int, sort string) ([]ReviewDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -612,7 +617,7 @@ func (c *KomentarRatingController) GetReviewsByComic(comicId int, sort string) (
 	return list, nil
 }
 
-func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, error) {
+func (c *KomentarController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -643,7 +648,7 @@ func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewD
 	return list, nil
 }
 
-func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string, rating float64) (bool, error) {
+func (c *KomentarController) AddReview(idPengguna, idKomik int, isi string, rating float64) (bool, error) {
 	if idPengguna <= 0 || idKomik <= 0 {
 		return false, errors.New("idPengguna dan idKomik harus lebih dari 0.")
 	}
@@ -669,7 +674,7 @@ func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string
 	return true, nil
 }
 
-func (c *KomentarRatingController) DeleteReview(idUlasan, idPengguna int, role string) (bool, error) {
+func (c *KomentarController) DeleteReview(idUlasan, idPengguna int, role string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
@@ -810,13 +815,18 @@ func (c *BookmarkHistoriController) DeleteHistori(idHistori, userId int) (bool, 
 	return ra > 0, nil
 }
 
-type PembayaranController struct{}
+type ProsesPembayaranController struct{}
 
-func NewPembayaranController() *PembayaranController {
-	return &PembayaranController{}
+func NewProsesPembayaranController() *ProsesPembayaranController {
+	return &ProsesPembayaranController{}
 }
 
-func (c *PembayaranController) GetUserIdByEmail(email string) (int, error) {
+// Compatibility alias; the SRS participant is ProsesPembayaranController.
+type PembayaranController = ProsesPembayaranController
+
+func NewPembayaranController() *ProsesPembayaranController { return NewProsesPembayaranController() }
+
+func (c *ProsesPembayaranController) GetUserIdByEmail(email string) (int, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return 0, err
@@ -829,7 +839,7 @@ func (c *PembayaranController) GetUserIdByEmail(email string) (int, error) {
 	return id, nil
 }
 
-func (c *PembayaranController) Checkout(userId int, method string, amount float64) (int, error) {
+func (c *ProsesPembayaranController) Checkout(userId int, method string, amount float64) (int, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return 0, err
@@ -844,7 +854,7 @@ func (c *PembayaranController) Checkout(userId int, method string, amount float6
 	return int(id), err
 }
 
-func (c *PembayaranController) ProcessPayment(txId int, status string) (bool, error) {
+func (c *ProsesPembayaranController) ProcessPayment(txId int, status string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
@@ -872,7 +882,7 @@ func (c *PembayaranController) ProcessPayment(txId int, status string) (bool, er
 	return true, nil
 }
 
-func (c *PembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, error) {
+func (c *ProsesPembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -902,7 +912,7 @@ func (c *PembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, 
 	return list, nil
 }
 
-func (c *PembayaranController) GetAllTransactions() ([]TransaksiDTO, error) {
+func (c *ProsesPembayaranController) GetAllTransactions() ([]TransaksiDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
