@@ -6,14 +6,52 @@
 }
 
 .trending-heading {
-    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.trending-heading-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: white;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.trending-heading-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.trending-heading-copy {
+    min-width: 0;
 }
 
 .trending-heading h1 {
     margin: 0;
     color: var(--text);
-    font-size: clamp(28px, 4vw, 36px);
+    font-size: clamp(27px, 3vw, 32px);
     font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+}
+
+.trending-description {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 .trending-rank-badge {

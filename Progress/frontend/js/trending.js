@@ -18,8 +18,18 @@ export function frontTrending() {
         <main class="trending-main">
             <section aria-labelledby="trending-title">
                 <div class="trending-heading">
-                    <p class="section-eyebrow">PALING DIBICARAKAN</p>
-                    <h1 id="trending-title">Trending</h1>
+                    <span class="trending-heading-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 17 9 11l4 4 8-9"></path>
+                            <path d="M15 6h6v6"></path>
+                        </svg>
+                    </span>
+                    <div class="trending-heading-copy">
+                        <h1 id="trending-title">Trending</h1>
+                        <p class="trending-description">
+                            Pilihan komik yang sedang ramai dibicarakan.
+                        </p>
+                    </div>
                 </div>
                 ${trendingComics.length
                     ? `<div class="comic-grid">${trendingComics
