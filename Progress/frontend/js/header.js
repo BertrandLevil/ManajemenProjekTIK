@@ -90,14 +90,15 @@ export function header() {
                     >
                         Pengajuan Creator
                     </a>
-                ` : `
-                    <a
-                        class="nav-link ${currentPage === "premium" ? "active" : ""}"
-                        href="premium.html"
-                    >
-                        Upgrade Premium
-                    </a>
-                `}
+                ` : ""}
+                ${(isReader || isCreator) ? `
+                <a
+                    class="nav-link ${currentPage === "premium" ? "active" : ""}"
+                    href="premium.html"
+                >
+                    Upgrade Premium
+                </a>
+            ` : ""}
                 <a class="nav-link" href="bookmark.html">Bookmark</a>
             </nav>
 
