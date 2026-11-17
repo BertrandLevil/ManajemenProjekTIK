@@ -10,6 +10,7 @@ import { initTheme, updateThemeButton } from "./theme.js";
 import { frontComicDetail } from "./comic.js";
 import { frontReader } from "./reader.js";
 import { frontPremium } from "./premium.js";
+import { frontTrending } from "./trending.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const currentPage = document.body.dataset.page;
@@ -17,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     switch (currentPage) {
         case "home":
             frontHome();
+            break;
+        case "trending":
+            frontTrending();
             break;
         case "register":
             frontRegister();

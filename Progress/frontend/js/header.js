@@ -65,7 +65,7 @@ export function header() {
 
             <nav class="sidebar-nav">
                 <a class="nav-link ${currentPage === "home" ? "active" : ""}" href="home.html">Beranda</a>
-                <a class="nav-link" href="trending.html">Trending</a>
+                <a class="nav-link ${currentPage === "trending" ? "active" : ""}" href="trending.html">Trending</a>
                 <a class="nav-link" href="latest.html">Terbaru</a>
                 ${isReader ? `
                     <a
