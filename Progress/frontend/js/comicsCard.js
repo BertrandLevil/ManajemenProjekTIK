@@ -1,4 +1,4 @@
-export function comicCard(comic) {
+export function comicCard(comic, rankLabel = "") {
     return `
         <article class="comic-card">
             ${
@@ -13,7 +13,7 @@ export function comicCard(comic) {
             }
             <a class="comic-cover ${comic.cover ? "has-cover" : `cover-${comic.color}`}"
                 href="comic.html?id=${comic.id}"
-                aria-label="Lihat ${comic.title}">
+                aria-label="Lihat ${comic.title}${rankLabel ? `, peringkat ${rankLabel}` : ""}">
 
                 ${
                     comic.cover
@@ -26,6 +26,7 @@ export function comicCard(comic) {
 
                 <span class="cover-tag">${comic.category}</span>
                 <span class="cover-status">${comic.status}</span>
+                ${rankLabel ? `<span class="trending-rank-badge">${rankLabel}</span>` : ""}
             </a>
 
             <div class="comic-info">
@@ -93,7 +94,7 @@ export function comicSection(title, subtitle, list, sectionId) {
             </div>
 
             <div class="comic-grid">
-                ${list.map(comicCard).join("")}
+                ${list.map(comic => comicCard(comic)).join("")}
             </div>
         </section>
     `;
