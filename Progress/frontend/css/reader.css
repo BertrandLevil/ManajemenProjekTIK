@@ -71,30 +71,59 @@
 }
 
 .reader-content {
-    min-height: 400px;
+    width: 100%;
+    min-height: 200px;
     margin: 24px auto;
-    padding: 24px;
-    background: var(--surface);
-    border-radius: 12px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
     text-align: center;
 }
 
-.reader-placeholder {
+.reader-image-page-wrap {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+    background: #fff;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.reader-image-page {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
+}
+
+.reader-loading {
+    padding: 50px 16px;
     color: var(--muted);
-    padding: 100px 12px;
+}
+
+.reader-error {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.reader-error a {
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--primary);
+    text-decoration: none;
 }
 
 @media (max-width: 600px) {
     .reader-content {
-        padding: 12px;
+        margin: 16px auto;
     }
 
-    .reader-navigation {
-        gap: 8px;
-    }
-
-    .reader-button {
-        padding: 10px 12px;
-        font-size: 13px;
+    .reader-image-page-wrap {
+        margin-bottom: 4px;
     }
 }

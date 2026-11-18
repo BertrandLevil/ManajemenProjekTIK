@@ -18,8 +18,17 @@ export function frontRegister() {
 
                 <section class="auth-card">
                     <a class="brand auth-brand" href="home.html">
-                        <span class="brand-icon">C</span>
-                        <span>Comic<span class="brand-accent">ID</span></span>
+                        <svg
+                            class="auth-brand-logo"
+                            viewBox="0 0 128 36"
+                            role="img"
+                            aria-label="ComicID"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <rect x="0" y="2" width="32" height="32" rx="10" fill="#8b5cf6"/>
+                            <text x="16" y="26" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700">C</text>
+                            <text x="40" y="25" fill="var(--text)" font-family="Arial, sans-serif" font-size="19" font-weight="800" letter-spacing="-0.7">Comic<tspan fill="var(--accent)">ID</tspan></text>
+                        </svg>
                     </a>
 
                     <p class="section-eyebrow">GABUNG DENGAN COMICID</p>

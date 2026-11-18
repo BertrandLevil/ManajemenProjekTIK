@@ -1,5 +1,6 @@
 import { header } from "./header.js";
-import { comics, popularComics } from "./data.js";
+import { comics as defaultComics, popularComics } from "./data.js";
+import { getAllComics } from "./comicData.js";
 import { comicSection } from "./comicsCard.js";
 import { heroSlide, setupCarousel } from "./carousel.js";
 import { setupSearch } from "./search.js";
@@ -9,22 +10,43 @@ export function frontHome() {
 
     if (!app) return;
 
+    const allComics = getAllComics();
+
     const Heropopular = popularComics
-        .map(id => comics.find(comic => comic.id === id))
+        .map(id => allComics.find(comic => comic.id === id))
         .filter(Boolean);
 
-    const trending = comics.filter(
+    const trending = allComics.filter(
         comic => comic.isTrending === true
     );
 
-    const popular = [...comics]
+    const popular = [...allComics]
         .filter(comic => comic.isPopular === true)
         .sort((a, b) => Number(b.rating) - Number(a.rating))
         .slice(0, 4);
 
-    const latest = [...comics]
+    const latest = [...allComics]
         .sort((a, b) => Number(b.chapter) - Number(a.chapter))
         .slice(0, 4);
+
+    const email = localStorage.getItem("comicid_logged_in_email");
+    const role = localStorage.getItem("comicid_logged_in_role");
+
+    const creatorId = Number(localStorage.getItem("comicid_user_id"));
+
+    const isCreatorLoggedIn =
+        localStorage.getItem("comicid_logged_in") === "true" &&
+        role === "Kreator" &&
+        email;
+
+    const creatorComics = isCreatorLoggedIn
+        ? allComics.filter(comic =>
+            !defaultComics.some(
+                defaultComic => Number(defaultComic.id) === Number(comic.id)
+            ) &&
+            Number(comic.creatorId) === creatorId
+        )
+        : [];
 
     app.innerHTML = `
         ${header()}
@@ -38,20 +60,30 @@ export function frontHome() {
                 <div class="hero-controls">
                     <button class="carousel-arrow"
                             id="hero-prev"
-                            aria-label="Banner sebelumnya">←</button>
+                            aria-label="Banner sebelumnya">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M19 12H5m0 0 7 7m-7-7 7-7"></path>
+                        </svg>
+                    </button>
 
                     <div class="carousel-dots" id="hero-dots">
-                        ${Heropopular.map((comic, index) => `
+                        ${Heropopular.map(
+                            (comic, index) => `
                             <button class="carousel-dot ${index === 0 ? "active" : ""}"
                                     data-go-slide="${index}"
                                     aria-label="Banner ${index + 1}">
                             </button>
-                        `).join("")}
+                        `,
+                        ).join("")}
                     </div>
 
                     <button class="carousel-arrow"
                             id="hero-next"
-                            aria-label="Banner berikutnya">→</button>
+                            aria-label="Banner berikutnya">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14m0 0-7-7m7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
             </section>
 
@@ -62,30 +94,30 @@ export function frontHome() {
                 </div>
 
                 <label class="search-box">
-                    <span>⌕</span>
+                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.3"></circle>
+                        <path d="m15.5 15.5 4.2 4.2"></path>
+                    </svg>
                     <input id="comic-search"
                         type="search"
-                        placeholder="Cari judul atau genre komik..."
+                        placeholder="Cari judul atau genre komik"
                         autocomplete="off">
                     <kbd>⌕</kbd>
                 </label>
             </section>
 
-            <section class="cateogory-section">
+            <section class="category-section">
                 <div class="category-list" id="category-list">
-                    ${[
-                        "All",
-                        "Komik",
-                        "Manga",
-                        "Manhwa",
-                        "Manhua",
-                        "Comic"
-                    ].map((category, index) => `
+                    ${["All", "Komik", "Manga", "Manhwa", "Manhua", "Comic"]
+                        .map(
+                        (category, index) => `
                         <button class="category-chip ${index === 0 ? "active" : ""}"
                                 data-category="${category}">
                             ${category}
                         </button>
-                    `).join("")}
+                    `,
+                        )
+                        .join("")}
                 </div>
             </section>
 
@@ -123,13 +155,17 @@ export function frontHome() {
                         "Reincarnation",
                         "Transmigration",
                         "Regression",
-                        "Supernatural"
-                    ].map((genre, index) => `
+                        "Supernatural",
+                    ]
+                        .map(
+                        (genre, index) => `
                         <button class="genre-chip ${index === 0 ? "active" : ""}"
                                 data-genre="${genre}">
                             ${genre}
                         </button>
-                    `).join("")}
+                    `,
+                        )
+                        .join("")}
                 </div>
             </section>
 
@@ -141,21 +177,31 @@ export function frontHome() {
                 "Trending sekarang",
                 "PALING DIBICARAKAN",
                 trending,
-                "trending"
+                "trending",
             )}
 
             ${comicSection(
                 "Update terbaru",
                 "JANGAN LEWATKAN",
                 latest,
-                "latest"
+                "latest",
             )}
+
+            ${creatorComics.length > 0
+                ? comicSection(
+                    "Komik Kreator",
+                    "KARYA KREATOR COMICID",
+                    creatorComics,
+                    "creator"
+                )
+                : ""
+            }
 
             ${comicSection(
                 "Komik Populer",
                 "YANG PALING BANYAK DIBACA",
                 popular,
-                "popular"
+                "popular",
             )}
 
             <section class="bottom-cta">
@@ -185,5 +231,5 @@ export function frontHome() {
     `;
 
     setupCarousel();
-    setupSearch();
+    setupSearch(allComics);
 }

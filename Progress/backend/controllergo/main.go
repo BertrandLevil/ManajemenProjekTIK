@@ -37,22 +37,40 @@ func resolveFrontendDir() string {
 
 func main() {
 	port := 8080
-	loginCtrl := NewLoginController()
+	registerCtrl := NewRegisterController()
 	userCtrl := NewUserController()
+	analysisCtrl := NewAnalisisController()
 	komikCtrl := NewKomikController()
 	babCtrl := NewBabController()
 	kategoriCtrl := NewKategoriController()
-	reviewCtrl := NewKomentarRatingController()
+	reviewCtrl := NewKomentarController()
 	bookmarkCtrl := NewBookmarkHistoriController()
-	pembayaranCtrl := NewPembayaranController()
+	pembayaranCtrl := NewProsesPembayaranController()
 
 	frontendDir := resolveFrontendDir()
-
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/login", LoginHttpHandler(loginCtrl))
-	mux.HandleFunc("/api/register", RegisterHttpHandler(loginCtrl))
+	// Lokasi folder penyimpanan PDF dan file lainnya.
+	projectDir := filepath.Dir(frontendDir)
+	storageDir := filepath.Join(projectDir, "backend", "storage")
+
+	fmt.Printf("[Storage] Folder penyimpanan: %s\n", storageDir)
+
+	// Sajikan file dari folder backend/storage melalui URL /storage/.
+	mux.Handle(
+		"/storage/",
+		http.StripPrefix(
+			"/storage/",
+			http.FileServer(http.Dir(storageDir)),
+		),
+	)
+
+	mux.HandleFunc("/api/login", LoginHttpHandler(userCtrl))
+	mux.HandleFunc("/api/register", RegisterHttpHandler(registerCtrl))
 	mux.HandleFunc("/api/health", HealthHttpHandler())
+	mux.HandleFunc("/api/logout", userCtrl.LogoutHandler())
+	mux.HandleFunc("/api/admin/analysis", analysisCtrl.Handler())
+	mux.HandleFunc("/api/recommendations", RecommendationsHttpHandler())
 
 	mux.HandleFunc("/api/user/profile", UserProfileHttpHandler(userCtrl))
 	mux.HandleFunc("/api/admin/users", AdminUsersHttpHandler(userCtrl))
@@ -64,6 +82,8 @@ func main() {
 
 	mux.HandleFunc("/api/chapters", ChaptersHttpHandler(babCtrl))
 	mux.HandleFunc("/api/chapters/detail", ChaptersDetailHttpHandler(babCtrl))
+	mux.HandleFunc("/api/chapter-pages", ChapterPagesHttpHandler(babCtrl))
+	mux.HandleFunc("/api/chapter-pages/upload", ChapterPagesUploadHttpHandler(storageDir))
 
 	mux.HandleFunc("/api/categories", CategoriesHttpHandler(kategoriCtrl))
 	mux.HandleFunc("/api/categories/detail", CategoriesDetailHttpHandler(kategoriCtrl))
@@ -93,7 +113,7 @@ func main() {
 	fmt.Println(" [Autentikasi] : /api/login, /api/register, /api/health")
 	fmt.Println(" [Pengguna]    : /api/user/profile, /api/admin/users")
 	fmt.Println(" [Komik]       : /api/comics, /api/comics/detail, /api/comics/verify, /api/comics/stats")
-	fmt.Println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail")
+	fmt.Println(" [Bab/Chapter] : /api/chapters, /api/chapters/detail, /api/chapter-pages")
 	fmt.Println(" [Kategori]    : /api/categories, /api/categories/detail")
 	fmt.Println(" [Ulasan]      : /api/reviews, /api/reviews/detail, /api/author/reviews")
 	fmt.Println(" [Bookmark]    : /api/bookmarks, /api/history")

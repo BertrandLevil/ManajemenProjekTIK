@@ -13,7 +13,12 @@ function escapeHTML(value) {
 export function header() {
     const isLoggedIn =
         localStorage.getItem("comicid_logged_in") === "true";
+
     const currentPage = document.body.dataset.page;
+    const role = localStorage.getItem("comicid_logged_in_role");
+    const isReader = isLoggedIn && role === "Pembaca";
+    const isCreator = isLoggedIn && role === "Kreator";
+    const isAdmin = isLoggedIn && role === "Admin";
 
     return `
         <header class="site-header">
@@ -60,10 +65,41 @@ export function header() {
 
             <nav class="sidebar-nav">
                 <a class="nav-link ${currentPage === "home" ? "active" : ""}" href="home.html">Beranda</a>
-                <a class="nav-link" href="trending.html">Trending</a>
+                <a class="nav-link ${currentPage === "trending" ? "active" : ""}" href="trending.html">Trending</a>
                 <a class="nav-link" href="latest.html">Terbaru</a>
+                ${isReader ? `
+                    <a
+                        class="nav-link ${currentPage === "upgrade-creator" ? "active" : ""}"
+                        href="upgradeCreator.html"
+                    >
+                        Upgrade Creator
+                    </a>
+                ` : ""}
+                ${isCreator ? `
+                    <a
+                        class="nav-link ${currentPage === "manajemen-data-komik" ? "active" : ""}"
+                        href="manajemenDataKomik.html"
+                    >
+                            Manajemen Data Komik
+                    </a>
+                `: ""}
+                ${isAdmin ? `
+                    <a
+                        class="nav-link ${currentPage === "pengajuan-creator" ? "active" : ""}"
+                        href="pengajuanCreator.html"
+                    >
+                        Pengajuan Creator
+                    </a>
+                ` : ""}
+                ${(isReader || isCreator) ? `
+                <a
+                    class="nav-link ${currentPage === "premium" ? "active" : ""}"
+                    href="premium.html"
+                >
+                    Upgrade Premium
+                </a>
+            ` : ""}
                 <a class="nav-link" href="bookmark.html">Bookmark</a>
-                <a class="nav-link ${currentPage === "premium" ? "active" : ""}" href="premium.html">Upgrade Premium</a>
             </nav>
 
             <div class="sidebar-actions">
@@ -99,7 +135,6 @@ export function header() {
         </aside>
     `;
 }
-
 
 export function setupSidebar() {
     const menuToggle = document.getElementById("menu-toggle");

@@ -1,0 +1,671 @@
+.management-page {
+    min-height: 100vh;
+    padding: 40px;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.management-eyebrow {
+    margin: 0 0 8px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.management-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.management-header p:not(.management-eyebrow) {
+    margin: 10px 0 0;
+    color: var(--muted, #888);
+    font-size: 14px;
+}
+
+.management-add-button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.management-add-button span {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.management-add-button:hover {
+    opacity: 0.9;
+}
+
+.management-statistics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.management-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.management-stat-card span {
+    color: var(--muted, #888);
+    font-size: 13px;
+}
+
+.management-stat-card strong {
+    font-size: 28px;
+}
+
+.management-content {
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+}
+
+.management-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.management-content-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.management-content-header p {
+    margin: 7px 0 0;
+    color: var(--muted, #888);
+    font-size: 13px;
+}
+
+.management-comic-count {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    font-size: 12px;
+}
+
+.management-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.management-toolbar input,
+.management-toolbar select {
+    min-height: 42px;
+    padding: 0 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+}
+
+.management-toolbar input {
+    flex: 1;
+    min-width: 0;
+}
+
+.management-toolbar select {
+    min-width: 150px;
+}
+
+.management-toolbar input:focus,
+.management-toolbar select:focus {
+    border-color: var(--accent);
+}
+
+.management-comic-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(250px, 1fr)
+    );
+    gap: 20px;
+}
+
+.management-comic-card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--bg);
+}
+
+.management-comic-cover {
+    height: 190px;
+    overflow: hidden;
+    background: var(--surface-2);
+}
+
+.management-comic-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.management-comic-info {
+    padding: 16px;
+}
+
+.management-comic-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.management-category,
+.management-status {
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    font-size: 11px;
+}
+
+.management-comic-info h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.management-comic-author {
+    margin: 7px 0;
+    color: var(--muted, #888);
+    font-size: 13px;
+}
+
+.management-comic-genre {
+    min-height: 34px;
+    margin: 10px 0;
+    color: var(--muted, #888);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.management-comic-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+}
+
+.management-comic-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.management-comic-actions button {
+    flex: 1;
+    padding: 9px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.management-comic-actions button:hover {
+    border-color: var(--accent);
+}
+
+.management-empty {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.management-empty-icon {
+    margin-bottom: 15px;
+    font-size: 42px;
+}
+
+.management-empty h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.management-empty p {
+    margin-top: 9px;
+    color: var(--muted, #888);
+    font-size: 13px;
+}
+
+.management-access-denied {
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 30px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    text-align: center;
+}
+
+.management-access-denied a {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--accent);
+}
+
+@media (max-width: 700px) {
+    .management-page {
+        padding: 24px 16px;
+    }
+
+    .management-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .management-content {
+        padding: 16px;
+    }
+
+    .management-toolbar {
+        flex-direction: column;
+    }
+
+    .management-toolbar select {
+        width: 100%;
+    }
+}
+
+.management-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.management-header-actions .theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.comic-form-overlay[hidden] {
+    display: none;
+}
+
+.comic-form-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    overflow-y: auto;
+}
+
+.comic-form-modal {
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+}
+
+.comic-form-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 26px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+
+.comic-form-header h2 {
+    margin: 5px 0 0;
+}
+
+.comic-form-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.comic-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 26px;
+}
+
+.comic-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.comic-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comic-form-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.comic-form-group input,
+.comic-form-group select,
+.comic-form-group textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.comic-form-group textarea {
+    resize: vertical;
+}
+
+.comic-form-group input:focus,
+.comic-form-group select:focus,
+.comic-form-group textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.comic-form-group input[type="color"] {
+    height: 44px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.comic-form-group small {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.comic-cover-preview {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.comic-cover-preview img {
+    max-width: 160px;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.comic-form-footer {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 18px 26px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+}
+
+.comic-cancel-button {
+    padding: 11px 20px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .management-header-actions {
+        flex-wrap: wrap;
+    }
+
+    .comic-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .comic-form-body {
+        padding: 18px;
+    }
+
+    .comic-form-header,
+    .comic-form-footer {
+        padding: 16px 18px;
+    }
+}
+
+.chapter-manager-overlay[hidden] {
+    display: none;
+}
+
+.chapter-manager-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    overflow-y: auto;
+}
+
+.chapter-manager-modal {
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+}
+
+.chapter-manager-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 26px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+
+.chapter-manager-header h2 {
+    margin: 5px 0 0;
+}
+
+.chapter-manager-body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 26px;
+}
+
+.chapter-list-section h3,
+#chapter-form h3 {
+    margin: 0 0 16px;
+}
+
+.chapter-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+
+.chapter-list-item div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.chapter-list-item span,
+.chapter-empty {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.chapter-empty {
+    padding: 20px;
+    text-align: center;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+}
+
+.chapter-form-divider {
+    border-top: 1px solid var(--line);
+}
+
+#chapter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+#chapter-page-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chapter-page-item {
+    display: grid;
+    grid-template-columns: 75px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+
+.chapter-page-item img {
+    width: 75px;
+    height: 95px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.chapter-page-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.chapter-page-info span {
+    color: var(--muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.chapter-page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.chapter-page-actions button {
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.chapter-page-actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .chapter-manager-body {
+        padding: 18px;
+    }
+
+    .chapter-manager-header {
+        padding: 16px 18px;
+    }
+
+    .chapter-page-item {
+        grid-template-columns: 60px minmax(0, 1fr);
+    }
+
+    .chapter-page-item img {
+        width: 60px;
+        height: 80px;
+    }
+
+    .chapter-page-actions {
+        grid-column: 1 / -1;
+    }
+}

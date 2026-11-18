@@ -15,7 +15,7 @@ var emailRegex = regexp.MustCompile(`^[^\s@]+@[^\s@]+\.[^\s@]+$`)
 
 func setCORSHeaders(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
@@ -32,7 +32,9 @@ func sendJSONError(w http.ResponseWriter, statusCode int, message string) {
 	})
 }
 
-func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
+func LoginHttpHandler(controller interface {
+	LoginWithQuery(string, string) (UserInterface, error)
+}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 
@@ -106,7 +108,9 @@ func LoginHttpHandler(controller *LoginController) http.HandlerFunc {
 	}
 }
 
-func RegisterHttpHandler(controller *LoginController) http.HandlerFunc {
+func RegisterHttpHandler(controller interface {
+	RegisterWithQuery(string, string, string, string) (bool, error)
+}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setCORSHeaders(w)
 
@@ -307,6 +311,50 @@ func StaticFileHandler(baseDir string) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(content)
+	}
+}
+
+func ChapterPagesHttpHandler(controller *BabController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		setCORSHeaders(w)
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
+			return
+		}
+
+		chapterID := r.URL.Query().Get("chapter_id")
+
+		if chapterID == "" {
+			sendJSONError(w, http.StatusBadRequest, "ID chapter wajib diisi.")
+			return
+		}
+
+		var idBab int
+
+		_, err := fmt.Sscanf(chapterID, "%d", &idBab)
+		if err != nil || idBab <= 0 {
+			sendJSONError(w, http.StatusBadRequest, "ID chapter tidak valid.")
+			return
+		}
+
+		pages, err := controller.GetHalamanByBab(idBab)
+		if err != nil {
+			fmt.Printf("[ChapterPagesHandler] Error: %v\n", err)
+			sendJSONError(w, http.StatusInternalServerError, "Gagal mengambil halaman chapter.")
+			return
+		}
+
+		sendJSON(w, http.StatusOK, map[string]interface{}{
+			"success": true,
+			"total":   len(pages),
+			"data":    pages,
+		})
 	}
 }
 

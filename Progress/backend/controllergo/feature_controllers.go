@@ -120,9 +120,16 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
-              WHERE b.id_komik = ? ORDER BY b.nomor_bab ASC`
+	query := `SELECT
+                b.id_bab,
+                b.id_komik,
+                b.nomor_bab,
+                b.tanggal_rilis,
+                k.nama_komik
+              FROM bab b
+              JOIN komik k ON b.id_komik = k.id_komik
+              WHERE b.id_komik = ?
+              ORDER BY b.nomor_bab ASC`
 
 	rows, err := conn.Query(query, idKomik)
 	if err != nil {
@@ -131,13 +138,27 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
 	defer rows.Close()
 
 	list := make([]BabDTO, 0)
+
 	for rows.Next() {
 		var b BabDTO
-		if err := rows.Scan(&b.IdBab, &b.IdKomik, &b.NomorBab, &b.TanggalRilis, &b.NamaKomik); err != nil {
+
+		if err := rows.Scan(
+			&b.IdBab,
+			&b.IdKomik,
+			&b.NomorBab,
+			&b.TanggalRilis,
+			&b.NamaKomik,
+		); err != nil {
 			return nil, err
 		}
+
 		list = append(list, b)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return list, nil
 }
 
@@ -147,12 +168,26 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		return nil, err
 	}
 
-	query := `SELECT b.id_bab, b.id_komik, b.nomor_bab, b.tanggal_rilis, k.nama_komik
-              FROM bab b JOIN komik k ON b.id_komik = k.id_komik
+	query := `SELECT
+                b.id_bab,
+                b.id_komik,
+                b.nomor_bab,
+                b.tanggal_rilis,
+                k.nama_komik
+              FROM bab b
+              JOIN komik k ON b.id_komik = k.id_komik
               WHERE b.id_bab = ?`
 
 	var b BabDTO
-	err = conn.QueryRow(query, idBab).Scan(&b.IdBab, &b.IdKomik, &b.NomorBab, &b.TanggalRilis, &b.NamaKomik)
+
+	err = conn.QueryRow(query, idBab).Scan(
+		&b.IdBab,
+		&b.IdKomik,
+		&b.NomorBab,
+		&b.TanggalRilis,
+		&b.NamaKomik,
+	)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -160,6 +195,52 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
 		return nil, err
 	}
 	return &b, nil
+}
+
+func (c *BabController) GetHalamanByBab(idBab int) ([]HalamanBabDTO, error) {
+	conn, err := GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+        SELECT
+            id_halaman,
+            id_bab,
+            nomor_halaman,
+            file_path
+        FROM halaman_bab
+        WHERE id_bab = ?
+        ORDER BY nomor_halaman ASC
+    `
+
+	rows, err := conn.Query(query, idBab)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]HalamanBabDTO, 0)
+
+	for rows.Next() {
+		var halaman HalamanBabDTO
+
+		err := rows.Scan(
+			&halaman.IdHalaman,
+			&halaman.IdBab,
+			&halaman.NomorHalaman,
+			&halaman.FilePath,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, halaman)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (c *BabController) CreateBab(idKomik, nomorBab int, tanggalRilis string) (bool, error) {
@@ -487,13 +568,18 @@ func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{},
 	}, nil
 }
 
-type KomentarRatingController struct{}
+type KomentarController struct{}
 
-func NewKomentarRatingController() *KomentarRatingController {
-	return &KomentarRatingController{}
+func NewKomentarController() *KomentarController {
+	return &KomentarController{}
 }
 
-func (c *KomentarRatingController) GetReviewsByComic(comicId int, sort string) ([]ReviewDTO, error) {
+// Compatibility alias for code written before the SRS naming alignment.
+type KomentarRatingController = KomentarController
+
+func NewKomentarRatingController() *KomentarController { return NewKomentarController() }
+
+func (c *KomentarController) GetReviewsByComic(comicId int, sort string) ([]ReviewDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -531,7 +617,7 @@ func (c *KomentarRatingController) GetReviewsByComic(comicId int, sort string) (
 	return list, nil
 }
 
-func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, error) {
+func (c *KomentarController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -562,7 +648,7 @@ func (c *KomentarRatingController) GetReviewsForAuthor(creatorId int) ([]ReviewD
 	return list, nil
 }
 
-func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string, rating float64) (bool, error) {
+func (c *KomentarController) AddReview(idPengguna, idKomik int, isi string, rating float64) (bool, error) {
 	if idPengguna <= 0 || idKomik <= 0 {
 		return false, errors.New("idPengguna dan idKomik harus lebih dari 0.")
 	}
@@ -588,7 +674,7 @@ func (c *KomentarRatingController) AddReview(idPengguna, idKomik int, isi string
 	return true, nil
 }
 
-func (c *KomentarRatingController) DeleteReview(idUlasan, idPengguna int, role string) (bool, error) {
+func (c *KomentarController) DeleteReview(idUlasan, idPengguna int, role string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
@@ -729,13 +815,18 @@ func (c *BookmarkHistoriController) DeleteHistori(idHistori, userId int) (bool, 
 	return ra > 0, nil
 }
 
-type PembayaranController struct{}
+type ProsesPembayaranController struct{}
 
-func NewPembayaranController() *PembayaranController {
-	return &PembayaranController{}
+func NewProsesPembayaranController() *ProsesPembayaranController {
+	return &ProsesPembayaranController{}
 }
 
-func (c *PembayaranController) GetUserIdByEmail(email string) (int, error) {
+// Compatibility alias; the SRS participant is ProsesPembayaranController.
+type PembayaranController = ProsesPembayaranController
+
+func NewPembayaranController() *ProsesPembayaranController { return NewProsesPembayaranController() }
+
+func (c *ProsesPembayaranController) GetUserIdByEmail(email string) (int, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return 0, err
@@ -748,7 +839,7 @@ func (c *PembayaranController) GetUserIdByEmail(email string) (int, error) {
 	return id, nil
 }
 
-func (c *PembayaranController) Checkout(userId int, method string, amount float64) (int, error) {
+func (c *ProsesPembayaranController) Checkout(userId int, method string, amount float64) (int, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return 0, err
@@ -763,7 +854,7 @@ func (c *PembayaranController) Checkout(userId int, method string, amount float6
 	return int(id), err
 }
 
-func (c *PembayaranController) ProcessPayment(txId int, status string) (bool, error) {
+func (c *ProsesPembayaranController) ProcessPayment(txId int, status string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return false, err
@@ -791,7 +882,7 @@ func (c *PembayaranController) ProcessPayment(txId int, status string) (bool, er
 	return true, nil
 }
 
-func (c *PembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, error) {
+func (c *ProsesPembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err
@@ -821,7 +912,7 @@ func (c *PembayaranController) GetUserTransactions(userId int) ([]TransaksiDTO, 
 	return list, nil
 }
 
-func (c *PembayaranController) GetAllTransactions() ([]TransaksiDTO, error) {
+func (c *ProsesPembayaranController) GetAllTransactions() ([]TransaksiDTO, error) {
 	conn, err := GetConnection()
 	if err != nil {
 		return nil, err

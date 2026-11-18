@@ -18,11 +18,19 @@ export function frontLogin() {
 
                 <section class="auth-card">
                     <a class="brand auth-brand" href="home.html">
-                        <span class="brand-icon">C</span>
-                        <span>Comic<span class="brand-accent">ID</span></span>
+                        <svg
+                            class="auth-brand-logo"
+                            viewBox="0 0 128 36"
+                            role="img"
+                            aria-label="ComicID"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <rect x="0" y="2" width="32" height="32" rx="10" fill="#8b5cf6"/>
+                            <text x="16" y="26" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700">C</text>
+                            <text x="40" y="25" fill="var(--text)" font-family="Arial, sans-serif" font-size="19" font-weight="800" letter-spacing="-0.7">Comic<tspan fill="var(--accent)">ID</tspan></text>
+                        </svg>
                     </a>
 
-                    <p class="section-eyebrow">SELAMAT DATANG KEMBALI</p>
                     <h1>Masuk ke akunmu</h1>
                     <p class="auth-description">
                         Masuk dan lanjutkan membaca komik favoritmu.
@@ -115,7 +123,6 @@ export function frontLogin() {
       return;
     }
 
-    // Jika memasukkan format email, validasi polanya. Jika username, minimal 3 karakter.
     if (email.includes("@")) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showMessage("Format email tidak valid.");
@@ -162,7 +169,13 @@ export function frontLogin() {
       }
       localStorage.setItem("comicid_logged_in_email", result.email);
       localStorage.setItem("comicid_logged_in", "true");
-      localStorage.setItem("comicid_logged_in_role", result.role);
+
+      const savedRole = localStorage.getItem(`comicid_role_${result.email}`);
+
+      const effectiveRole =
+        result.role === "Admin" ? "Admin" : savedRole || result.role;
+
+      localStorage.setItem("comicid_logged_in_role", effectiveRole);
       localStorage.setItem(`comicid_username_${result.email}`, result.username);
 
       showMessage("Login berhasil! Mengalihkan ke beranda...", false);
@@ -176,33 +189,33 @@ export function frontLogin() {
       );
     } finally {
       if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Masuk";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Masuk";
       }
     }
   });
 
-    const toggleButtonsLogin = form.querySelectorAll(".toggle-password");
-    
-    const eyeOpenSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>`;
-    const eyeOffSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
+  const toggleButtonsLogin = form.querySelectorAll(".toggle-password");
 
-    toggleButtonsLogin.forEach(button => {
-        button.addEventListener("click", () => {
-            const targetId = button.getAttribute("data-target");
-            const passwordInput = document.getElementById(targetId);
-            
-            if (!passwordInput) return;
+  const eyeOpenSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const eyeOffSvg = `<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                button.innerHTML = eyeOffSvg;
-                button.setAttribute("aria-label", "Sembunyikan password");
-            } else {
-                passwordInput.type = "password";
-                button.innerHTML = eyeOpenSvg;
-                button.setAttribute("aria-label", "Tampilkan password");
-            }
-        });
+  toggleButtonsLogin.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.getAttribute("data-target");
+      const passwordInput = document.getElementById(targetId);
+
+      if (!passwordInput) return;
+
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        button.innerHTML = eyeOffSvg;
+        button.setAttribute("aria-label", "Sembunyikan password");
+      } else {
+        passwordInput.type = "password";
+        button.innerHTML = eyeOpenSvg;
+        button.setAttribute("aria-label", "Tampilkan password");
+      }
     });
+  });
 }

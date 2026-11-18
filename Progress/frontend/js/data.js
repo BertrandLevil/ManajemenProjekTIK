@@ -1,6 +1,7 @@
 export const comics = [
     {
         id: 1,
+        creatorID: 11,
         title: "Solo Leveling",
         author: "Chugong",
         studio: ["Redice Studio"],
@@ -17,6 +18,7 @@ export const comics = [
     },
     {
         id: 2,
+        creatorID: 12,
         title: "The Siren: Becoming the Villain's Family",
         author: "Sol Leesu (설이수 / Seol Yi-soo)",
         studio: ["ODR"],
@@ -32,6 +34,7 @@ export const comics = [
     },
     {
         id: 3,
+        creatorID: 13,
         title: "Author of My Destiny",
         author: "Gyeoulip (겨울잎)",
         studio: ["Yeondam", "Daon"],
@@ -48,6 +51,7 @@ export const comics = [
     },
     {
         id: 4,
+        creatorID: 14,
         title: "Soul Land II",
         author: "Tang Jia San Shao",
         studio: ["Changsha Angel  Culture Co., Ltd", "Magic Comic"],
@@ -63,6 +67,7 @@ export const comics = [
     },
     {
         id: 5,
+        creatorID: 16,
         title: "Shadow Slave",
         author: "Guiltythree",
         studio: ["Aethon Studio"],
@@ -78,6 +83,7 @@ export const comics = [
     },
     {
         id: 6,
+        creatorID: 16,
         title: "Dedes",
         author: "Esti Siwi / Egestigi",
         studio: ["Esti Siwi / Egestigi"],
@@ -93,6 +99,7 @@ export const comics = [
     },
     {
         id: 7,
+        creatorID: 17,
         title: "Chainsaw Man",
         author: "Tatsuki Fujimoto",
         studio: ["Fujimoto-gumi"],
@@ -108,6 +115,7 @@ export const comics = [
     },
     {
         id: 8,
+        creatorID: 18,
         title: "Magic Emperor",
         author: "Nightingale",
         studio: ["Night Comic Studio"],
@@ -123,6 +131,7 @@ export const comics = [
     },
         {
         id: 9,
+        creatorID: 19,
         title: "Genshin Impact",
         author: "Hoyoverse",
         studio: ["Hoyoverse"],
