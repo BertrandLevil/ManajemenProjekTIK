@@ -176,7 +176,8 @@ export function frontRegister() {
                 submitBtn.textContent = "Mendaftarkan...";
             }
 
-            const response = await fetch("http://localhost:8080/api/register", {
+            const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+            const response = await fetch(`${apiBase}/api/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

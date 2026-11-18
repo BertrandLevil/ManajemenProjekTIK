@@ -307,7 +307,7 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 				_ = tx.Rollback()
 				cleanup()
 
-				fmt.Printf("[UploadChapter] Error DB: %v\n", err)
+				LogStatus("UploadController", "UploadChapterPages", "ERROR", "Gagal menyimpan data halaman bab ID %d: %v", chapterID, err)
 
 				sendJSONError(w, http.StatusInternalServerError,
 					"Gagal menyimpan data halaman.")
@@ -318,10 +318,13 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 		if err := tx.Commit(); err != nil {
 			cleanup()
 
+			LogStatus("UploadController", "UploadChapterPages", "ERROR", "Gagal menyelesaikan commit upload bab ID %d: %v", chapterID, err)
 			sendJSONError(w, http.StatusInternalServerError,
 				"Gagal menyelesaikan upload.")
 			return
 		}
+
+		LogStatus("UploadController", "UploadChapterPages", "SUCCESS", "Berhasil mengunggah %d halaman untuk bab ID %d (Komik ID %d, Bab %d)", len(files), chapterID, comicID, chapterNumber)
 
 		sendJSON(w, http.StatusCreated, map[string]interface{}{
 			"success": true,

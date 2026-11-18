@@ -204,6 +204,17 @@ export async function frontReader() {
 
             if (chapterId > 0) {
                 await renderChapterImages(chapterId);
+
+                // Rekam riwayat baca pengguna ke controllergo backend
+                const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+                if (userId > 0) {
+                    const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+                    fetch(`${apiBase}/api/history`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ user_id: userId, chapter_id: chapterId })
+                    }).catch(err => console.warn("Record history ke server:", err));
+                }
             } else {
                 readerContent.innerHTML = `
                     <div class="reader-loading">

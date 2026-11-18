@@ -149,7 +149,8 @@ export function frontLogin() {
         submitBtn.textContent = "Memverifikasi...";
       }
 
-      const response = await fetch("http://localhost:8080/api/login", {
+      const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+      const response = await fetch(`${apiBase}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

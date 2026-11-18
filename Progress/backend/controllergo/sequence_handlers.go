@@ -24,6 +24,7 @@ func (c *AnalisisController) Handler() http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
+			LogStatus("AnalisisController", "GenerateAnalysis", "FAILED", "Method tidak diizinkan: %s", r.Method)
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 			return
 		}
@@ -40,6 +41,7 @@ func (c *AnalisisController) Handler() http.HandlerFunc {
 		startDate, err1 := time.Parse("2006-01-02", start)
 		endDate, err2 := time.Parse("2006-01-02", end)
 		if err1 != nil || err2 != nil || endDate.Before(startDate) {
+			LogStatus("AnalisisController", "GenerateAnalysis", "FAILED", "Rentang tanggal tidak valid: %s s/d %s", start, end)
 			sendJSONError(w, http.StatusBadRequest, "Rentang tanggal tidak valid. Gunakan YYYY-MM-DD dan pastikan tanggal akhir tidak sebelum tanggal awal.")
 			return
 		}
@@ -47,6 +49,7 @@ func (c *AnalisisController) Handler() http.HandlerFunc {
 
 		conn, err := GetConnection()
 		if err != nil {
+			LogStatus("AnalisisController", "GenerateAnalysis", "ERROR", "Koneksi database gagal: %v", err)
 			sendJSONError(w, http.StatusServiceUnavailable, "Koneksi database gagal.")
 			return
 		}
@@ -64,6 +67,7 @@ func (c *AnalisisController) Handler() http.HandlerFunc {
 			err = conn.QueryRow(`SELECT COUNT(*), COALESCE(SUM(CASE WHEN status_pembayaran = 'Berhasil' THEN jumlah_bayar ELSE 0 END), 0) FROM transaksi WHERE tanggal_transaksi >= ? AND tanggal_transaksi < ?`, startDate, endExclusive).Scan(&totalTransactions, &successfulRevenue)
 		}
 		if err != nil {
+			LogStatus("AnalisisController", "GenerateAnalysis", "ERROR", "Gagal query data laporan: %v", err)
 			sendJSONError(w, http.StatusInternalServerError, "Gagal mengambil data laporan.")
 			return
 		}
@@ -80,9 +84,11 @@ func (c *AnalisisController) Handler() http.HandlerFunc {
 			_ = writer.Write([]string{"transactions_in_period", strconv.Itoa(totalTransactions), period[0], period[1]})
 			_ = writer.Write([]string{"successful_revenue_in_period", fmt.Sprintf("%.2f", successfulRevenue), period[0], period[1]})
 			writer.Flush()
+			LogStatus("AnalisisController", "GenerateAnalysis", "SUCCESS", "Export CSV analisis berhasil untuk periode %s s/d %s", start, end)
 			return
 		}
 
+		LogStatus("AnalisisController", "GenerateAnalysis", "SUCCESS", "Laporan analisis berhasil dibuat (Periode: %s s/d %s, Users: %d, Comics: %d, Reviews: %d, Trx: %d, Rev: Rp%.2f)", start, end, totalUsers, totalComics, totalReviews, totalTransactions, successfulRevenue)
 		sendJSON(w, http.StatusOK, map[string]interface{}{
 			"success": true,
 			"period":  map[string]string{"start_date": start, "end_date": end},
@@ -108,6 +114,7 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
+			LogStatus("RekomendasiController", "GetRecommendations", "FAILED", "Method tidak diizinkan: %s", r.Method)
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 			return
 		}
@@ -118,6 +125,7 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 		}
 		conn, err := GetConnection()
 		if err != nil {
+			LogStatus("RekomendasiController", "GetRecommendations", "ERROR", "Koneksi database gagal: %v", err)
 			sendJSONError(w, http.StatusServiceUnavailable, "Koneksi database gagal.")
 			return
 		}
@@ -145,6 +153,7 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 			LIMIT ?`
 		rows, err := conn.Query(query, userID, userID, userID, userID, limit)
 		if err != nil {
+			LogStatus("RekomendasiController", "GetRecommendations", "ERROR", "Gagal query rekomendasi User ID %d: %v", userID, err)
 			sendJSONError(w, http.StatusInternalServerError, "Gagal mengambil rekomendasi komik.")
 			return
 		}
@@ -153,6 +162,7 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 		for rows.Next() {
 			var item KomikDTO
 			if err := rows.Scan(&item.IdKomik, &item.IdKreator, &item.NamaKreator, &item.NamaKomik, &item.Deskripsi, &item.NamaStudio, &item.RatingRataRata, &item.TotalChapters); err != nil {
+				LogStatus("RekomendasiController", "GetRecommendations", "ERROR", "Gagal scan rekomendasi User ID %d: %v", userID, err)
 				sendJSONError(w, http.StatusInternalServerError, "Gagal membaca rekomendasi komik.")
 				return
 			}
@@ -160,9 +170,11 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 			items = append(items, item)
 		}
 		if err := rows.Err(); err != nil {
+			LogStatus("RekomendasiController", "GetRecommendations", "ERROR", "Error baris rekomendasi User ID %d: %v", userID, err)
 			sendJSONError(w, http.StatusInternalServerError, "Gagal membaca rekomendasi komik.")
 			return
 		}
+		LogStatus("RekomendasiController", "GetRecommendations", "SUCCESS", "Berhasil mengambil %d rekomendasi komik untuk User ID %d", len(items), userID)
 		sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "total": len(items), "data": items})
 	}
 }
@@ -178,9 +190,11 @@ func (c *UserController) LogoutHandler() http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodPost {
+			LogStatus("UserController", "Logout", "FAILED", "Method tidak diizinkan: %s", r.Method)
 			sendJSONError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan.")
 			return
 		}
+		LogStatus("UserController", "Logout", "SUCCESS", "Pengguna berhasil melakukan logout")
 		sendJSON(w, http.StatusOK, map[string]interface{}{"success": true, "message": "Logout berhasil. Hapus status login pada browser."})
 	}
 }

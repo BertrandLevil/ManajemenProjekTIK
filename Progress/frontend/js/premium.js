@@ -507,8 +507,9 @@ export function frontPremium() {
             );
 
             try {
+                const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
                 const response = await fetch(
-                    "http://localhost:8080/api/payment/checkout",
+                    `${apiBase}/api/payment/checkout`,
                     {
                         method: "POST",
                         headers: {

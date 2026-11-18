@@ -18,6 +18,7 @@ func NewRegisterController() *RegisterController {
 func (c *UserController) LoginWithQuery(emailOrUsername, passwordInput string) (UserInterface, error) {
 	conn, err := GetConnection()
 	if err != nil {
+		LogStatus("UserController", "LoginWithQuery", "ERROR", "Koneksi database gagal untuk '%s': %v", emailOrUsername, err)
 		return nil, err
 	}
 
@@ -40,12 +41,15 @@ func (c *UserController) LoginWithQuery(emailOrUsername, passwordInput string) (
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			LogStatus("UserController", "LoginWithQuery", "NOT_FOUND", "Pengguna '%s' tidak ditemukan", emailOrUsername)
 			return nil, nil
 		}
+		LogStatus("UserController", "LoginWithQuery", "ERROR", "Gagal query pengguna '%s': %v", emailOrUsername, err)
 		return nil, err
 	}
 
 	if dbPassword != passwordInput {
+		LogStatus("UserController", "LoginWithQuery", "FAILED", "Password tidak cocok untuk '%s'", emailOrUsername)
 		return nil, ErrInvalidPassword
 	}
 
@@ -70,12 +74,14 @@ func (c *UserController) LoginWithQuery(emailOrUsername, passwordInput string) (
 	}
 
 	loggedInUser.Login(dbEmail, dbPassword)
+	LogStatus("UserController", "LoginWithQuery", "SUCCESS", "Pengguna '%s' (ID: %d, Role: %s) berhasil login", username, idPengguna, role)
 	return loggedInUser, nil
 }
 
 func (c *RegisterController) RegisterWithQuery(username, email, password, role string) (bool, error) {
 	conn, err := GetConnection()
 	if err != nil {
+		LogStatus("RegisterController", "RegisterWithQuery", "ERROR", "Koneksi database gagal: %v", err)
 		return false, err
 	}
 
@@ -83,16 +89,20 @@ func (c *RegisterController) RegisterWithQuery(username, email, password, role s
 	var existingId int
 	err = conn.QueryRow(checkUserQuery, username).Scan(&existingId)
 	if err == nil {
+		LogStatus("RegisterController", "RegisterWithQuery", "FAILED", "Nama pengguna '%s' sudah digunakan", username)
 		return false, errors.New("Nama pengguna sudah digunakan.")
 	} else if !errors.Is(err, sql.ErrNoRows) {
+		LogStatus("RegisterController", "RegisterWithQuery", "ERROR", "Gagal cek username '%s': %v", username, err)
 		return false, err
 	}
 
 	checkEmailQuery := `SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?)`
 	err = conn.QueryRow(checkEmailQuery, email).Scan(&existingId)
 	if err == nil {
+		LogStatus("RegisterController", "RegisterWithQuery", "FAILED", "Email '%s' sudah terdaftar", email)
 		return false, errors.New("Email sudah terdaftar.")
 	} else if !errors.Is(err, sql.ErrNoRows) {
+		LogStatus("RegisterController", "RegisterWithQuery", "ERROR", "Gagal cek email '%s': %v", email, err)
 		return false, err
 	}
 
@@ -108,15 +118,23 @@ func (c *RegisterController) RegisterWithQuery(username, email, password, role s
 	insertQuery := `INSERT INTO pengguna (username, email, password, role, is_premium) VALUES (?, ?, ?, ?, ?)`
 	res, err := conn.Exec(insertQuery, username, email, password, finalRole, isPremium)
 	if err != nil {
+		LogStatus("RegisterController", "RegisterWithQuery", "ERROR", "Gagal insert pengguna '%s': %v", username, err)
 		return false, err
 	}
 
 	affected, err := res.RowsAffected()
 	if err != nil {
+		LogStatus("RegisterController", "RegisterWithQuery", "ERROR", "Gagal membaca affected rows: %v", err)
 		return false, err
 	}
 
-	return affected > 0, nil
+	if affected > 0 {
+		LogStatus("RegisterController", "RegisterWithQuery", "SUCCESS", "Pengguna '%s' (%s, Role: %s) berhasil didaftarkan", username, email, finalRole)
+		return true, nil
+	}
+
+	LogStatus("RegisterController", "RegisterWithQuery", "FAILED", "Tidak ada baris yang tersimpan untuk '%s'", username)
+	return false, nil
 }
 
 // LoginController is retained as a compatibility facade for older callers.

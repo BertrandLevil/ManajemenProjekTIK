@@ -190,6 +190,22 @@ export function frontReview(comic, chapter = null) {
                 JSON.stringify(ratings)
             );
 
+            const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+            const comicId = parseInt(comic.id || "0", 10);
+            if (userId > 0 && comicId > 0) {
+                const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+                fetch(`${apiBase}/api/reviews`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        comic_id: comicId,
+                        comment: `Rating ${score} bintang`,
+                        rating: score
+                    })
+                }).catch(err => console.warn("Sync rating ke server:", err));
+            }
+
             alert("Rating berhasil diperbarui!");
             refreshReviews();
         });
@@ -235,6 +251,22 @@ export function frontReview(comic, chapter = null) {
                 commentKey,
                 JSON.stringify(comments)
             );
+
+            const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+            const comicId = parseInt(comic.id || "0", 10);
+            if (userId > 0 && comicId > 0) {
+                const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+                fetch(`${apiBase}/api/reviews`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        comic_id: comicId,
+                        comment: commentText,
+                        rating: 5
+                    })
+                }).catch(err => console.warn("Sync komentar ke server:", err));
+            }
 
             refreshReviews();
         });

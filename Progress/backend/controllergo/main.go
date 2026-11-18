@@ -130,7 +130,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
-		Handler: mux,
+		Handler: RequestLoggerMiddleware(mux),
 	}
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

@@ -177,7 +177,7 @@ export function frontProfile() {
         reader.readAsDataURL(file);
     });
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         message.hidden = true;
 
@@ -196,15 +196,38 @@ export function frontProfile() {
         }
 
         const email = localStorage.getItem("comicid_logged_in_email");
+        const userId = parseInt(localStorage.getItem("comicid_user_id") || "0", 10);
+
+        try {
+            const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+            if (userId > 0) {
+                await fetch(`${apiBase}/api/user/profile`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: userId, username: newUsername, email: email })
+                });
+            }
+        } catch (err) {
+            console.warn("Gagal sinkronisasi ke server:", err);
+        }
+
         localStorage.setItem(`comicid_username_${email}`, newUsername);
         showMessage("Username berhasil diperbarui.");
     });
 
     document
         .getElementById("profile-logout")
-        .addEventListener("click", () => {
+        .addEventListener("click", async () => {
+            try {
+                const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+                await fetch(`${apiBase}/api/logout`, { method: "POST" });
+            } catch (err) {
+                console.warn("Gagal request logout ke server:", err);
+            }
             localStorage.removeItem("comicid_logged_in");
             localStorage.removeItem("comicid_logged_in_email");
+            localStorage.removeItem("comicid_user_id");
+            localStorage.removeItem("comicid_logged_in_role");
             window.location.href = "home.html";
         });
 }
