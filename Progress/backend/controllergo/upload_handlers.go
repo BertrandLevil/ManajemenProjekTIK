@@ -59,6 +59,7 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 		}
 
 		if r.Method != http.MethodPost {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Method HTTP tidak diizinkan: %s", r.Method)
 			sendJSONError(w, http.StatusMethodNotAllowed,
 				"Method tidak diizinkan.")
 			return
@@ -68,6 +69,7 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 		r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
 
 		if err := r.ParseMultipartForm(32 << 20); err != nil {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Data upload tidak valid atau melebihi batas ukuran: %v", err)
 			sendJSONError(w, http.StatusBadRequest,
 				"Data upload tidak valid atau terlalu besar.")
 			return
@@ -79,6 +81,7 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 
 		userID, err := strconv.Atoi(r.FormValue("user_id"))
 		if err != nil || userID <= 0 {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Parameter user_id tidak valid: '%s'", r.FormValue("user_id"))
 			sendJSONError(w, http.StatusBadRequest,
 				"user_id tidak valid.")
 			return
@@ -86,6 +89,7 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 
 		chapterID, err := strconv.Atoi(r.FormValue("chapter_id"))
 		if err != nil || chapterID <= 0 {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Parameter chapter_id tidak valid: '%s'", r.FormValue("chapter_id"))
 			sendJSONError(w, http.StatusBadRequest,
 				"chapter_id tidak valid.")
 			return
@@ -94,12 +98,14 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 		files := r.MultipartForm.File["images"]
 
 		if len(files) == 0 {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Tidak ada file gambar yang dipilih untuk chapter ID %d", chapterID)
 			sendJSONError(w, http.StatusBadRequest,
 				"Minimal satu gambar harus dipilih.")
 			return
 		}
 
 		if len(files) > maxImageCount {
+			LogStatus("UploadController", "UploadChapterPages", "FAILED", "Jumlah file gambar melebihi batas maksimum (100 gambar): %d", len(files))
 			sendJSONError(w, http.StatusBadRequest,
 				"Maksimal 100 gambar dalam satu upload.")
 			return

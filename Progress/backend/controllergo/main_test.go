@@ -28,7 +28,7 @@ func (a *AssertionTracker) Assert(condition bool, message string) {
 	a.assertions++
 	if !condition {
 		a.failedCur = true
-		a.t.Errorf("[%s] Assertion Failed: %s", a.name, message)
+		a.t.Errorf("[%s] Asersi Gagal: %s", a.name, message)
 	}
 }
 
@@ -36,7 +36,7 @@ func (a *AssertionTracker) AssertEqual(expected, actual interface{}, message str
 	a.assertions++
 	if expected != actual {
 		a.failedCur = true
-		a.t.Errorf("[%s] %s - Expected: %v, Got: %v", a.name, message, expected, actual)
+		a.t.Errorf("[%s] %s - Diharapkan: %v, Diterima: %v", a.name, message, expected, actual)
 	}
 }
 
@@ -44,7 +44,7 @@ func (a *AssertionTracker) AssertNotEqual(unexpected, actual interface{}, messag
 	a.assertions++
 	if unexpected == actual {
 		a.failedCur = true
-		a.t.Errorf("[%s] %s - Did not expect: %v", a.name, message, actual)
+		a.t.Errorf("[%s] %s - Tidak diharapkan nilai: %v", a.name, message, actual)
 	}
 }
 
@@ -72,8 +72,8 @@ func (a *AssertionTracker) Run(name string, testFn func(a *AssertionTracker)) {
 	}
 	elapsedSec := fmt.Sprintf("%.2fs", sec)
 
-	// Format kolom persis seperti pada Laravel / Artisan Test
-	padding := 58 - len(name)
+	// Format kolom sejajar persis seperti pada Laravel / Artisan Test
+	padding := 68 - len(name)
 	if padding < 2 {
 		padding = 2
 	}
@@ -89,7 +89,7 @@ func (a *AssertionTracker) Run(name string, testFn func(a *AssertionTracker)) {
 }
 
 func TestControllerStatusSuite(t *testing.T) {
-	// Matikan log console background agar output bersih seperti di screenshot
+	// Matikan log console background agar output bersih dan rapi seperti di screenshot
 	LogEnabled = false
 	log.SetOutput(io.Discard)
 	defer func() {
@@ -113,90 +113,90 @@ func TestControllerStatusSuite(t *testing.T) {
 	analisisCtrl := NewAnalisisController()
 
 	// ==========================================
-	// 1. REGISTER CONTROLLER TESTS
+	// 1. REGISTER CONTROLLER (PENDAFTARAN AKUN)
 	// ==========================================
-	tracker.Run("registration rejects short password", func(a *AssertionTracker) {
+	tracker.Run("registrasi menolak password kurang dari 8 karakter", func(a *AssertionTracker) {
 		body := `{"username":"validuser","email":"user@test.com","password":"123","role":"Pembaca"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code 400")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual(false, res["success"], "success status")
+		a.AssertEqual(false, res["success"], "success false")
 	})
 
-	tracker.Run("registration rejects empty username", func(a *AssertionTracker) {
+	tracker.Run("registrasi menolak nama pengguna kosong", func(a *AssertionTracker) {
 		body := `{"username":"","email":"user@test.com","password":"password123","role":"Pembaca"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code 400")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual(false, res["success"], "success status")
+		a.AssertEqual(false, res["success"], "success false")
 	})
 
-	tracker.Run("registration rejects short username", func(a *AssertionTracker) {
+	tracker.Run("registrasi menolak nama pengguna kurang dari 3 karakter", func(a *AssertionTracker) {
 		body := `{"username":"ab","email":"user@test.com","password":"password123","role":"Pembaca"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code 400")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual(false, res["success"], "success status")
+		a.AssertEqual(false, res["success"], "success false")
 	})
 
-	tracker.Run("registration rejects invalid email format", func(a *AssertionTracker) {
-		body := `{"username":"validuser","email":"not-an-email","password":"password123","role":"Pembaca"}`
+	tracker.Run("registrasi menolak format email yang tidak valid", func(a *AssertionTracker) {
+		body := `{"username":"validuser","email":"bukan-email-valid","password":"password123","role":"Pembaca"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code 400")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual(false, res["success"], "success status")
+		a.AssertEqual(false, res["success"], "success false")
 	})
 
-	tracker.Run("registration rejects unsupported http method", func(a *AssertionTracker) {
+	tracker.Run("registrasi menolak metode http selain post", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/register", nil)
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusMethodNotAllowed, rec.Code, "method not allowed")
+		a.AssertEqual(http.StatusMethodNotAllowed, rec.Code, "status 405")
 	})
 
-	tracker.Run("registration rejects invalid json payload", func(a *AssertionTracker) {
+	tracker.Run("registrasi menolak payload json yang tidak valid", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBufferString(`{invalid json`))
 		rec := httptest.NewRecorder()
 		RegisterHttpHandler(registerCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "bad request")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "status 400")
 	})
 
 	// ==========================================
-	// 2. USER CONTROLLER (LOGIN & LOGOUT)
+	// 2. USER CONTROLLER (AUTENTIKASI & LOGOUT)
 	// ==========================================
-	tracker.Run("login with correct credentials", func(a *AssertionTracker) {
+	tracker.Run("login berhasil dengan kredensial pembaca yang valid", func(a *AssertionTracker) {
 		pembaca := NewPembaca("reader_active", "reader@active.com", "validPass123")
 		a.Assert(pembaca.Login("reader@active.com", "validPass123"), "login oop model")
 		a.AssertEqual("Pembaca", pembaca.GetRole(), "role pembaca")
 		a.AssertEqual("reader_active", pembaca.GetUsername(), "username")
 	})
 
-	tracker.Run("login rejects unregistered email", func(a *AssertionTracker) {
+	tracker.Run("login menolak email yang belum terdaftar", func(a *AssertionTracker) {
 		body := `{"email":"unknown_user_999@test.com","password":"password123"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		LoginHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "not found or db error")
+		a.Assert(rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "not found atau error db")
 	})
 
-	tracker.Run("login rejects wrong password", func(a *AssertionTracker) {
+	tracker.Run("login menolak kata sandi yang salah", func(a *AssertionTracker) {
 		admin := NewAdmin("admin_auth", "admin@auth.com", "realPassword123", 1)
-		a.Assert(!admin.Login("admin@auth.com", "wrongPassword"), "wrong password fails")
+		a.Assert(!admin.Login("admin@auth.com", "wrongPassword"), "password salah ditolak")
 	})
 
-	tracker.Run("login requires email and password", func(a *AssertionTracker) {
+	tracker.Run("login mewajibkan pengisian email dan kata sandi", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBufferString(`{}`))
 		rec := httptest.NewRecorder()
 		LoginHttpHandler(userCtrl)(rec, req)
@@ -206,31 +206,31 @@ func TestControllerStatusSuite(t *testing.T) {
 		a.AssertEqual(false, res["success"], "success false")
 	})
 
-	tracker.Run("login rejects empty password", func(a *AssertionTracker) {
+	tracker.Run("login menolak kata sandi yang kosong", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBufferString(`{"email":"user@test.com","password":""}`))
 		rec := httptest.NewRecorder()
 		LoginHttpHandler(userCtrl)(rec, req)
 		a.AssertEqual(http.StatusBadRequest, rec.Code, "status code 400")
 	})
 
-	tracker.Run("login rejects non post method", func(a *AssertionTracker) {
+	tracker.Run("login menolak metode http selain post", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/login", nil)
 		rec := httptest.NewRecorder()
 		LoginHttpHandler(userCtrl)(rec, req)
 		a.AssertEqual(http.StatusMethodNotAllowed, rec.Code, "status 405")
 	})
 
-	tracker.Run("authenticated user can logout", func(a *AssertionTracker) {
+	tracker.Run("pengguna terautentikasi dapat melakukan logout", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/logout", nil)
 		rec := httptest.NewRecorder()
 		userCtrl.LogoutHandler()(rec, req)
 		a.AssertEqual(http.StatusOK, rec.Code, "status 200")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual(true, res["success"], "logout success")
+		a.AssertEqual(true, res["success"], "logout sukses")
 	})
 
-	tracker.Run("logout rejects get method", func(a *AssertionTracker) {
+	tracker.Run("logout menolak metode http selain post", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/logout", nil)
 		rec := httptest.NewRecorder()
 		userCtrl.LogoutHandler()(rec, req)
@@ -238,484 +238,484 @@ func TestControllerStatusSuite(t *testing.T) {
 	})
 
 	// ==========================================
-	// 3. USER CONTROLLER (PROFILE & ADMIN USER MGMT)
+	// 3. USER CONTROLLER (PROFIL & MANAJEMEN ADMIN)
 	// ==========================================
-	tracker.Run("authenticated user can view profile", func(a *AssertionTracker) {
+	tracker.Run("pengguna terautentikasi dapat melihat profil akun", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/user/profile?email=admin@test.com", nil)
 		rec := httptest.NewRecorder()
 		UserProfileHttpHandler(userCtrl)(rec, req)
 		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError || rec.Code == http.StatusNotFound, "handled profile")
 	})
 
-	tracker.Run("guest cannot view profile without id or email", func(a *AssertionTracker) {
+	tracker.Run("profil akun menolak akses tanpa parameter id atau email", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/user/profile", nil)
 		rec := httptest.NewRecorder()
 		UserProfileHttpHandler(userCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "requires param")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib parameter")
 	})
 
-	tracker.Run("authenticated user can update profile", func(a *AssertionTracker) {
+	tracker.Run("pengguna terautentikasi dapat memperbarui data profil", func(a *AssertionTracker) {
 		body := `{"id":1,"username":"new_admin_name","email":"admin@test.com"}`
 		req := httptest.NewRequest(http.MethodPut, "/api/user/profile", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		UserProfileHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "update processed")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "update profil")
 	})
 
-	tracker.Run("profile update rejects empty required fields", func(a *AssertionTracker) {
+	tracker.Run("pembaruan profil menolak payload json yang tidak valid", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPut, "/api/user/profile", bytes.NewBufferString(`{invalid}`))
 		rec := httptest.NewRecorder()
 		UserProfileHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusBadRequest || rec.Code == http.StatusOK, "json parse")
+		a.Assert(rec.Code == http.StatusBadRequest || rec.Code == http.StatusOK, "validasi json")
 	})
 
-	tracker.Run("admin can view all users list", func(a *AssertionTracker) {
+	tracker.Run("admin dapat melihat daftar seluruh pengguna sistem", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/users", nil)
 		rec := httptest.NewRecorder()
 		AdminUsersHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "users list")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar pengguna")
 	})
 
-	tracker.Run("admin can create new user account", func(a *AssertionTracker) {
+	tracker.Run("admin dapat membuat akun pengguna baru", func(a *AssertionTracker) {
 		body := `{"username":"user_by_admin","email":"admin_created@test.com","password":"password123","role":"Kreator","is_premium":false}`
 		req := httptest.NewRequest(http.MethodPost, "/api/admin/users", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		AdminUsersHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "admin create user")
+		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "admin buat akun")
 	})
 
-	tracker.Run("admin can update user role and premium", func(a *AssertionTracker) {
+	tracker.Run("admin dapat memperbarui role dan status premium pengguna", func(a *AssertionTracker) {
 		body := `{"id":2,"role":"Kreator","is_premium":true}`
 		req := httptest.NewRequest(http.MethodPut, "/api/admin/users", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		AdminUsersHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "admin update user")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "admin perbarui akun")
 	})
 
-	tracker.Run("admin can delete user by id", func(a *AssertionTracker) {
+	tracker.Run("admin dapat menghapus akun pengguna berdasarkan id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/admin/users?id=9999", nil)
 		rec := httptest.NewRecorder()
 		AdminUsersHttpHandler(userCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "admin delete user")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "admin hapus akun")
 	})
 
-	tracker.Run("admin delete user rejects missing id", func(a *AssertionTracker) {
+	tracker.Run("penghapusan pengguna menolak permintaan tanpa parameter id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/admin/users", nil)
 		rec := httptest.NewRecorder()
 		AdminUsersHttpHandler(userCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "bad request missing id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib parameter id")
 	})
 
 	// ==========================================
-	// 4. KOMIK CONTROLLER TESTS
+	// 4. KOMIK CONTROLLER (MANAJEMEN & KATALOG KOMIK)
 	// ==========================================
-	tracker.Run("comic controller retrieves all comics", func(a *AssertionTracker) {
+	tracker.Run("controller komik mengambil seluruh daftar komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics", nil)
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "get comics")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar komik")
 	})
 
-	tracker.Run("comic controller filters comics by category", func(a *AssertionTracker) {
+	tracker.Run("controller komik memfilter daftar komik berdasarkan kategori", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics?category=Action", nil)
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "category filter")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "filter kategori")
 	})
 
-	tracker.Run("comic controller searches comics by keyword", func(a *AssertionTracker) {
+	tracker.Run("controller komik mencari komik berdasarkan kata kunci", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics?search=Solo", nil)
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "keyword search")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "pencarian komik")
 	})
 
-	tracker.Run("comic controller sorts by popular and rating", func(a *AssertionTracker) {
+	tracker.Run("controller komik mengurutkan berdasarkan popularitas dan rating", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics?sort_by=popular", nil)
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "sort popular")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "urutkan komik")
 	})
 
-	tracker.Run("comic controller retrieves comic detail by id", func(a *AssertionTracker) {
+	tracker.Run("controller komik mengambil detail komik berdasarkan id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics/detail?id=1", nil)
 		rec := httptest.NewRecorder()
 		ComicsDetailHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "comic detail")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "detail komik")
 	})
 
-	tracker.Run("comic detail rejects missing id parameter", func(a *AssertionTracker) {
+	tracker.Run("detail komik menolak permintaan tanpa parameter id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics/detail", nil)
 		rec := httptest.NewRecorder()
 		ComicsDetailHttpHandler(komikCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "missing comic id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib parameter id komik")
 	})
 
-	tracker.Run("creator can create new comic", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat membuat data komik baru", func(a *AssertionTracker) {
 		body := `{"id_kreator":1,"title":"Komik Petualangan Baru","description":"Deskripsi komik","studio":"Studio X","category_ids":[1,2]}`
 		req := httptest.NewRequest(http.MethodPost, "/api/comics", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "create comic")
+		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "buat komik")
 	})
 
-	tracker.Run("create comic rejects empty title", func(a *AssertionTracker) {
+	tracker.Run("pembuatan komik menolak judul komik yang kosong", func(a *AssertionTracker) {
 		body := `{"id_kreator":1,"title":"","description":"Deskripsi"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/comics", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ComicsHttpHandler(komikCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "empty title rejected")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "judul kosong ditolak")
 	})
 
-	tracker.Run("creator can update comic metadata", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat memperbarui metadata komik", func(a *AssertionTracker) {
 		body := `{"id":1,"id_kreator":1,"title":"Judul Diperbarui","description":"Deskripsi baru","studio":"Studio Y"}`
 		req := httptest.NewRequest(http.MethodPut, "/api/comics/detail", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ComicsDetailHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "update comic")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "perbarui komik")
 	})
 
-	tracker.Run("creator can delete comic", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat menghapus data komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/comics/detail?id=9999", nil)
 		rec := httptest.NewRecorder()
 		ComicsDetailHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "delete comic")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "hapus komik")
 	})
 
-	tracker.Run("admin can verify comic eligibility", func(a *AssertionTracker) {
+	tracker.Run("admin dapat memverifikasi kelayakan rilis komik", func(a *AssertionTracker) {
 		body := `{"comic_id":1,"admin_id":1}`
 		req := httptest.NewRequest(http.MethodPost, "/api/comics/verify", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ComicsVerifyHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusForbidden || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "verify comic")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusForbidden || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "verifikasi komik")
 	})
 
-	tracker.Run("comic controller retrieves comic statistics", func(a *AssertionTracker) {
+	tracker.Run("controller komik mengambil statistik pembaca dan rating", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/comics/stats?comic_id=1", nil)
 		rec := httptest.NewRecorder()
 		ComicsStatsHttpHandler(komikCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "comic stats")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "statistik komik")
 	})
 
 	// ==========================================
-	// 5. BAB CONTROLLER (CHAPTER & PAGES)
+	// 5. BAB CONTROLLER (CHAPTER & HALAMAN)
 	// ==========================================
-	tracker.Run("chapter controller retrieves chapters by comic id", func(a *AssertionTracker) {
+	tracker.Run("controller bab mengambil daftar chapter berdasarkan komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapters?comic_id=1", nil)
 		rec := httptest.NewRecorder()
 		ChaptersHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "chapters list")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar chapter")
 	})
 
-	tracker.Run("chapter controller requires comic id parameter", func(a *AssertionTracker) {
+	tracker.Run("daftar chapter mewajibkan parameter id komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapters", nil)
 		rec := httptest.NewRecorder()
 		ChaptersHttpHandler(babCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "requires comic_id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib id komik")
 	})
 
-	tracker.Run("chapter controller retrieves chapter detail", func(a *AssertionTracker) {
+	tracker.Run("controller bab mengambil detail chapter berdasarkan id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapters/detail?id=1", nil)
 		rec := httptest.NewRecorder()
 		ChaptersDetailHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "chapter detail")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "detail chapter")
 	})
 
-	tracker.Run("chapter detail rejects missing id parameter", func(a *AssertionTracker) {
+	tracker.Run("detail chapter menolak permintaan tanpa parameter id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapters/detail", nil)
 		rec := httptest.NewRecorder()
 		ChaptersDetailHttpHandler(babCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "missing chapter id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib id chapter")
 	})
 
-	tracker.Run("chapter controller retrieves chapter pages", func(a *AssertionTracker) {
+	tracker.Run("controller bab mengambil daftar halaman gambar chapter", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapter-pages?chapter_id=1", nil)
 		rec := httptest.NewRecorder()
 		ChapterPagesHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "chapter pages")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "halaman chapter")
 	})
 
-	tracker.Run("chapter pages requires chapter id parameter", func(a *AssertionTracker) {
+	tracker.Run("daftar halaman chapter mewajibkan parameter id chapter", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapter-pages", nil)
 		rec := httptest.NewRecorder()
 		ChapterPagesHttpHandler(babCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "missing chapter_id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib chapter_id")
 	})
 
-	tracker.Run("creator can create new chapter", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat menambahkan bab chapter baru", func(a *AssertionTracker) {
 		body := `{"id_komik":1,"nomor_bab":1,"tanggal_rilis":"2026-11-20"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/chapters", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ChaptersHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "create chapter")
+		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "buat chapter")
 	})
 
-	tracker.Run("creator can update chapter metadata", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat memperbarui metadata bab chapter", func(a *AssertionTracker) {
 		body := `{"id":1,"nomor_bab":2,"tanggal_rilis":"2026-11-21"}`
 		req := httptest.NewRequest(http.MethodPut, "/api/chapters/detail", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ChaptersDetailHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "update chapter")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "perbarui chapter")
 	})
 
-	tracker.Run("creator can delete chapter", func(a *AssertionTracker) {
+	tracker.Run("kreator dapat menghapus bab chapter", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/chapters/detail?id=9999", nil)
 		rec := httptest.NewRecorder()
 		ChaptersDetailHttpHandler(babCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "delete chapter")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "hapus chapter")
 	})
 
 	// ==========================================
-	// 6. KATEGORI CONTROLLER TESTS
+	// 6. KATEGORI CONTROLLER (GENRE & KATEGORI)
 	// ==========================================
-	tracker.Run("category controller retrieves all categories", func(a *AssertionTracker) {
+	tracker.Run("controller kategori mengambil seluruh daftar kategori", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/categories", nil)
 		rec := httptest.NewRecorder()
 		CategoriesHttpHandler(kategoriCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "get categories")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar kategori")
 	})
 
-	tracker.Run("category controller retrieves category by id", func(a *AssertionTracker) {
+	tracker.Run("controller kategori mengambil data kategori berdasarkan id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/categories/detail?id=1", nil)
 		rec := httptest.NewRecorder()
 		CategoriesDetailHttpHandler(kategoriCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "category by id")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusNotFound || rec.Code == http.StatusInternalServerError, "kategori by id")
 	})
 
-	tracker.Run("category detail rejects missing id parameter", func(a *AssertionTracker) {
+	tracker.Run("detail kategori menolak permintaan tanpa parameter id", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/categories/detail", nil)
 		rec := httptest.NewRecorder()
 		CategoriesDetailHttpHandler(kategoriCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "missing id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib id kategori")
 	})
 
-	tracker.Run("category controller creates new category", func(a *AssertionTracker) {
+	tracker.Run("controller kategori membuat kategori komik baru", func(a *AssertionTracker) {
 		body := `{"name":"Fantasy Adventure"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/categories", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		CategoriesHttpHandler(kategoriCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "create category")
+		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "buat kategori")
 	})
 
-	tracker.Run("category controller rejects empty category name", func(a *AssertionTracker) {
+	tracker.Run("pembuatan kategori menolak nama kategori yang kosong", func(a *AssertionTracker) {
 		body := `{"name":""}`
 		req := httptest.NewRequest(http.MethodPost, "/api/categories", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		CategoriesHttpHandler(kategoriCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "empty category name rejected")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "nama kategori kosong ditolak")
 	})
 
-	tracker.Run("category controller updates category name", func(a *AssertionTracker) {
+	tracker.Run("controller kategori memperbarui nama kategori", func(a *AssertionTracker) {
 		body := `{"id":1,"name":"Action Shounen"}`
 		req := httptest.NewRequest(http.MethodPut, "/api/categories/detail", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		CategoriesDetailHttpHandler(kategoriCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "update category")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "perbarui kategori")
 	})
 
-	tracker.Run("category controller deletes category", func(a *AssertionTracker) {
+	tracker.Run("controller kategori menghapus data kategori", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/categories/detail?id=9999", nil)
 		rec := httptest.NewRecorder()
 		CategoriesDetailHttpHandler(kategoriCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "delete category")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "hapus kategori")
 	})
 
 	// ==========================================
-	// 7. KOMENTAR CONTROLLER (REVIEWS & RATINGS)
+	// 7. KOMENTAR & RATING CONTROLLER (ULASAN)
 	// ==========================================
-	tracker.Run("review controller retrieves reviews for comic", func(a *AssertionTracker) {
+	tracker.Run("controller ulasan mengambil ulasan pembaca komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/reviews?comic_id=1", nil)
 		rec := httptest.NewRecorder()
 		ReviewsHttpHandler(komentarCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "get reviews")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "ulasan komik")
 	})
 
-	tracker.Run("user can post review and rating", func(a *AssertionTracker) {
+	tracker.Run("pembaca dapat mengirimkan ulasan dan nilai rating", func(a *AssertionTracker) {
 		body := `{"user_id":1,"comic_id":1,"comment":"Komik ini luar biasa seru!","rating":5.0}`
 		req := httptest.NewRequest(http.MethodPost, "/api/reviews", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ReviewsHttpHandler(komentarCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "post review")
+		a.Assert(rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "kirim ulasan")
 	})
 
-	tracker.Run("post review rejects empty comment", func(a *AssertionTracker) {
+	tracker.Run("pengiriman ulasan menolak komentar yang kosong", func(a *AssertionTracker) {
 		body := `{"user_id":1,"comic_id":1,"comment":"","rating":4.5}`
 		req := httptest.NewRequest(http.MethodPost, "/api/reviews", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		ReviewsHttpHandler(komentarCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "empty comment rejected")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "komentar kosong ditolak")
 	})
 
-	tracker.Run("review controller retrieves author reviews", func(a *AssertionTracker) {
+	tracker.Run("controller ulasan mengambil ulasan untuk author komik", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/author/reviews?creator_id=1", nil)
 		rec := httptest.NewRecorder()
 		AuthorReviewsHttpHandler(komentarCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "author reviews")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "ulasan author")
 	})
 
-	tracker.Run("author reviews requires creator id parameter", func(a *AssertionTracker) {
+	tracker.Run("ulasan author mewajibkan parameter id kreator", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/author/reviews", nil)
 		rec := httptest.NewRecorder()
 		AuthorReviewsHttpHandler(komentarCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "requires creator_id")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib creator_id")
 	})
 
-	tracker.Run("user can delete own review", func(a *AssertionTracker) {
+	tracker.Run("pengguna dapat menghapus komentar ulasan miliknya", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/reviews/detail?review_id=9999&user_id=1&role=Admin", nil)
 		rec := httptest.NewRecorder()
 		ReviewsDetailHttpHandler(komentarCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "delete review")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "hapus ulasan")
 	})
 
 	// ==========================================
 	// 8. BOOKMARK & HISTORI CONTROLLER
 	// ==========================================
-	tracker.Run("bookmark controller retrieves user bookmarks", func(a *AssertionTracker) {
+	tracker.Run("controller bookmark mengambil daftar komik tersimpan", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/bookmarks?user_id=1", nil)
 		rec := httptest.NewRecorder()
 		BookmarksHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "get bookmarks")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar bookmark")
 	})
 
-	tracker.Run("bookmark controller adds comic to bookmark", func(a *AssertionTracker) {
+	tracker.Run("pembaca dapat menambahkan komik ke daftar bookmark", func(a *AssertionTracker) {
 		body := `{"user_id":1,"comic_id":2}`
 		req := httptest.NewRequest(http.MethodPost, "/api/bookmarks", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		BookmarksHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "add bookmark")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "tambah bookmark")
 	})
 
-	tracker.Run("bookmark controller removes comic from bookmark", func(a *AssertionTracker) {
+	tracker.Run("pembaca dapat menghapus komik dari daftar bookmark", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodDelete, "/api/bookmarks?user_id=1&comic_id=2", nil)
 		rec := httptest.NewRecorder()
 		BookmarksHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "remove bookmark")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "hapus bookmark")
 	})
 
-	tracker.Run("history controller records read chapter", func(a *AssertionTracker) {
+	tracker.Run("controller histori mencatat bab komik yang dibaca", func(a *AssertionTracker) {
 		body := `{"user_id":1,"chapter_id":10}`
 		req := httptest.NewRequest(http.MethodPost, "/api/history", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		HistoryHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "record history")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "catat histori")
 	})
 
-	tracker.Run("history controller retrieves reading history", func(a *AssertionTracker) {
+	tracker.Run("controller histori mengambil riwayat baca pengguna", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/history?user_id=1", nil)
 		rec := httptest.NewRecorder()
 		HistoryHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "get history")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "riwayat baca")
 	})
 
 	// ==========================================
 	// 9. PROSES PEMBAYARAN CONTROLLER
 	// ==========================================
-	tracker.Run("payment checkout requires user id and method", func(a *AssertionTracker) {
+	tracker.Run("checkout pembayaran mewajibkan id pengguna dan metode bayar", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/payment/checkout", bytes.NewBufferString(`{}`))
 		rec := httptest.NewRecorder()
 		PaymentCheckoutHttpHandler(pembayaranCtrl)(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "requires fields")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib field lengkap")
 	})
 
-	tracker.Run("payment checkout creates pending transaction", func(a *AssertionTracker) {
+	tracker.Run("checkout pembayaran membuat transaksi berstatus menunggu", func(a *AssertionTracker) {
 		body := `{"user_id":1,"payment_method":"GoPay","amount":30000}`
 		req := httptest.NewRequest(http.MethodPost, "/api/payment/checkout", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		PaymentCheckoutHttpHandler(pembayaranCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "checkout ok")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "checkout transaksi")
 	})
 
-	tracker.Run("payment process upgrades user account to premium", func(a *AssertionTracker) {
+	tracker.Run("proses pembayaran memverifikasi dan mengupgrade status premium", func(a *AssertionTracker) {
 		body := `{"transaction_id":1,"status":"Berhasil"}`
 		req := httptest.NewRequest(http.MethodPost, "/api/payment/process", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		PaymentProcessHttpHandler(pembayaranCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "payment process")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "proses bayar")
 	})
 
-	tracker.Run("user can retrieve payment transaction history", func(a *AssertionTracker) {
+	tracker.Run("pengguna dapat melihat riwayat transaksi pembayaran akun", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/payment/history?user_id=1", nil)
 		rec := httptest.NewRecorder()
 		UserTransactionsHttpHandler(pembayaranCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "user tx history")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "riwayat transaksi")
 	})
 
-	tracker.Run("admin can retrieve all system transactions", func(a *AssertionTracker) {
+	tracker.Run("admin dapat melihat dan mengelola seluruh transaksi sistem", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/transactions", nil)
 		rec := httptest.NewRecorder()
 		AdminTransactionsHttpHandler(pembayaranCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "admin tx list")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusInternalServerError, "daftar transaksi admin")
 	})
 
 	// ==========================================
-	// 10. ANALISIS CONTROLLER & RECOMMENDATIONS
+	// 10. ANALISIS CONTROLLER & REKOMENDASI
 	// ==========================================
-	tracker.Run("analysis controller requires valid date range", func(a *AssertionTracker) {
+	tracker.Run("controller analisis memvalidasi rentang format tanggal laporan", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/analysis?start_date=invalid-date", nil)
 		rec := httptest.NewRecorder()
 		analisisCtrl.Handler()(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "bad date format")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "format tanggal tidak valid")
 	})
 
-	tracker.Run("analysis controller rejects end date before start date", func(a *AssertionTracker) {
+	tracker.Run("controller analisis menolak tanggal akhir sebelum tanggal awal", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/analysis?start_date=2026-11-20&end_date=2026-11-01", nil)
 		rec := httptest.NewRecorder()
 		analisisCtrl.Handler()(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "reversed dates")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "urutan tanggal terbalik")
 	})
 
-	tracker.Run("analysis controller generates period summary", func(a *AssertionTracker) {
+	tracker.Run("controller analisis menghasilkan ringkasan statistik periode", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/analysis?start_date=2026-10-01&end_date=2026-11-20", nil)
 		rec := httptest.NewRecorder()
 		analisisCtrl.Handler()(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "analysis response")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "analisis periode")
 	})
 
-	tracker.Run("analysis controller exports csv report", func(a *AssertionTracker) {
+	tracker.Run("controller analisis mengekspor laporan dalam format csv", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/admin/analysis?start_date=2026-10-01&end_date=2026-11-20&format=csv", nil)
 		rec := httptest.NewRecorder()
 		analisisCtrl.Handler()(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "csv export")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "ekspor csv")
 		if rec.Code == http.StatusOK {
-			a.Assert(strings.Contains(rec.Header().Get("Content-Type"), "text/csv"), "csv content type")
+			a.Assert(strings.Contains(rec.Header().Get("Content-Type"), "text/csv"), "content type csv")
 		}
 	})
 
-	tracker.Run("recommendation controller requires get method", func(a *AssertionTracker) {
+	tracker.Run("controller rekomendasi menolak metode http selain get", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodPost, "/api/recommendations", nil)
 		rec := httptest.NewRecorder()
 		RecommendationsHttpHandler()(rec, req)
 		a.AssertEqual(http.StatusMethodNotAllowed, rec.Code, "status 405")
 	})
 
-	tracker.Run("recommendation controller returns personalized comics", func(a *AssertionTracker) {
+	tracker.Run("controller rekomendasi menyajikan rekomendasi komik pengguna", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/recommendations?user_id=1&limit=5", nil)
 		rec := httptest.NewRecorder()
 		RecommendationsHttpHandler()(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "recommendations")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable || rec.Code == http.StatusInternalServerError, "rekomendasi komik")
 	})
 
 	// ==========================================
 	// 11. UPLOAD CONTROLLER & HEALTH CHECK
 	// ==========================================
-	tracker.Run("health check returns running server status", func(a *AssertionTracker) {
+	tracker.Run("endpoint health check mengembalikan status operasional server", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/health", nil)
 		rec := httptest.NewRecorder()
 		HealthHttpHandler()(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable, "health code")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusServiceUnavailable, "status health")
 		var res map[string]interface{}
 		_ = json.Unmarshal(rec.Body.Bytes(), &res)
-		a.AssertEqual("running", res["status"], "server running")
+		a.AssertEqual("running", res["status"], "status server berjalan")
 	})
 
-	tracker.Run("upload handler rejects get method", func(a *AssertionTracker) {
+	tracker.Run("upload gambar chapter menolak metode http selain post", func(a *AssertionTracker) {
 		req := httptest.NewRequest(http.MethodGet, "/api/chapter-pages/upload", nil)
 		rec := httptest.NewRecorder()
 		ChapterPagesUploadHttpHandler(".")(rec, req)
 		a.AssertEqual(http.StatusMethodNotAllowed, rec.Code, "status 405")
 	})
 
-	tracker.Run("upload handler validates image file signatures", func(a *AssertionTracker) {
+	tracker.Run("upload gambar chapter menolak jika tidak ada gambar yang dipilih", func(a *AssertionTracker) {
 		var b bytes.Buffer
 		w := multipart.NewWriter(&b)
 		_ = w.WriteField("user_id", "1")
@@ -726,35 +726,35 @@ func TestControllerStatusSuite(t *testing.T) {
 		req.Header.Set("Content-Type", w.FormDataContentType())
 		rec := httptest.NewRecorder()
 		ChapterPagesUploadHttpHandler(".")(rec, req)
-		a.AssertEqual(http.StatusBadRequest, rec.Code, "requires images")
+		a.AssertEqual(http.StatusBadRequest, rec.Code, "wajib sertakan file gambar")
 	})
 
 	// ==========================================
-	// 12. MODEL OOP HIERARCHY TESTS
+	// 12. MODEL OOP HIERARKI (ADMIN, AUTHOR, PEMBACA)
 	// ==========================================
-	tracker.Run("admin model registers and verifies comic", func(a *AssertionTracker) {
+	tracker.Run("model admin menginisialisasi registrasi dan verifikasi komik", func(a *AssertionTracker) {
 		admin := NewAdmin("admin_oop", "admin_oop@test.com", "pass1234", 1)
 		a.Assert(admin.Register(), "admin register")
 		a.Assert(admin.Login("admin_oop@test.com", "pass1234"), "admin login")
-		a.Assert(admin.VerifyKomik(101), "admin verify")
-		a.AssertEqual("Admin", admin.GetRole(), "admin role")
+		a.Assert(admin.VerifyKomik(101), "admin verifikasi komik")
+		a.AssertEqual("Admin", admin.GetRole(), "role admin")
 	})
 
-	tracker.Run("author model registers and publishes comic", func(a *AssertionTracker) {
+	tracker.Run("model author menginisialisasi registrasi dan publikasi komik", func(a *AssertionTracker) {
 		author := NewAuthor("author_oop", "author_oop@test.com", "pass1234", "Studio B")
 		a.Assert(author.Register(), "author register")
 		a.Assert(author.Login("author_oop@test.com", "pass1234"), "author login")
-		a.Assert(author.PostKomik("Komik Petualangan Baru"), "author publish")
-		a.AssertEqual("Kreator", author.GetRole(), "author role")
+		a.Assert(author.PostKomik("Komik Petualangan Baru"), "author publikasi komik")
+		a.AssertEqual("Kreator", author.GetRole(), "role kreator")
 	})
 
-	tracker.Run("reader model registers and bookmarks comic", func(a *AssertionTracker) {
+	tracker.Run("model pembaca menginisialisasi registrasi dan penyimpanan bookmark", func(a *AssertionTracker) {
 		reader := NewPembaca("reader_oop", "reader_oop@test.com", "pass1234")
 		a.Assert(reader.Register(), "reader register")
 		a.Assert(reader.Login("reader_oop", "pass1234"), "reader login")
 		reader.Bookmark(505)
-		a.AssertEqual("Pembaca", reader.GetRole(), "reader role")
-		a.AssertEqual(1, len(reader.BookmarkKomikIds), "bookmark count")
+		a.AssertEqual("Pembaca", reader.GetRole(), "role pembaca")
+		a.AssertEqual(1, len(reader.BookmarkKomikIds), "jumlah bookmark tersimpan")
 	})
 
 	// CETAK RINGKASAN PERSIS SEPERTI PADA SCREENSHOT
@@ -763,7 +763,7 @@ func TestControllerStatusSuite(t *testing.T) {
 		totalDuration = 2.15
 	}
 	fmt.Println()
-	fmt.Printf("Tests:  \033[32m%d passed\033[0m (%d assertions)\n", tracker.passed, tracker.assertions)
-	fmt.Printf("Duration: %.2fs\n", totalDuration)
+	fmt.Printf("Tests:    \033[32m%d passed\033[0m (%d asersi)\n", tracker.passed, tracker.assertions)
+	fmt.Printf("Durasi:   %.2fs\n", totalDuration)
 	fmt.Println()
 }

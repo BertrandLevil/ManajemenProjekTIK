@@ -210,6 +210,8 @@ func HealthHttpHandler() http.HandlerFunc {
 			statusCode = http.StatusServiceUnavailable
 		}
 
+		LogStatus("HealthController", "CheckHealth", "SUCCESS", "Pemeriksaan kesehatan server: status=running, db=%s", dbStatus)
+
 		sendJSON(w, statusCode, map[string]interface{}{
 			"status":   "running",
 			"database": dbStatus,
