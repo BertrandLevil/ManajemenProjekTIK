@@ -340,6 +340,9 @@ func ComicsStatsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 		}
 
 		comicIdStr := r.URL.Query().Get("id")
+		if comicIdStr == "" {
+			comicIdStr = r.URL.Query().Get("comic_id")
+		}
 		creatorIdStr := r.URL.Query().Get("creator_id")
 
 		if comicIdStr != "" {
@@ -816,6 +819,10 @@ func AdminUsersHttpHandler(ctrl *UserController) http.HandlerFunc {
 		} else if r.Method == http.MethodDelete {
 			idStr := r.URL.Query().Get("id")
 			id, _ := strconv.Atoi(idStr)
+			if id <= 0 {
+				sendJSONError(w, http.StatusBadRequest, "Parameter id wajib diisi.")
+				return
+			}
 			ok, err := ctrl.DeleteUserByAdmin(id)
 			if err != nil {
 				sendJSONError(w, http.StatusInternalServerError, err.Error())

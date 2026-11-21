@@ -7,9 +7,16 @@ import (
 	"time"
 )
 
+// LogEnabled mengatur apakah LogStatus aktif mencetak ke output console.
+// Dapat dinonaktifkan saat menjalankan test suite agar output bersih.
+var LogEnabled = true
+
 // LogStatus mencatat log status terstandarisasi untuk seluruh aksi pada controller.
 // Format: [LOG STATUS][Controller.Aksi] STATUS: <SUCCESS|FAILED|ERROR|NOT_FOUND|NO_OP> | <keterangan>
 func LogStatus(controller, action, status, format string, args ...interface{}) {
+	if !LogEnabled {
+		return
+	}
 	detail := fmt.Sprintf(format, args...)
 	log.Printf("[LOG STATUS][%s.%s] STATUS: %s | %s", controller, action, status, detail)
 }
