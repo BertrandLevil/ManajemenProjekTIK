@@ -223,13 +223,18 @@ func ComicsHttpHandler(ctrl *KomikController) http.HandlerFunc {
 			defer r.Body.Close()
 			var req struct {
 				CreatorId   int    `json:"creator_id"`
+				IdKreator   int    `json:"id_kreator"`
 				Title       string `json:"title"`
 				Description string `json:"description"`
 				Studio      string `json:"studio"`
 				CategoryIds []int  `json:"category_ids"`
 			}
 			_ = json.Unmarshal(body, &req)
-			newId, err := ctrl.CreateKomik(req.CreatorId, req.Title, req.Description, req.Studio, req.CategoryIds)
+			creatorId := req.CreatorId
+			if creatorId <= 0 {
+				creatorId = req.IdKreator
+			}
+			newId, err := ctrl.CreateKomik(creatorId, req.Title, req.Description, req.Studio, req.CategoryIds)
 			if err != nil {
 				sendJSONError(w, http.StatusBadRequest, err.Error())
 				return
@@ -273,6 +278,7 @@ func ComicsDetailHttpHandler(ctrl *KomikController) http.HandlerFunc {
 			var req struct {
 				Id          int    `json:"id"`
 				CreatorId   int    `json:"creator_id"`
+				IdKreator   int    `json:"id_kreator"`
 				Title       string `json:"title"`
 				Description string `json:"description"`
 				Studio      string `json:"studio"`
@@ -282,7 +288,11 @@ func ComicsDetailHttpHandler(ctrl *KomikController) http.HandlerFunc {
 			if req.Id <= 0 {
 				req.Id = id
 			}
-			ok, err := ctrl.UpdateKomik(req.Id, req.CreatorId, req.Title, req.Description, req.Studio, req.CategoryIds)
+			creatorId := req.CreatorId
+			if creatorId <= 0 {
+				creatorId = req.IdKreator
+			}
+			ok, err := ctrl.UpdateKomik(req.Id, creatorId, req.Title, req.Description, req.Studio, req.CategoryIds)
 			if err != nil {
 				sendJSONError(w, http.StatusBadRequest, err.Error())
 				return

@@ -1171,6 +1171,17 @@ export function frontManajemenDataKomik() {
                 ).length;
 
                 saveComics();
+
+                // Sinkronisasi chapter baru ke backend API
+                fetch('/api/chapters', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_komik: selectedComicId,
+                        nomor_bab: chapterNumber,
+                        tanggal_rilis: new Date().toISOString().split('T')[0]
+                    })
+                }).catch(e => console.warn("Sync chapter backend error:", e));
             }
 
             resetChapterForm();
@@ -1284,6 +1295,33 @@ export function frontManajemenDataKomik() {
 
         if (!saveComics()) return;
 
+        // Sinkronisasi penambahan/pembaruan komik ke backend Golang API
+        const isUpdate = (editingComicId !== null);
+        const endpoint = isUpdate ? '/api/comics/detail' : '/api/comics';
+        const method = isUpdate ? 'PUT' : 'POST';
+        const payload = {
+            id: comicData.id,
+            creator_id: creatorId,
+            id_kreator: creatorId,
+            title: comicData.title,
+            description: comicData.description || "",
+            studio: Array.isArray(comicData.studio) ? comicData.studio.join(", ") : (comicData.studio || ""),
+            category_ids: []
+        };
+
+        fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(apiRes => {
+            console.log("[Backend API Sync Komik]:", apiRes);
+        })
+        .catch(err => {
+            console.warn("[Backend API Sync Error]:", err);
+        });
+
         closeForm();
         filterComics();
 
@@ -1329,4 +1367,44 @@ export function frontManajemenDataKomik() {
     statusFilter.addEventListener("change", filterComics);
 
     renderComics(myComics);
+
+    // Sinkronisasi daftar komik dari backend API saat pertama kali dibuka
+    fetch('/api/comics')
+        .then(res => res.json())
+        .then(apiRes => {
+            if (apiRes && apiRes.success && Array.isArray(apiRes.data)) {
+                let changed = false;
+                apiRes.data.forEach(apiComic => {
+                    const cId = Number(apiComic.id_komik || apiComic.id);
+                    const kId = Number(apiComic.id_kreator || apiComic.creator_id);
+                    if (kId === creatorId) {
+                        const exists = myComics.some(c => Number(c.id) === cId);
+                        if (!exists) {
+                            myComics.push({
+                                id: cId,
+                                creatorId: kId,
+                                title: apiComic.nama_komik || apiComic.title,
+                                author: apiComic.nama_kreator || "Kreator",
+                                studio: [apiComic.nama_studio || "-"],
+                                category: "Action",
+                                status: "on-going",
+                                genre: apiComic.categories || [],
+                                description: apiComic.deskripsi || apiComic.description || "",
+                                cover: "",
+                                chapter: apiComic.total_chapters || 0,
+                                rating: apiComic.rating_rata_rata || 0
+                            });
+                            changed = true;
+                        }
+                    }
+                });
+                if (changed) {
+                    saveComics();
+                    renderComics(myComics);
+                }
+            }
+        })
+        .catch(err => {
+            console.warn("[Backend Sync] Backend offline atau gagal memuat komik:", err);
+        });
 }
