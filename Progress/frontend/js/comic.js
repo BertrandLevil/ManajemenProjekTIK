@@ -71,6 +71,90 @@ export function frontComicDetail() {
         return;
     }
 
+    function getBookmarkUserId() {
+        const isLoggedIn =
+            localStorage.getItem("comicid_logged_in") === "true";
+
+        const userId = localStorage.getItem("comicid_user_id");
+
+        if (!isLoggedIn || !userId) {
+            return null;
+        }
+
+        return userId;
+    }
+
+    function getBookmarkKey() {
+        const userId = getBookmarkUserId();
+
+        if (!userId) return null;
+
+        return `comicid_bookmarks_${userId}`;
+    }
+
+    function getBookmarks() {
+        const key = getBookmarkKey();
+
+        if (!key) return [];
+
+        try {
+            const bookmarks = JSON.parse(
+                localStorage.getItem(key) || "[]"
+            );
+
+            return Array.isArray(bookmarks) ? bookmarks : [];
+        } catch (error) {
+            console.error("Gagal membaca bookmark:", error);
+            return [];
+        }
+    }
+
+    function isBookmarked() {
+        return getBookmarks().some(
+            id => String(id) === String(comic.id)
+        );
+    }
+
+    function updateBookmarkButton() {
+        const button = document.getElementById("comic-bookmark-btn");
+
+        if (!button) return;
+
+        const saved = isBookmarked();
+
+        button.classList.toggle("bookmarked", saved);
+        button.setAttribute("aria-pressed", String(saved));
+
+        button.innerHTML = saved
+            ? `<span>🔖</span> Tersimpan`
+            : `<span>♧</span> Bookmark`;
+    }
+
+    function toggleBookmark() {
+        const key = getBookmarkKey();
+
+        if (!key) {
+            alert("Silakan login terlebih dahulu untuk menggunakan bookmark.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        let bookmarks = getBookmarks();
+
+        if (isBookmarked()) {
+            bookmarks = bookmarks.filter(
+                id => String(id) !== String(comic.id)
+            );
+        } else {
+            bookmarks.push(comic.id);
+        }
+
+        localStorage.setItem(key, JSON.stringify(bookmarks));
+
+        updateBookmarkButton();
+    }
+
+
     let localChapters = [];
 
     try {
@@ -208,6 +292,15 @@ export function frontComicDetail() {
                         <p class="detail-eyebrow">DETAIL KOMIK</p>
                         <h1>${escapeHTML(comic.title)}</h1>
 
+                        <button
+                            type="button"
+                            class="comic-bookmark-btn"
+                            id="comic-bookmark-btn"
+                            aria-pressed="false"
+                        >
+                            <span>♧</span> Bookmark
+                        </button>
+
                         <div class="detail-rating">
                             <span>★</span>
                             <strong>${(Number(comic.rating) || 0).toFixed(1)}</strong>
@@ -268,6 +361,12 @@ export function frontComicDetail() {
             </main>
         `;
         
+        updateBookmarkButton();
+
+        document
+            .getElementById("comic-bookmark-btn")
+            .addEventListener("click", toggleBookmark);
+
         const description = document.getElementById("comic-description");
         const toggleButton = document.getElementById("description-toggle");
 

@@ -92,14 +92,20 @@ export function header() {
                     </a>
                 ` : ""}
                 ${(isReader || isCreator) ? `
-                <a
-                    class="nav-link ${currentPage === "premium" ? "active" : ""}"
-                    href="premium.html"
-                >
-                    Upgrade Premium
-                </a>
-            ` : ""}
-                <a class="nav-link" href="bookmark.html">Bookmark</a>
+                    <a
+                        class="nav-link ${currentPage === "premium" ? "active" : ""}"
+                        href="premium.html"
+                    >
+                        Upgrade Premium
+                    </a>
+
+                    <a
+                        class="nav-link ${currentPage === "bookmark" ? "active" : ""}"
+                        href="bookmark.html"
+                    >
+                        Bookmark Saya
+                    </a>
+                ` : ""}
             </nav>
 
             <div class="sidebar-actions">

@@ -11,6 +11,7 @@ import { frontComicDetail } from "./comic.js";
 import { frontReader } from "./reader.js";
 import { frontPremium } from "./premium.js";
 import { frontTrending } from "./trending.js";
+import { frontBookmark } from "./bookmark.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const currentPage = document.body.dataset.page;
@@ -30,6 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "profile":
             frontProfile();
+            break;
+        case "bookmark":
+            frontBookmark();
             break;
         case "upgrade-creator":
             frontUpgradeCreator();
