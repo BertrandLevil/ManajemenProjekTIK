@@ -130,18 +130,18 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 			return
 		}
 
-		query := `SELECT k.id_komik, k.id_kreator, COALESCE(u.username, ''),
-			k.nama_komik, COALESCE(k.deskripsi, ''), COALESCE(k.nama_studio, '-'),
-			k.rating_rata_rata, (SELECT COUNT(*) FROM bab b WHERE b.id_komik=k.id_komik) AS total_bab
-			FROM komik k LEFT JOIN pengguna u ON u.id_pengguna=k.id_kreator
-			WHERE (? <= 0 OR k.id_komik NOT IN (
+		query := `SELECT k.id, k.creatorID, COALESCE(u.username, ''),
+			k.title, COALESCE(k.description, ''), COALESCE(CAST(k.studio AS CHAR), '-'),
+			k.rating, (SELECT COUNT(*) FROM bab b WHERE b.id_komik=k.id) AS total_bab
+			FROM komik k LEFT JOIN pengguna u ON u.id_pengguna=k.creatorID
+			WHERE (? <= 0 OR k.id NOT IN (
 				SELECT rb.id_komik FROM histori_baca hb
 				JOIN bab rb ON rb.id_bab=hb.id_bab WHERE hb.id_pengguna=?
 			))
 			ORDER BY
 			CASE WHEN ? > 0 THEN (
 				SELECT COUNT(*) FROM komik_kategori target
-				WHERE target.id_komik=k.id_komik AND target.id_kategori IN (
+				WHERE target.id_komik=k.id AND target.id_kategori IN (
 					SELECT source.id_kategori
 					FROM histori_baca hb
 					JOIN bab read_bab ON read_bab.id_bab=hb.id_bab
@@ -149,7 +149,7 @@ func RecommendationsHttpHandler() http.HandlerFunc {
 					WHERE hb.id_pengguna=?
 				)
 			) ELSE 0 END DESC,
-			k.rating_rata_rata DESC, k.id_komik DESC
+			k.rating DESC, k.id DESC
 			LIMIT ?`
 		rows, err := conn.Query(query, userID, userID, userID, userID, limit)
 		if err != nil {

@@ -129,9 +129,9 @@ func ChapterPagesUploadHttpHandler(storageDir string) http.HandlerFunc {
 		var comicID, chapterNumber, creatorID int
 
 		err = conn.QueryRow(`
-			SELECT k.id_komik, b.nomor_bab, k.id_kreator
+			SELECT k.id, b.nomor_bab, k.creatorID
 			FROM bab b
-			JOIN komik k ON b.id_komik = k.id_komik
+			JOIN komik k ON b.id_komik = k.id
 			WHERE b.id_bab = ?
 		`, chapterID).Scan(
 			&comicID,

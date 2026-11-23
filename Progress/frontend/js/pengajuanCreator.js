@@ -222,6 +222,16 @@ export function frontPengajuanCreator() {
                 JSON.stringify(requests)
             );
 
+            // Sinkronkan peran pengguna ke database backend melalui /api/admin/users
+            fetch("/api/admin/users", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: request.email,
+                    role: "Kreator"
+                })
+            }).catch(e => console.warn("Sync update user role:", e));
+
             alert("Pengajuan berhasil disetujui.");
             renderRequests();
         } catch {

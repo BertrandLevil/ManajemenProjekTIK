@@ -158,9 +158,9 @@ func (c *BabController) GetBabByKomik(idKomik int) ([]BabDTO, error) {
                 b.id_komik,
                 b.nomor_bab,
                 b.tanggal_rilis,
-                k.nama_komik
+                COALESCE(k.title, '')
               FROM bab b
-              JOIN komik k ON b.id_komik = k.id_komik
+              LEFT JOIN komik k ON b.id_komik = k.id
               WHERE b.id_komik = ?
               ORDER BY b.nomor_bab ASC`
 
@@ -211,9 +211,9 @@ func (c *BabController) GetBabDetail(idBab int) (*BabDTO, error) {
                 b.id_komik,
                 b.nomor_bab,
                 b.tanggal_rilis,
-                k.nama_komik
+                COALESCE(k.title, '')
               FROM bab b
-              JOIN komik k ON b.id_komik = k.id_komik
+              LEFT JOIN komik k ON b.id_komik = k.id
               WHERE b.id_bab = ?`
 
 	var b BabDTO
@@ -380,37 +380,37 @@ func (c *KomikController) GetAllKomik(search, kategori, sortBy string) ([]KomikD
 		return nil, err
 	}
 
-	sqlQuery := `SELECT k.id_komik, k.id_kreator, COALESCE(u.username, '') AS nama_kreator,
-                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi,
-                 COALESCE(k.nama_studio, '-') AS nama_studio, k.rating_rata_rata,
-                 (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id_komik) AS total_bab
+	sqlQuery := `SELECT k.id, k.creatorID, COALESCE(u.username, '') AS nama_kreator,
+                 k.title, COALESCE(k.description, '') AS deskripsi,
+                 COALESCE(CAST(k.studio AS CHAR), '-') AS nama_studio, k.rating,
+                 (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id) AS total_bab
                  FROM komik k
-                 LEFT JOIN pengguna u ON k.id_kreator = u.id_pengguna
+                 LEFT JOIN pengguna u ON k.creatorID = u.id_pengguna
                  WHERE 1=1 `
 
 	var params []interface{}
 
 	if strings.TrimSpace(search) != "" {
-		sqlQuery += "AND (LOWER(k.nama_komik) LIKE LOWER(?) OR LOWER(k.deskripsi) LIKE LOWER(?) OR LOWER(k.nama_studio) LIKE LOWER(?)) "
+		sqlQuery += "AND (LOWER(k.title) LIKE LOWER(?) OR LOWER(COALESCE(k.description, '')) LIKE LOWER(?) OR LOWER(COALESCE(CAST(k.studio AS CHAR), '')) LIKE LOWER(?)) "
 		pat := "%" + strings.TrimSpace(search) + "%"
 		params = append(params, pat, pat, pat)
 	}
 
 	if strings.TrimSpace(kategori) != "" {
-		sqlQuery += `AND k.id_komik IN (
+		sqlQuery += `AND (LOWER(COALESCE(k.category, '')) = LOWER(?) OR k.id IN (
             SELECT kk.id_komik FROM komik_kategori kk
             JOIN kategori kat ON kk.id_kategori = kat.id_kategori
             WHERE LOWER(kat.nama_kategori) = LOWER(?) OR kk.id_kategori = ?
-        ) `
-		params = append(params, strings.TrimSpace(kategori), strings.TrimSpace(kategori))
+        )) `
+		params = append(params, strings.TrimSpace(kategori), strings.TrimSpace(kategori), strings.TrimSpace(kategori))
 	}
 
 	if sortBy == "rating" || sortBy == "popular" {
-		sqlQuery += "ORDER BY k.rating_rata_rata DESC, k.id_komik DESC"
+		sqlQuery += "ORDER BY k.rating DESC, k.id DESC"
 	} else if sortBy == "title" || sortBy == "az" {
-		sqlQuery += "ORDER BY k.nama_komik ASC"
+		sqlQuery += "ORDER BY k.title ASC"
 	} else {
-		sqlQuery += "ORDER BY k.id_komik DESC"
+		sqlQuery += "ORDER BY k.id DESC"
 	}
 
 	rows, err := conn.Query(sqlQuery, params...)
@@ -456,13 +456,13 @@ func (c *KomikController) GetKomikById(id int) (*KomikDTO, error) {
 		return nil, err
 	}
 
-	sqlQuery := `SELECT k.id_komik, k.id_kreator, COALESCE(u.username, '') AS nama_kreator,
-                 k.nama_komik, COALESCE(k.deskripsi, '') AS deskripsi,
-                 COALESCE(k.nama_studio, '-') AS nama_studio, k.rating_rata_rata,
-                 (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id_komik) AS total_bab
+	sqlQuery := `SELECT k.id, k.creatorID, COALESCE(u.username, '') AS nama_kreator,
+                 k.title, COALESCE(k.description, '') AS deskripsi,
+                 COALESCE(CAST(k.studio AS CHAR), '-') AS nama_studio, k.rating,
+                 (SELECT COUNT(*) FROM bab b WHERE b.id_komik = k.id) AS total_bab
                  FROM komik k
-                 LEFT JOIN pengguna u ON k.id_kreator = u.id_pengguna
-                 WHERE k.id_komik = ?`
+                 LEFT JOIN pengguna u ON k.creatorID = u.id_pengguna
+                 WHERE k.id = ?`
 
 	var k KomikDTO
 	err = conn.QueryRow(sqlQuery, id).Scan(
@@ -507,7 +507,7 @@ func (c *KomikController) CreateKomik(idKreator int, title, desc, studio string,
 		return 0, err
 	}
 
-	res, err := conn.Exec("INSERT INTO komik (id_kreator, nama_komik, deskripsi, nama_studio, rating_rata_rata) VALUES (?, ?, ?, ?, 0.00)",
+	res, err := conn.Exec("INSERT INTO komik (creatorID, title, description, studio, rating) VALUES (?, ?, ?, ?, 0.00)",
 		idKreator, title, desc, studio)
 	if err != nil {
 		LogStatus("KomikController", "CreateKomik", "ERROR", "Gagal insert komik '%s': %v", title, err)
@@ -543,7 +543,7 @@ func (c *KomikController) UpdateKomik(idKomik, idKreator int, title, desc, studi
 		return false, err
 	}
 
-	res, err := conn.Exec("UPDATE komik SET nama_komik = ?, deskripsi = ?, nama_studio = ? WHERE id_komik = ?",
+	res, err := conn.Exec("UPDATE komik SET title = ?, description = ?, studio = ? WHERE id = ?",
 		title, desc, studio, idKomik)
 	if err != nil {
 		LogStatus("KomikController", "UpdateKomik", "ERROR", "Gagal update komik ID %d: %v", idKomik, err)
@@ -574,7 +574,7 @@ func (c *KomikController) DeleteKomik(id int) (bool, error) {
 		LogStatus("KomikController", "DeleteKomik", "ERROR", "Koneksi database gagal: %v", err)
 		return false, err
 	}
-	res, err := conn.Exec("DELETE FROM komik WHERE id_komik = ?", id)
+	res, err := conn.Exec("DELETE FROM komik WHERE id = ?", id)
 	if err != nil {
 		LogStatus("KomikController", "DeleteKomik", "ERROR", "Gagal menghapus komik ID %d: %v", id, err)
 		return false, err
@@ -616,11 +616,11 @@ func (c *KomikController) GetKomikStats(comicId int) (map[string]interface{}, er
 		return nil, err
 	}
 
-	query := `SELECT k.nama_komik, k.rating_rata_rata,
-              (SELECT COUNT(*) FROM bab WHERE id_komik = k.id_komik) AS total_bab,
-              (SELECT COUNT(*) FROM komentar_rating WHERE id_komik = k.id_komik) AS total_komentar,
-              (SELECT COUNT(*) FROM bookmark WHERE id_komik = k.id_komik) AS total_bookmark
-              FROM komik k WHERE k.id_komik = ?`
+	query := `SELECT k.title, k.rating,
+              (SELECT COUNT(*) FROM bab WHERE id_komik = k.id) AS total_bab,
+              (SELECT COUNT(*) FROM komentar_rating WHERE id_komik = k.id) AS total_komentar,
+              (SELECT COUNT(*) FROM bookmark WHERE id_komik = k.id) AS total_bookmark
+              FROM komik k WHERE k.id = ?`
 
 	var (
 		title         string
@@ -654,8 +654,8 @@ func (c *KomikController) GetAuthorStats(creatorId int) (map[string]interface{},
 		return nil, err
 	}
 
-	query := `SELECT COUNT(*) AS total_komik, COALESCE(AVG(rating_rata_rata), 0) AS avg_rating
-              FROM komik WHERE id_kreator = ?`
+	query := `SELECT COUNT(*) AS total_komik, COALESCE(AVG(rating), 0) AS avg_rating
+              FROM komik WHERE creatorID = ?`
 
 	var (
 		totalKomik int
@@ -693,11 +693,11 @@ func (c *KomentarController) GetReviewsByComic(comicId int, sort string) ([]Revi
 		return nil, err
 	}
 
-	query := `SELECT kr.id_ulasan, kr.id_pengguna, u.username, kr.id_komik, k.nama_komik,
+	query := `SELECT kr.id_ulasan, kr.id_pengguna, u.username, kr.id_komik, COALESCE(k.title, ''),
               kr.isi_komentar, kr.nilai_rating, kr.tanggal_komentar
               FROM komentar_rating kr
               JOIN pengguna u ON kr.id_pengguna = u.id_pengguna
-              JOIN komik k ON kr.id_komik = k.id_komik
+              LEFT JOIN komik k ON kr.id_komik = k.id
               WHERE kr.id_komik = ? `
 
 	if sort == "oldest" {
@@ -735,12 +735,12 @@ func (c *KomentarController) GetReviewsForAuthor(creatorId int) ([]ReviewDTO, er
 		return nil, err
 	}
 
-	query := `SELECT kr.id_ulasan, kr.id_pengguna, u.username, kr.id_komik, k.nama_komik,
+	query := `SELECT kr.id_ulasan, kr.id_pengguna, u.username, kr.id_komik, COALESCE(k.title, ''),
               kr.isi_komentar, kr.nilai_rating, kr.tanggal_komentar
               FROM komentar_rating kr
               JOIN pengguna u ON kr.id_pengguna = u.id_pengguna
-              JOIN komik k ON kr.id_komik = k.id_komik
-              WHERE k.id_kreator = ?
+              LEFT JOIN komik k ON kr.id_komik = k.id
+              WHERE k.creatorID = ?
               ORDER BY kr.tanggal_komentar DESC`
 
 	rows, err := conn.Query(query, creatorId)
@@ -786,9 +786,9 @@ func (c *KomentarController) AddReview(idPengguna, idKomik int, isi string, rati
 		return false, err
 	}
 
-	_, _ = conn.Exec(`UPDATE komik SET rating_rata_rata = (
+	_, _ = conn.Exec(`UPDATE komik SET rating = (
         SELECT COALESCE(AVG(nilai_rating), 0.0) FROM komentar_rating WHERE id_komik = ?
-    ) WHERE id_komik = ?`, idKomik, idKomik)
+    ) WHERE id = ?`, idKomik, idKomik)
 
 	LogStatus("KomentarController", "AddReview", "SUCCESS", "User ID %d berhasil mengirim ulasan & rating %.1f untuk komik ID %d", idPengguna, rating, idKomik)
 	return true, nil
@@ -819,9 +819,9 @@ func (c *KomentarController) DeleteReview(idUlasan, idPengguna int, role string)
 		return false, err
 	}
 
-	_, _ = conn.Exec(`UPDATE komik SET rating_rata_rata = (
+	_, _ = conn.Exec(`UPDATE komik SET rating = (
         SELECT COALESCE(AVG(nilai_rating), 0.0) FROM komentar_rating WHERE id_komik = ?
-    ) WHERE id_komik = ?`, comicId, comicId)
+    ) WHERE id = ?`, comicId, comicId)
 
 	ra, _ := res.RowsAffected()
 	if ra > 0 {
@@ -845,10 +845,10 @@ func (c *BookmarkHistoriController) GetBookmarks(userId int) ([]BookmarkDTO, err
 		return nil, err
 	}
 
-	query := `SELECT b.id_bookmark, b.id_pengguna, b.id_komik, k.nama_komik,
-              COALESCE(k.nama_studio, '-'), k.rating_rata_rata, b.tanggal_ditambahkan
+	query := `SELECT b.id_bookmark, b.id_pengguna, b.id_komik, COALESCE(k.title, ''),
+              COALESCE(CAST(k.studio AS CHAR), '-'), k.rating, b.tanggal_ditambahkan
               FROM bookmark b
-              JOIN komik k ON b.id_komik = k.id_komik
+              LEFT JOIN komik k ON b.id_komik = k.id
               WHERE b.id_pengguna = ?
               ORDER BY b.tanggal_ditambahkan DESC`
 
@@ -914,7 +914,7 @@ func (c *BookmarkHistoriController) AddHistori(userId, chapterId int) (bool, err
 		LogStatus("BookmarkHistoriController", "AddHistori", "ERROR", "Koneksi database gagal: %v", err)
 		return false, err
 	}
-	_, err = conn.Exec("INSERT INTO histori_baca (id_pengguna, id_bab, tanggal_baca) VALUES (?, ?, NOW())", userId, chapterId)
+	_, err = conn.Exec("INSERT INTO histori_baca (id_pengguna, id_komik, id_bab, tanggal_baca) VALUES (?, COALESCE((SELECT id_komik FROM bab WHERE id_bab = ?), 0), ?, NOW())", userId, chapterId, chapterId)
 	if err != nil {
 		LogStatus("BookmarkHistoriController", "AddHistori", "ERROR", "Gagal mencatat riwayat baca bab ID %d User ID %d: %v", chapterId, userId, err)
 		return false, err
@@ -931,10 +931,10 @@ func (c *BookmarkHistoriController) GetHistori(userId int) ([]HistoriDTO, error)
 	}
 
 	query := `SELECT h.id_histori, h.id_pengguna, h.id_bab, b.nomor_bab,
-              k.id_komik, k.nama_komik, h.tanggal_baca
+              COALESCE(k.id, 0), COALESCE(k.title, ''), h.tanggal_baca
               FROM histori_baca h
-              JOIN bab b ON h.id_bab = b.id_bab
-              JOIN komik k ON b.id_komik = k.id_komik
+              LEFT JOIN bab b ON h.id_bab = b.id_bab
+              LEFT JOIN komik k ON b.id_komik = k.id
               WHERE h.id_pengguna = ?
               ORDER BY h.tanggal_baca DESC`
 
@@ -1202,6 +1202,10 @@ func (c *UserController) UpdateProfile(id int, newUsername, newEmail, newPasswor
 		return false, err
 	}
 
+	if id <= 0 && strings.TrimSpace(newEmail) != "" {
+		_ = conn.QueryRow("SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?)", strings.TrimSpace(newEmail)).Scan(&id)
+	}
+
 	updates := make([]string, 0)
 	params := make([]interface{}, 0)
 
@@ -1298,6 +1302,10 @@ func (c *UserController) UpdateUserByAdmin(id int, username, email, role string,
 	if err != nil {
 		LogStatus("UserController", "UpdateUserByAdmin", "ERROR", "Koneksi database gagal untuk User ID %d: %v", id, err)
 		return false, err
+	}
+
+	if id <= 0 && strings.TrimSpace(email) != "" {
+		_ = conn.QueryRow("SELECT id_pengguna FROM pengguna WHERE LOWER(email) = LOWER(?)", strings.TrimSpace(email)).Scan(&id)
 	}
 
 	updates := make([]string, 0)

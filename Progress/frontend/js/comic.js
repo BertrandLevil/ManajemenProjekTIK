@@ -140,8 +140,9 @@ export function frontComicDetail() {
         }
 
         let bookmarks = getBookmarks();
+        const wasBookmarked = isBookmarked();
 
-        if (isBookmarked()) {
+        if (wasBookmarked) {
             bookmarks = bookmarks.filter(
                 id => String(id) !== String(comic.id)
             );
@@ -150,8 +151,23 @@ export function frontComicDetail() {
         }
 
         localStorage.setItem(key, JSON.stringify(bookmarks));
-
         updateBookmarkButton();
+
+        // Sinkronisasi bookmark ke backend API ComicID
+        const uid = getBookmarkUserId();
+        if (uid) {
+            if (wasBookmarked) {
+                fetch(`/api/bookmarks?user_id=${uid}&comic_id=${comic.id}`, {
+                    method: "DELETE"
+                }).catch(e => console.warn("Sync delete bookmark:", e));
+            } else {
+                fetch("/api/bookmarks", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: Number(uid), comic_id: Number(comic.id) })
+                }).catch(e => console.warn("Sync add bookmark:", e));
+            }
+        }
     }
 
 
@@ -362,6 +378,16 @@ export function frontComicDetail() {
         `;
         
         updateBookmarkButton();
+
+        if (comicId) {
+            fetch(`/api/comics/detail?id=${comicId}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res && res.success && res.data) {
+                        console.log("[Backend Sync] Detail komik termuat:", res.data.title);
+                    }
+                }).catch(e => console.warn("Sync detail komik:", e));
+        }
 
         document
             .getElementById("comic-bookmark-btn")
