@@ -311,6 +311,134 @@ export function frontManajemenDataKomik() {
         }
     }
 
+    async function deleteComic(comicId) {
+        const comic = myComics.find(
+        item =>
+            Number(item.id) === comicId &&
+            Number(item.creatorId) === creatorId
+        );
+
+        if (!comic) {
+            alert("Komik tidak ditemukan atau bukan milikmu.");
+            return;
+        }
+
+        const confirmed = confirm(
+            `Apakah kamu yakin ingin menghapus komik "${comic.title}"?\n\n` +
+            "Semua chapter dan halaman chapter komik ini juga akan dihapus."
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const checkResponse = await fetch("/api/comics");
+
+            if (!checkResponse.ok) {
+                throw new Error("Gagal memeriksa data komik di backend.");
+            }
+
+            const apiData = await checkResponse.json();
+
+            if (!apiData.success || !Array.isArray(apiData.data)) {
+                throw new Error("Data komik dari backend tidak valid.");
+            }
+
+            const existsInBackend = apiData.data.some(apiComic => {
+                const backendComicId = Number(
+                    apiComic.id_komik || apiComic.id
+                );
+
+                const backendCreatorId = Number(
+                    apiComic.id_kreator || apiComic.creator_id
+                );
+
+                return (
+                    backendComicId === comicId &&
+                    backendCreatorId === creatorId
+                );
+            });
+
+            if (existsInBackend) {
+                const response = await fetch(
+                    `/api/comics/detail?id=${encodeURIComponent(comicId)}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+                const apiResult = await response.json();
+
+                if (!response.ok || !apiResult.success) {
+                    throw new Error(
+                        apiResult.message || "Gagal menghapus komik dari backend."
+                    );
+                }
+            }
+
+            const deletedChapters = allChapters.filter(
+                chapter =>
+                    Number(chapter.comicId) === comicId &&
+                    Number(chapter.creatorId) === creatorId
+            );
+
+            const imageIds = deletedChapters.flatMap(chapter =>
+                (chapter.pages || [])
+                    .map(page => page.imageId)
+                    .filter(Boolean)
+            );
+
+            myComics = myComics.filter(
+                item => Number(item.id) !== comicId
+            );
+
+            allChapters = allChapters.filter(
+                chapter =>
+                    !(
+                        Number(chapter.comicId) === comicId &&
+                        Number(chapter.creatorId) === creatorId
+                    )
+            );
+
+            const comicsSaved = saveComics();
+            const chaptersSaved = saveChapters();
+
+            if (!comicsSaved || !chaptersSaved) {
+                alert(
+                    "Penghapusan backend mungkin sudah berhasil, tetapi " +
+                    "penyimpanan data lokal gagal. Periksa kembali data komik."
+                );
+                return;
+            }
+
+            if (imageIds.length > 0) {
+                try {
+                    await deleteChapterImages(imageIds);
+                } catch (imageError) {
+                    console.error(
+                        "Gagal menghapus gambar chapter dari IndexedDB:",
+                        imageError
+                    );
+
+                    alert(
+                        "Komik berhasil dihapus, tetapi sebagian gambar " +
+                        "chapter gagal dibersihkan dari IndexedDB."
+                    );
+                }
+            }
+
+            filterComics();
+
+            alert(`Komik "${comic.title}" berhasil dihapus.`);
+
+        } catch (error) {
+            console.error("Gagal menghapus komik:", error);
+
+            alert(
+                "Penghapusan komik gagal.\n\n" + error.message
+            );
+        }
+    }
+
     app.innerHTML = `
         <main class="management-page">
             <button
@@ -805,6 +933,15 @@ export function frontManajemenDataKomik() {
                                 data-comic-id="${escapeHTML(comic.id)}"
                             >
                                 Kelola Chapter
+                            </button>
+
+                            <button
+                                type="button"
+                                class="management-delete-button"
+                                data-action="delete"
+                                data-comic-id="${escapeHTML(comic.id)}"
+                            >
+                                Hapus Komik
                             </button>
                         </div>
 
@@ -1366,6 +1503,10 @@ export function frontManajemenDataKomik() {
 
         if (button.dataset.action === "chapter") {
             openChapterManager(comicId);
+        }
+
+        if (button.dataset.action === "delete") {
+            deleteComic(comicId);
         }
     });
 
