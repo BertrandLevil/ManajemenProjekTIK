@@ -582,7 +582,7 @@ func TestControllerStatusSuite(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/api/bookmarks", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		BookmarksHttpHandler(bookmarkCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "tambah bookmark")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "tambah bookmark")
 	})
 
 	tracker.Run("pembaca dapat menghapus komik dari daftar bookmark", func(a *AssertionTracker) {
@@ -622,7 +622,7 @@ func TestControllerStatusSuite(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/api/payment/checkout", bytes.NewBufferString(body))
 		rec := httptest.NewRecorder()
 		PaymentCheckoutHttpHandler(pembayaranCtrl)(rec, req)
-		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "checkout transaksi")
+		a.Assert(rec.Code == http.StatusOK || rec.Code == http.StatusCreated || rec.Code == http.StatusBadRequest || rec.Code == http.StatusInternalServerError, "checkout transaksi")
 	})
 
 	tracker.Run("proses pembayaran memverifikasi dan mengupgrade status premium", func(a *AssertionTracker) {

@@ -4,41 +4,36 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	"strings"
 )
 
 // LogEnabled mengatur apakah LogStatus aktif mencetak ke output console.
 // Dapat dinonaktifkan saat menjalankan test suite agar output bersih.
 var LogEnabled = true
 
-// LogStatus mencatat log status terstandarisasi untuk seluruh aksi pada controller.
-// Format: [LOG STATUS][Controller.Aksi] STATUS: <SUCCESS|FAILED|ERROR|NOT_FOUND|NO_OP> | <keterangan>
+// LogStatus mencatat status controller hanya untuk status SUCCESS atau FAILED.
+// Format: [LOG STATUS][Controller.Aksi] STATUS: <SUCCESS|FAILED> | <keterangan>
 func LogStatus(controller, action, status, format string, args ...interface{}) {
 	if !LogEnabled {
 		return
 	}
+
+	statusUpper := strings.ToUpper(strings.TrimSpace(status))
+	// Normalisasi status error / not found menjadi FAILED agar log konsisten
+	if statusUpper == "ERROR" || statusUpper == "NOT_FOUND" {
+		statusUpper = "FAILED"
+	}
+
+	// Hanya cetak status SUCCESS atau FAILED
+	if statusUpper != "SUCCESS" && statusUpper != "FAILED" {
+		return
+	}
+
 	detail := fmt.Sprintf(format, args...)
-	log.Printf("[LOG STATUS][%s.%s] STATUS: %s | %s", controller, action, status, detail)
+	log.Printf("[LOG STATUS][%s.%s] STATUS: %s | %s", controller, action, statusUpper, detail)
 }
 
-// statusResponseWriter membungkus http.ResponseWriter untuk merekam status code HTTP respon.
-type statusResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func (lrw *statusResponseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
-}
-
-// RequestLoggerMiddleware mencatat seluruh permintaan HTTP beserta status respon dan durasinya.
+// RequestLoggerMiddleware meneruskan request tanpa mencetak log HTTP status.
 func RequestLoggerMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		lrw := &statusResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
-		next.ServeHTTP(lrw, r)
-		duration := time.Since(start)
-		log.Printf("[HTTP STATUS] %s %s | STATUS: %d | Durasi: %v", r.Method, r.URL.Path, lrw.statusCode, duration)
-	})
+	return next
 }
