@@ -11,6 +11,7 @@ import { frontComicDetail } from "./comic.js";
 import { frontReader } from "./reader.js";
 import { frontPremium } from "./premium.js";
 import { frontTrending } from "./trending.js";
+import { frontLatest } from "./latest.js";
 import { frontBookmark } from "./bookmark.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,6 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "profile":
             frontProfile();
+            break;
+        case "latest":
+            frontLatest();
             break;
         case "bookmark":
             frontBookmark();

@@ -1170,9 +1170,10 @@ export function frontManajemenDataKomik() {
                     Number(chapter.creatorId) === creatorId
                 ).length;
 
+                comic.updatedAt = new Date().toISOString();
+
                 saveComics();
 
-                // Sinkronisasi chapter baru ke backend API
                 fetch('/api/chapters', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1258,6 +1259,8 @@ export function frontManajemenDataKomik() {
                 comic => Number(comic.id) === editingComicId
             )
             : null;
+        
+        const publicationTime = new Date().toISOString();
 
         const comicData = {
             ...(existingComic || {}),
@@ -1265,6 +1268,9 @@ export function frontManajemenDataKomik() {
             id: editingComicId !== null
                 ? editingComicId
                 : Math.max(0, ...allComics.map(comic => Number(comic.id) || 0)) + 1,
+
+            createdAt: existingComic?.createdAt || publicationTime,
+            updatedAt: existingComic?.updatedAt || publicationTime,
 
             creatorId: creatorId,
             title: title,

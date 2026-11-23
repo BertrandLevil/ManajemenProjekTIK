@@ -66,7 +66,8 @@ export function header() {
             <nav class="sidebar-nav">
                 <a class="nav-link ${currentPage === "home" ? "active" : ""}" href="home.html">Beranda</a>
                 <a class="nav-link ${currentPage === "trending" ? "active" : ""}" href="trending.html">Trending</a>
-                <a class="nav-link" href="latest.html">Terbaru</a>
+                <a class="nav-link ${currentPage === "latest" ? "active" : ""}" href="latest.html">Terbaru</a>
+
                 ${isReader ? `
                     <a
                         class="nav-link ${currentPage === "upgrade-creator" ? "active" : ""}"
@@ -75,6 +76,7 @@ export function header() {
                         Upgrade Creator
                     </a>
                 ` : ""}
+
                 ${isCreator ? `
                     <a
                         class="nav-link ${currentPage === "manajemen-data-komik" ? "active" : ""}"
@@ -83,6 +85,7 @@ export function header() {
                             Manajemen Data Komik
                     </a>
                 `: ""}
+
                 ${isAdmin ? `
                     <a
                         class="nav-link ${currentPage === "pengajuan-creator" ? "active" : ""}"
@@ -91,6 +94,7 @@ export function header() {
                         Pengajuan Creator
                     </a>
                 ` : ""}
+                
                 ${(isReader || isCreator) ? `
                     <a
                         class="nav-link ${currentPage === "premium" ? "active" : ""}"

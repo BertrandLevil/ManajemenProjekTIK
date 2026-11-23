@@ -1,4 +1,3 @@
-
 import { header } from "./header.js";
 import { getAllComics } from "./comicData.js";
 import { comicCard } from "./comicsCard.js";
