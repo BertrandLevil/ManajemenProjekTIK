@@ -4,7 +4,8 @@ import { frontLogin } from "./login.js";
 import { frontProfile } from "./profile.js";
 import { frontUpgradeCreator } from "./upgradeCreator.js";
 import { frontPengajuanCreator } from "./pengajuanCreator.js";
-import { frontManajemenDataKomik} from "./manajemenDataKomik.js";
+import { frontManajemenDataKomik } from "./manajemenDataKomik.js";
+import { frontManajemenUser } from "./manajemenUser.js";
 import { setupSidebar } from "./header.js";
 import { initTheme, updateThemeButton } from "./theme.js";
 import { frontComicDetail } from "./comic.js";
@@ -14,7 +15,20 @@ import { frontTrending } from "./trending.js";
 import { frontLatest } from "./latest.js";
 import { frontBookmark } from "./bookmark.js";
 
+function ensureFavicon() {
+    if (!document.querySelector('link[rel="icon"]')) {
+        const isPagesDir = window.location.pathname.includes("/pages/");
+        const prefix = isPagesDir ? "../assets/favicon/" : "assets/favicon/";
+        const link = document.createElement("link");
+        link.rel = "icon";
+        link.type = "image/svg+xml";
+        link.href = `${prefix}favicon.svg`;
+        document.head.appendChild(link);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    ensureFavicon();
     const currentPage = document.body.dataset.page;
 
     switch (currentPage) {
@@ -44,6 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "pengajuan-creator":
             frontPengajuanCreator();
+            break;
+        case "manajemen-user":
+            frontManajemenUser();
             break;
         case "manajemen-data-komik":
             frontManajemenDataKomik();

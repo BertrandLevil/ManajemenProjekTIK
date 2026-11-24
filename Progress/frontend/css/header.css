@@ -63,14 +63,28 @@
 }
 
 .brand-icon {
-    width: 36px;
-    height: 36px;
-    display: grid;
-    place-items: center;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #a78bfa, #6d28d9);
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
     color: white;
-    font-size: 22px;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0 !important;
+    text-indent: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.brand-icon svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
 }
 
 .brand-accent {
