@@ -1,4 +1,3 @@
-import { comics } from "./data.js";
 import { updateThemeButton } from "./theme.js";
 
 export function frontManajemenDataKomik() {
@@ -41,7 +40,6 @@ export function frontManajemenDataKomik() {
         return;
     }
 
-    const STORAGE_KEY = "comicid_creator_comics";
     const CHAPTER_STORAGE_KEY = "comicid_creator_chapters";
     const DB_NAME = "ComicIDDB";
     const DB_VERSION = 1;
@@ -254,37 +252,8 @@ export function frontManajemenDataKomik() {
         }
     }
 
-    let savedComics = [];
-
-    try {
-        savedComics = JSON.parse(
-            localStorage.getItem(STORAGE_KEY) || "[]"
-        );
-    } catch (error) {
-        console.error("Gagal membaca data komik:", error);
-    }
-
-    const savedMap = new Map(
-        savedComics.map(comic => [Number(comic.id), comic])
-    );
-
-    const allComics = comics.map(comic => {
-        return savedMap.get(Number(comic.id)) || { ...comic };
-    });
-
-    savedComics.forEach(savedComic => {
-        const alreadyExists = allComics.some(
-            comic => Number(comic.id) === Number(savedComic.id)
-        );
-
-        if (!alreadyExists) {
-            allComics.push(savedComic);
-        }
-    });
-
-    let myComics = allComics.filter(
-        comic => Number(comic.creatorId) === creatorId
-    );
+    let allComics = [];
+    let myComics = [];
 
     function escapeHTML(value) {
         return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -294,21 +263,6 @@ export function frontManajemenDataKomik() {
             '"': "&quot;",
             "'": "&#39;"
         })[char]);
-    }
-
-    function saveComics() {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(myComics)
-            );
-
-            return true;
-        } catch (error) {
-            console.error("Gagal menyimpan komik:", error);
-            alert("Penyimpanan gagal. Kapasitas penyimpanan browser mungkin tidak mencukupi.");
-            return false;
-        }
     }
 
     async function deleteComic(comicId) {
@@ -399,15 +353,10 @@ export function frontManajemenDataKomik() {
                     )
             );
 
-            const comicsSaved = saveComics();
             const chaptersSaved = saveChapters();
 
-            if (!comicsSaved || !chaptersSaved) {
-                alert(
-                    "Penghapusan backend mungkin sudah berhasil, tetapi " +
-                    "penyimpanan data lokal gagal. Periksa kembali data komik."
-                );
-                return;
+            if (!chaptersSaved) {
+                console.warn("Metadata chapter gagal disimpan secara lokal.");
             }
 
             if (imageIds.length > 0) {
@@ -1309,8 +1258,6 @@ export function frontManajemenDataKomik() {
 
                 comic.updatedAt = new Date().toISOString();
 
-                saveComics();
-
                 fetch('/api/chapters', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1374,7 +1321,7 @@ export function frontManajemenDataKomik() {
         }
     });
 
-    comicForm.addEventListener("submit", event => {
+    comicForm.addEventListener("submit", async event => {
         event.preventDefault();
 
         const title = document.getElementById("comic-title").value.trim();
@@ -1391,20 +1338,23 @@ export function frontManajemenDataKomik() {
             return;
         }
 
-        const existingComic = editingComicId !== null
-            ? myComics.find(
-                comic => Number(comic.id) === editingComicId
-            )
+        const isUpdate = editingComicId !== null;
+
+        const existingComic = isUpdate
+            ? myComics.find(comic => Number(comic.id) === editingComicId)
             : null;
-        
+
+        if (isUpdate && !existingComic) {
+            alert("Komik yang akan diedit tidak ditemukan.");
+            return;
+        }
+
         const publicationTime = new Date().toISOString();
 
         const comicData = {
             ...(existingComic || {}),
 
-            id: editingComicId !== null
-                ? editingComicId
-                : Math.max(0, ...allComics.map(comic => Number(comic.id) || 0)) + 1,
+            id: isUpdate ? editingComicId : null,
 
             createdAt: existingComic?.createdAt || publicationTime,
             updatedAt: existingComic?.updatedAt || publicationTime,
@@ -1424,55 +1374,75 @@ export function frontManajemenDataKomik() {
             rating: existingComic?.rating || 0
         };
 
-        if (editingComicId !== null) {
-            const index = myComics.findIndex(
-                comic => Number(comic.id) === editingComicId
-            );
+        const endpoint = isUpdate
+            ? `/api/comics/detail?id=${encodeURIComponent(editingComicId)}`
+            : "/api/comics";
 
-            if (index === -1) return;
+        const method = isUpdate ? "PUT" : "POST";
 
-            myComics[index] = comicData;
-        } else {
-            myComics.push(comicData);
-        }
-
-        if (!saveComics()) return;
-
-        // Sinkronisasi penambahan/pembaruan komik ke backend Golang API
-        const isUpdate = (editingComicId !== null);
-        const endpoint = isUpdate ? '/api/comics/detail' : '/api/comics';
-        const method = isUpdate ? 'PUT' : 'POST';
         const payload = {
             id: comicData.id,
             creator_id: creatorId,
             id_kreator: creatorId,
             title: comicData.title,
-            description: comicData.description || "",
-            studio: Array.isArray(comicData.studio) ? comicData.studio.join(", ") : (comicData.studio || ""),
+            author: comicData.author,
+            description: comicData.description,
+            studio: JSON.stringify(comicData.studio),
+            category: comicData.category,
+            genre: JSON.stringify(comicData.genre),
+            chapter: comicData.chapter,
+            rating: comicData.rating,
+            color: comicData.color,
+            status: comicData.status,
+            isTrending: false,
+            cover: comicData.cover,
+            createdAt: comicData.createdAt,
+            updatedAt: comicData.updatedAt,
             category_ids: []
         };
 
-        fetch(endpoint, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(apiRes => {
-            console.log("[Backend API Sync Komik]:", apiRes);
-        })
-        .catch(err => {
-            console.warn("[Backend API Sync Error]:", err);
-        });
+        console.log("Payload Komik:", payload);
+        console.log("Endpoint:", endpoint);
+        console.log("Method:", method);
 
-        closeForm();
-        filterComics();
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-        alert(
-            editingComicId === null
-                ? "Komik berhasil ditambahkan."
-                : "Data komik berhasil diperbarui."
-        );
+            const apiRes = await response.json();
+
+            console.log("Status HTTP:", response.status);
+            console.log("Respons Backend:", apiRes);
+
+            if (!response.ok || !apiRes.success) {
+                throw new Error(
+                    apiRes.message || "Backend gagal menyimpan komik."
+                );
+            }
+
+            await loadComics();
+
+            closeForm();
+
+            alert(
+                isUpdate
+                    ? "Komik berhasil diperbarui di database."
+                    : "Komik berhasil ditambahkan ke database."
+            );
+
+        } catch (error) {
+            console.error("Gagal menyimpan komik:", error);
+
+            alert(
+                "Penyimpanan komik ke backend gagal.\n\n" +
+                error.message
+            );
+        }
     });
 
     document.getElementById("add-comic-button")
@@ -1513,45 +1483,47 @@ export function frontManajemenDataKomik() {
     searchInput.addEventListener("input", filterComics);
     statusFilter.addEventListener("change", filterComics);
 
-    renderComics(myComics);
+    async function loadComics() {
+    try {
+        const response = await fetch("/api/comics");
 
-    // Sinkronisasi daftar komik dari backend API saat pertama kali dibuka
-    fetch('/api/comics')
-        .then(res => res.json())
-        .then(apiRes => {
-            if (apiRes && apiRes.success && Array.isArray(apiRes.data)) {
-                let changed = false;
-                apiRes.data.forEach(apiComic => {
-                    const cId = Number(apiComic.id_komik || apiComic.id);
-                    const kId = Number(apiComic.id_kreator || apiComic.creator_id);
-                    if (kId === creatorId) {
-                        const exists = myComics.some(c => Number(c.id) === cId);
-                        if (!exists) {
-                            myComics.push({
-                                id: cId,
-                                creatorId: kId,
-                                title: apiComic.nama_komik || apiComic.title,
-                                author: apiComic.nama_kreator || "Kreator",
-                                studio: [apiComic.nama_studio || "-"],
-                                category: "Action",
-                                status: "on-going",
-                                genre: apiComic.categories || [],
-                                description: apiComic.deskripsi || apiComic.description || "",
-                                cover: "",
-                                chapter: apiComic.total_chapters || 0,
-                                rating: apiComic.rating_rata_rata || 0
-                            });
-                            changed = true;
-                        }
-                    }
-                });
-                if (changed) {
-                    saveComics();
-                    renderComics(myComics);
-                }
-            }
-        })
-        .catch(err => {
-            console.warn("[Backend Sync] Backend offline atau gagal memuat komik:", err);
-        });
+        if (!response.ok) {
+            throw new Error("Gagal mengambil data komik dari backend.");
+        }
+
+        const apiRes = await response.json();
+
+        if (!apiRes.success || !Array.isArray(apiRes.data)) {
+            throw new Error("Format respons backend tidak valid.");
+        }
+
+        allComics = apiRes.data.map(apiComic => ({
+            id: Number(apiComic.id_komik ?? apiComic.id),
+            creatorId: Number(
+                apiComic.id_kreator ?? apiComic.creator_id
+            ),
+            title: apiComic.nama_komik ?? apiComic.title ?? "",
+            author: apiComic.nama_kreator ?? "Kreator",
+            studio: apiComic.nama_studio ?? [],
+            category: apiComic.category ?? "-",
+            status: apiComic.status ?? "On-going",
+            genre: apiComic.categories ?? [],
+            description: apiComic.deskripsi ?? apiComic.description ?? "",
+            cover: apiComic.cover ?? "",
+            chapter: Number(apiComic.total_chapters ?? 0),
+            rating: Number(apiComic.rating_rata_rata ?? 0)
+        }));
+
+        myComics = allComics.filter(
+            comic => comic.creatorId === creatorId
+        );
+
+        filterComics();
+
+    } catch (error) {
+        console.error("Gagal memuat komik:", error);
+        alert("Gagal mengambil daftar komik dari database.");
+    }}
+
+    loadComics();
 }

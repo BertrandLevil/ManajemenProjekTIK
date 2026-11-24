@@ -1,7 +1,7 @@
 export const comics = [
     {
         id: 1,
-        creatorID: 11,
+        creatorId: 11,
         title: "Solo Leveling",
         createdAt: "2026-10-20T10:00:00",
         author: "Chugong",
@@ -19,7 +19,7 @@ export const comics = [
     },
     {
         id: 2,
-        creatorID: 12,
+        creatorId: 12,
         title: "The Siren: Becoming the Villain's Family",
         createdAt: "2026-10-20T10:00:00",
         author: "Sol Leesu (설이수 / Seol Yi-soo)",
@@ -36,7 +36,7 @@ export const comics = [
     },
     {
         id: 3,
-        creatorID: 13,
+        creatorId: 13,
         title: "Author of My Destiny",
         createdAt: "2026-10-20T10:00:00",
         author: "Gyeoulip (겨울잎)",
@@ -54,7 +54,7 @@ export const comics = [
     },
     {
         id: 4,
-        creatorID: 14,
+        creatorId: 14,
         title: "Soul Land II",
         createdAt: "2026-10-20T10:00:00",
         author: "Tang Jia San Shao",
@@ -71,7 +71,7 @@ export const comics = [
     },
     {
         id: 5,
-        creatorID: 16,
+        creatorId: 16,
         title: "Shadow Slave",
         createdAt: "2026-10-20T10:00:00",
         author: "Guiltythree",
@@ -88,7 +88,7 @@ export const comics = [
     },
     {
         id: 6,
-        creatorID: 16,
+        creatorId: 16,
         title: "Dedes",
         createdAt: "2026-10-20T10:00:00",
         author: "Esti Siwi / Egestigi",
@@ -105,7 +105,7 @@ export const comics = [
     },
     {
         id: 7,
-        creatorID: 17,
+        creatorId: 17,
         title: "Chainsaw Man",
         createdAt: "2026-10-20T10:00:00",
         author: "Tatsuki Fujimoto",
@@ -122,7 +122,7 @@ export const comics = [
     },
     {
         id: 8,
-        creatorID: 18,
+        creatorId: 18,
         title: "Magic Emperor",
         createdAt: "2026-10-20T10:00:00",
         author: "Nightingale",
@@ -139,7 +139,7 @@ export const comics = [
     },
         {
         id: 9,
-        creatorID: 19,
+        creatorId: 19,
         title: "Genshin Impact",
         createdAt: "2026-10-20T10:00:00",
         author: "Hoyoverse",

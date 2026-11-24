@@ -543,8 +543,12 @@ func (c *KomikController) UpdateKomik(idKomik, idKreator int, title, desc, studi
 		return false, err
 	}
 
-	res, err := conn.Exec("UPDATE komik SET title = ?, description = ?, studio = ? WHERE id = ?",
-		title, desc, studio, idKomik)
+	res, err := conn.Exec(
+		`UPDATE komik
+    SET title = ?, description = ?, studio = ?
+    WHERE id = ? AND creatorID = ?`,
+		title, desc, studio, idKomik, idKreator,
+	)
 	if err != nil {
 		LogStatus("KomikController", "UpdateKomik", "ERROR", "Gagal update komik ID %d: %v", idKomik, err)
 		return false, err
