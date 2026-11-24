@@ -25,7 +25,6 @@ const ICONS = {
     chevronRight: `<svg class="um-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`
 };
 
-// Mock data fallback matching the SRS design mockup image
 const SAMPLE_USERS = [
     { id: 101, username: "Bertrand", email: "BL2111@gmail.com", location: "Indonesia, East", joined: "January 2, 2025", role: "Admin", is_premium: true, status: "Active", comicsRead: 42, bookmarks: 12 },
     { id: 102, username: "Bos Jeremy", email: "Jere@gmail.com", location: "Indonesia, East", joined: "January 3, 2025", role: "Admin", is_premium: true, status: "Active", comicsRead: 19, bookmarks: 8 },

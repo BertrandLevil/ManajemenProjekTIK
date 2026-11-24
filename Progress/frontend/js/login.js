@@ -149,7 +149,7 @@ export function frontLogin() {
         submitBtn.textContent = "Memverifikasi...";
       }
 
-      const apiBase = window.location.origin.startsWith("http") ? "" : "http://localhost:8080";
+      const apiBase = window.location.port === "8080" ? "" : "http://localhost:8080";
       const response = await fetch(`${apiBase}/api/login`, {
         method: "POST",
         headers: {
@@ -158,7 +158,12 @@ export function frontLogin() {
         body: JSON.stringify({ email, password }),
       });
 
-      const result = await response.json();
+      let result = {};
+      try {
+        result = await response.json();
+      } catch (e) {
+        // response was not valid JSON
+      }
 
       if (!response.ok || !result.success) {
         showMessage(result.message || "Gagal masuk ke akun.");
