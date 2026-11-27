@@ -3,13 +3,14 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 18, 2026 at 08:44 AM
+-- Generation Time: Nov 27, 2026 at 08:50 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -19,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `comicid`
 --
-CREATE DATABASE IF NOT EXISTS `comicid` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `comicid`;
 
 -- --------------------------------------------------------
 
@@ -182,7 +181,7 @@ CREATE TABLE `komentar_rating` (
   `isi_komentar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nilai_rating` int NOT NULL,
   `tanggal_komentar` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ;
 
 -- --------------------------------------------------------
 
@@ -268,13 +267,25 @@ INSERT INTO `pengguna` (`id_pengguna`, `username`, `email`, `password`, `role`, 
 (10, 'joko_reader', 'joko@example.com', 'hash_demo_joko', 'Pembaca', 0),
 (11, 'Chugong', 'Chugong@kreator.com', 'Kreatorchu123!', 'Kreator', 0),
 (12, 'Sol Leesu (설이수 / Seol Yi-soo)', 'SolLeesu@kreator.com', 'Kreatorsol123!', 'Kreator', 1),
-(13, 'Gyeoulip (겨울잎)', 'Gyeoulip@kreator.com', 'Kreatorgye123!', 'Kreator', 0),
+(13, 'Gyeoulip (겨울잎)', 'Gyeoulip (겨울잎)@kreator.com', 'Kreatorgye123!', 'Kreator', 0),
 (14, 'Tang Jia San Shao', 'TangJiaSanShao@kreator.com', 'Kreatortang123!', 'Kreator', 1),
 (15, 'Guiltythree', 'Guiltythree@kreator.com', 'Kreatorgui123!', 'Kreator', 1),
 (16, 'Esti Siwi / Egestigi', 'EstiSiwi@kreator.com', 'Kreatoresti123!', 'Kreator', 0),
 (17, 'Tatsuki Fujimoto', 'TatsukiFujimoto@kreator.com', 'Kreatortatsu123!', 'Kreator', 0),
 (18, 'Nightingale', 'Nightingale@kreator.com', 'Kreatornight123', 'Kreator', 1),
 (19, 'Hoyoverse', 'Hoyoverse@kreator.com', 'Kreatorhoyo123!', 'Kreator', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `profil`
+--
+
+CREATE TABLE `profil` (
+  `id` int NOT NULL,
+  `id_user` int NOT NULL,
+  `path_file` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -331,9 +342,7 @@ ALTER TABLE `bookmark`
 -- Indexes for table `comic_views`
 --
 ALTER TABLE `comic_views`
-  ADD PRIMARY KEY (`id_view`),
-  ADD KEY `fk_views_komik` (`id_comic`),
-  ADD KEY `fk_views_pengguna` (`id_pengguna`);
+  ADD PRIMARY KEY (`id_view`);
 
 --
 -- Indexes for table `halaman_bab`
@@ -348,7 +357,6 @@ ALTER TABLE `halaman_bab`
 ALTER TABLE `histori_baca`
   ADD PRIMARY KEY (`id_histori`),
   ADD KEY `fk_histori_pengguna` (`id_pengguna`),
-  ADD KEY `fk_histori_komik` (`id_komik`),
   ADD KEY `fk_histori_episode` (`id_bab`);
 
 --
@@ -388,6 +396,13 @@ ALTER TABLE `pengguna`
   ADD PRIMARY KEY (`id_pengguna`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `profil`
+--
+ALTER TABLE `profil`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_profil_pengguna` (`id_user`);
 
 --
 -- Indexes for table `transaksi`
@@ -461,6 +476,12 @@ ALTER TABLE `pengguna`
   MODIFY `id_pengguna` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
+-- AUTO_INCREMENT for table `profil`
+--
+ALTER TABLE `profil`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
@@ -484,13 +505,6 @@ ALTER TABLE `bookmark`
   ADD CONSTRAINT `fk_bookmark_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `comic_views`
---
-ALTER TABLE `comic_views`
-  ADD CONSTRAINT `fk_views_komik` FOREIGN KEY (`id_comic`) REFERENCES `komik` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_views_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
 -- Constraints for table `halaman_bab`
 --
 ALTER TABLE `halaman_bab`
@@ -501,7 +515,6 @@ ALTER TABLE `halaman_bab`
 --
 ALTER TABLE `histori_baca`
   ADD CONSTRAINT `fk_histori_episode` FOREIGN KEY (`id_bab`) REFERENCES `bab` (`id_bab`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_histori_komik` FOREIGN KEY (`id_komik`) REFERENCES `komik` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_histori_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -525,11 +538,16 @@ ALTER TABLE `komik_kategori`
   ADD CONSTRAINT `fk_kk_komik` FOREIGN KEY (`id_komik`) REFERENCES `komik` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `profil`
+--
+ALTER TABLE `profil`
+  ADD CONSTRAINT `fk_profil_pengguna` FOREIGN KEY (`id_user`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `transaksi`
 --
 ALTER TABLE `transaksi`
   ADD CONSTRAINT `fk_transaksi_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
